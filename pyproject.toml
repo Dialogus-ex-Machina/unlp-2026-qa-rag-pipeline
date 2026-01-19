@@ -1,0 +1,47 @@
+[project]
+name = "unlp-2026-submission"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Mykola Nosenko"},
+    {name = "Pavlo Kilko"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+[tool.poetry]
+packages = [{include = "unlp_2026_submission", from = "src"}]
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^26.1.0"
+isort = "^7.0.0"
+pylint = "^4.0.4"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = 'black'
+line_length = 88
+src_paths = ["src", "tests"]
+known_first_party = ["unlp_2026_submission"]
+
+[tool.pylint.main]
+py-version = "3.13"
+jobs = 0                    # 0 = авто-визначення за кількістю ядер
+recursive = true
+
+[tool.pylint.message_control]
+disable = [
+    "C0114",  # missing-module-docstring
+    "C0115",  # missing-class-docstring
+    "C0116",  # missing-function-docstring
+    # "R0903", too-few-public-methods
+]
+
+[tool.pylint.format]
+max-line-length = "88"
