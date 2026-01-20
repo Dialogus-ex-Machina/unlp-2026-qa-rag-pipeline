@@ -44,14 +44,47 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
 
     return pd.DataFrame(questions)
 
-def get_dataset():
+def get_full_dataset():
     df = pd.read_csv("datasets/dev_questions.csv")
 
     formatted_df = _format_dataframe(df)
 
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
-        name="question_answering_dev",
+        name="qa_full_dataset_dev",
+        backend="local/csv",
+        root_dir=''
+    )
+
+    return dataset
+
+
+def get_sports_domain_dataset():
+    df = pd.read_csv("datasets/dev_questions.csv")
+
+    sports_domain_df = df[df["Domain"].str.strip() == "domain_1"]
+
+    formatted_df = _format_dataframe(sports_domain_df)
+
+    dataset = Dataset.from_pandas(
+        dataframe=formatted_df,
+        name="qa_sports_domain_dev",
+        backend="local/csv",
+        root_dir=''
+    )
+
+    return dataset
+
+def get_medical_domain_dataset():
+    df = pd.read_csv("datasets/dev_questions.csv")
+
+    sports_domain_df = df[df["Domain"].str.strip() == "domain_2"]
+
+    formatted_df = _format_dataframe(sports_domain_df)
+
+    dataset = Dataset.from_pandas(
+        dataframe=formatted_df,
+        name="qa_medical_domain_dev",
         backend="local/csv",
         root_dir=''
     )

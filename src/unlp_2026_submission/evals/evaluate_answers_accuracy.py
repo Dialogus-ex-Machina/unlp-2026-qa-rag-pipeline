@@ -1,8 +1,10 @@
 from langgraph.graph.state import CompiledStateGraph
 
 from unlp_2026_submission.evals.experiments import answers_accuracy_experiment
+from unlp_2026_submission.evals.metrics import calculate_total_answers_accuracy
 
-async def evaluate_accuracy(
+
+async def evaluate_answers_accuracy(
         dataset,
         experiment_name: str,
         workflow: CompiledStateGraph
@@ -16,13 +18,13 @@ async def evaluate_accuracy(
     )
 
     # Calculate accuracy
-    total = len(experiment_results)
-    correct = sum(1 for r in experiment_results if r["score"] == 1)
-    answers_accuracy = correct / total if total > 0 else 0
+    answers_accuracy_result = calculate_total_answers_accuracy(
+        experiment_results
+    )
 
     print("\nExperiment completed!")
-    print(f"Total questions: {total}")
-    print(f"Correct answers: {correct}")
-    print(f"Answers accuracy: {answers_accuracy:.2%}")
+    print(f"Total questions: {len(experiment_results)}")
+    print(f"Correct answers: {answers_accuracy_result['correct']}")
+    print(f"Answers accuracy: {answers_accuracy_result['accuracy']:.5%}")
 
-    return experiment_results, answers_accuracy
+    return experiment_results, answers_accuracy_result['accuracy']

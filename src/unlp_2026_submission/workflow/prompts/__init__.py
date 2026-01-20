@@ -1,1 +1,1 @@
-from unlp_2026_submission.workflow.prompts.question_solver_prompt import QuestionSolverPrompt
+from unlp_2026_submission.workflow.prompts.question_answer_prompt import QuestionAnswerPrompt

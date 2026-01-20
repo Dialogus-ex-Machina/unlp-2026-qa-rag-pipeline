@@ -1,19 +1,19 @@
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
-from unlp_2026_submission.workflow.prompts import QuestionSolverPrompt
+from unlp_2026_submission.workflow.prompts import QuestionAnswerPrompt
 from unlp_2026_submission.workflow.state import WorkflowState
 from unlp_2026_submission.language_models import LanguageModel
 
-CALL_LLM_NODE_NAME = 'call_llm'
+QUESTION_ANSWER_NODE_NAME = 'question_answer_node'
 
-class CallLLMNode(BaseNode):
+class QuestionAnswerNode(BaseNode):
     def __init__(
             self,
             config: Config,
             language_model: LanguageModel
     ):
         super().__init__(
-            name=CALL_LLM_NODE_NAME,
+            name=QUESTION_ANSWER_NODE_NAME,
             config=config,
             language_model=language_model
         )
@@ -21,7 +21,7 @@ class CallLLMNode(BaseNode):
     def __call__(self, state: WorkflowState):
         question = state['question']
 
-        prompt = QuestionSolverPrompt().format_messages(
+        prompt = QuestionAnswerPrompt().format_messages(
             question=question
         )
         response = self.language_model.invoke(prompt)
@@ -33,5 +33,5 @@ class CallLLMNode(BaseNode):
         print('correct_answer:', question['correct_answer'])
 
         return {
-            **formatted_response
+            **formatted_response,
         }

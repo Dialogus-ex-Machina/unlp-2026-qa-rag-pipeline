@@ -35,7 +35,7 @@ Options:
 Respond with only the option letter.
 """.strip()
 
-class QuestionSolverPrompt:
+class QuestionAnswerPrompt:
     _template: ChatPromptTemplate
 
     def __init__(self):

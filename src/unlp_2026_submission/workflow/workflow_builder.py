@@ -2,7 +2,7 @@ from langgraph.graph import StateGraph
 
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModel
-from unlp_2026_submission.workflow.nodes import CallLLMNode
+from unlp_2026_submission.workflow.nodes import QuestionAnswerNode, ContextRetrievalNode
 from unlp_2026_submission.workflow.state.workflow_state import WorkflowState
 
 
@@ -27,14 +27,22 @@ class WorkflowBuilder:
             state_schema=WorkflowState
         )
 
-        call_llm_node = CallLLMNode(
+        context_retrieval_node = ContextRetrievalNode(
+            config=self._config,
+            language_model=self._language_model
+        )
+        question_answer_node = QuestionAnswerNode(
             config=self._config,
             language_model=self._language_model
         )
 
-        self._state_graph.add_node(call_llm_node.name, call_llm_node)
+        self._state_graph.add_node(question_answer_node.name, question_answer_node)
+        self._state_graph.add_node(context_retrieval_node.name, context_retrieval_node)
 
-        self._state_graph.set_entry_point(call_llm_node.name)
-        self._state_graph.set_finish_point(call_llm_node.name)
+        self._state_graph.set_entry_point(context_retrieval_node.name)
+
+        self._state_graph.add_edge(context_retrieval_node.name, question_answer_node.name)
+
+        self._state_graph.set_finish_point(question_answer_node.name)
 
         return self._state_graph.compile()
