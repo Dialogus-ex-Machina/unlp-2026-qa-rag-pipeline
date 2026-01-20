@@ -10,6 +10,7 @@ from unlp_2026_submission.workflow import WorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import OllamaLanguageModel
 from unlp_2026_submission.evals.evaluate_answers_accuracy import evaluate_answers_accuracy
+from unlp_2026_submission.evals.evaluate_composite_accuracy import evaluate_composite_accuracy
 
 async def main():
     dataset = get_full_dataset()
@@ -23,11 +24,11 @@ async def main():
         .build()
     )
 
-    await evaluate_documents_source_page_accuracy(
-        dataset=dataset,
-        experiment_name="documents_source_page_accuracy",
-        workflow=workflow
-    )
+    # await evaluate_documents_source_page_accuracy(
+    #     dataset=dataset,
+    #     experiment_name="documents_source_page_accuracy",
+    #     workflow=workflow
+    # )
 
     # await evaluate_documents_source_accuracy(
     #     dataset=dataset,
@@ -40,6 +41,12 @@ async def main():
     #     experiment_name="answers_accuracy",
     #     workflow=workflow
     # )
+
+    await evaluate_composite_accuracy(
+        dataset=dataset,
+        experiment_name="composite_accuracy",
+        workflow=workflow
+    )
 
 
 if __name__ == "__main__":
