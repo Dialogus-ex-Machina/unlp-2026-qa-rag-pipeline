@@ -1,7 +1,11 @@
-from typing import Annotated, Sequence, TypedDict
-from langchain_core.messages import BaseMessage
-from langgraph.graph.message import add_messages
+from typing import TypedDict
+
+from unlp_2026_submission.entities import SingleAnswerQuestion
+
 
 class WorkflowState(TypedDict):
-    query: str
-    messages: Annotated[Sequence[BaseMessage], add_messages]
+    question: SingleAnswerQuestion
+    answer: str
+    raw_answer: str
+
+    # messages: Annotated[Sequence[BaseMessage], add_messages]

@@ -1,5 +1,6 @@
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
+from unlp_2026_submission.workflow.prompts import QuestionSolverPrompt
 from unlp_2026_submission.workflow.state import WorkflowState
 from unlp_2026_submission.language_models import LanguageModel
 
@@ -17,11 +18,20 @@ class CallLLMNode(BaseNode):
             language_model=language_model
         )
 
-    async def __call__(self, state: WorkflowState):
-        query = state['query']
+    def __call__(self, state: WorkflowState):
+        question = state['question']
 
-        response_message = await self.language_model.ainvoke(query)
+        prompt = QuestionSolverPrompt().format_messages(
+            question=question
+        )
+        response = self.language_model.invoke(prompt)
+
+        formatted_response = self.format_single_answer_response(response)
+
+        print('raw_answer:', formatted_response['raw_answer'])
+        print('answer:', formatted_response['answer'])
+        print('correct_answer:', question['correct_answer'])
 
         return {
-            'messages': response_message
+            **formatted_response
         }

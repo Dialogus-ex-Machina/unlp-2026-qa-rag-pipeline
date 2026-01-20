@@ -16,7 +16,18 @@ async def main():
     )
 
     response = await workflow.ainvoke(
-        input={'query': 'What is the capital of France?'}
+        input={
+            'question': {
+                "question_id": "2966ef8f-c873-45cc-ba2c-5eec1407bc38",
+                "question_text": "Розв'яжіть рівняння (frac{x + 3}{3x - 2} - frac{x + 1}{3x + 2} = 0).",
+                "answers": [
+                    '\\(- \\frac{5}{4}\\)',
+                    '\\(\\  - \\frac{1}{3}\\)',
+                    '\\(\\  - 0,8\\)',
+                    '\\(0,8\\)'
+                ],
+            }
+        }
     )
 
     print('Response:', response)
