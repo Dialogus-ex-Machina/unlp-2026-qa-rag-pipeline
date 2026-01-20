@@ -1,9 +1,11 @@
 import asyncio
 
 from unlp_2026_submission.evals.datasets.datasets import (
-    get_full_dataset
+    get_full_dataset,
+    get_sports_domain_dataset
 )
 from unlp_2026_submission.evals.evaluate_documents_source_accuracy import evaluate_documents_source_accuracy
+from unlp_2026_submission.evals.evaluate_documents_source_page_accuracy import evaluate_documents_source_page_accuracy
 from unlp_2026_submission.workflow import WorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import OllamaLanguageModel
@@ -21,11 +23,17 @@ async def main():
         .build()
     )
 
-    await evaluate_documents_source_accuracy(
+    await evaluate_documents_source_page_accuracy(
         dataset=dataset,
-        experiment_name="documents_source_accuracy",
+        experiment_name="documents_source_page_accuracy",
         workflow=workflow
     )
+
+    # await evaluate_documents_source_accuracy(
+    #     dataset=dataset,
+    #     experiment_name="documents_source_accuracy",
+    #     workflow=workflow
+    # )
 
     # await evaluate_answers_accuracy(
     #     dataset=dataset,

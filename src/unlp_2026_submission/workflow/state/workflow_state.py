@@ -8,7 +8,7 @@ class WorkflowState(TypedDict):
 
     answer: str
     raw_answer: str
-    reference_document_id: int
+    reference_document_id: str
     reference_document_page: int
 
     # messages: Annotated[Sequence[BaseMessage], add_messages]
