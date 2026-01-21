@@ -30,7 +30,7 @@ def composite_accuracy_metric(
     # --- p_i: page proximity ---
     p_i = 0.0
     if correct_document_id == predicted_document_id:
-        predicted_document_page = workflow_result['reference_document_page']
+        predicted_document_page = workflow_result['reference_document_page_num']
         correct_document_page = question['page_num']
         n_pages = question['n_pages']
 

@@ -4,7 +4,6 @@ class SingleAnswerQuestion(TypedDict):
     question_id: int
     question_text: str
     answers: list[str]
-    correct_answer: str
 
     domain: str | None
     n_pages: int | None

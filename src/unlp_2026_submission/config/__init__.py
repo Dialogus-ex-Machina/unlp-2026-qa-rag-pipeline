@@ -1,1 +1,2 @@
-from unlp_2026_submission.config.config import *
+from unlp_2026_submission.config.config import Config
+from unlp_2026_submission.config.knowledge_base_config import KnowledgeBaseConfig

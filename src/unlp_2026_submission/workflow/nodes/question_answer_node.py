@@ -1,4 +1,5 @@
 from unlp_2026_submission.config import Config
+from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
 from unlp_2026_submission.workflow.prompts import QuestionAnswerPrompt
 from unlp_2026_submission.workflow.state import WorkflowState
@@ -10,20 +11,25 @@ class QuestionAnswerNode(BaseNode):
     def __init__(
             self,
             config: Config,
-            language_model: LanguageModel
+            language_model: LanguageModel,
+            knowledge_base: KnowledgeBase
     ):
         super().__init__(
             name=QUESTION_ANSWER_NODE_NAME,
             config=config,
-            language_model=language_model
+            language_model=language_model,
+            knowledge_base=knowledge_base
         )
 
     def __call__(self, state: WorkflowState):
         question = state['question']
+        document_page = state['reference_document_page']
 
         prompt = QuestionAnswerPrompt().format_messages(
-            question=question
+            question=question,
+            document_page=document_page
         )
+
         response = self.language_model.invoke(prompt)
 
         formatted_response = self.format_single_answer_response(response)

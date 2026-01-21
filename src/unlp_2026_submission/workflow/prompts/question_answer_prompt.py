@@ -1,11 +1,16 @@
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
 
-from unlp_2026_submission.entities import SingleAnswerQuestion
+from unlp_2026_submission.entities import SingleAnswerQuestion, DocumentPage
 
 SYSTEM_PROMPT = """
 Ти — корисний асистент для вирішення завдань з вибором однієї правильної відповіді.
 Відповідай лише літерою варіанту (A, B, C, D, E або F).
+{% if context %}
+Відповідай **тільки** на основі наведеного контексту.
+Контекст:
+{{ context }}
+{% endif %}
 """.strip()
 # TODO remove ABCDEFGHIJKLMNOPQRSTUVWXYZ from prompt
 USER_PROMPT = """
@@ -22,6 +27,11 @@ USER_PROMPT = """
 SYSTEM_PROMPT_EN = """
 You are a helpful assistant for multiple-choice questions.
 Reply with only the option letter (A, B, C, D, E or F).
+{% if context %}
+Answer **only** based on the context below.  
+Context:
+{{ context }}
+{% endif %}
 """.strip()
 
 USER_PROMPT_EN = """
@@ -47,11 +57,18 @@ class QuestionAnswerPrompt:
             template_format="jinja2"
         )
 
-    def format_messages(self, question: SingleAnswerQuestion) -> list[BaseMessage]:
+    def format_messages(
+            self,
+            question: SingleAnswerQuestion,
+            document_page: DocumentPage | None = None
+    ) -> list[BaseMessage]:
         question_text = question.get('question_text')
         answers = question.get('answers')
 
+        context = document_page.text if document_page else ''
+
         return self._template.format_messages(
             question=question_text,
-            answers=answers
+            answers=answers,
+            context=context
         )

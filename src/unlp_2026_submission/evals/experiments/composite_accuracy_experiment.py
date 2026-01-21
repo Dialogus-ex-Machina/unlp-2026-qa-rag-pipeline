@@ -30,7 +30,7 @@ async def composite_accuracy_experiment(
         'raw_answer': result.get('raw_answer'),
         'answer': result['answer'],
         'reference_document_id': result['reference_document_id'],
-        'reference_document_page': result['reference_document_page'],
+        'reference_document_page_num': result['reference_document_page_num'],
         "score": score.value,
     }
 
