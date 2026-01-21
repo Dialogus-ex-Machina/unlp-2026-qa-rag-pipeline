@@ -1,1 +1,2 @@
-from unlp_2026_submission.entities.single_answer_question import *
+from unlp_2026_submission.entities.single_answer_question import SingleAnswerQuestion
+from unlp_2026_submission.entities.document_page import DocumentPage

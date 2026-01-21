@@ -29,7 +29,7 @@ async def documents_source_accuracy_experiment(
         'correct_document_id': correct_document_id,
         'raw_answer': result.get('raw_answer'),
         'reference_document_id': result['reference_document_id'],
-        'reference_document_page': result['reference_document_page'],
+        'reference_document_page_num': result['reference_document_page_num'],
         "score": score.value,
     }
 

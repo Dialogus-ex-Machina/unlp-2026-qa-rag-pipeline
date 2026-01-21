@@ -3,6 +3,7 @@ import re
 
 from langchain_core.messages import AIMessage
 
+from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.language_models import LanguageModel
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.workflow.state import WorkflowState
@@ -11,16 +12,19 @@ class BaseNode(ABC):
     name: str
     config: Config
     language_model: LanguageModel
+    knowledge_base: KnowledgeBase
 
     def __init__(
             self,
             name: str,
             config: Config,
             language_model: LanguageModel,
+            knowledge_base: KnowledgeBase,
     ):
         self.name = name
         self.config = config
         self.language_model = language_model
+        self.knowledge_base = knowledge_base
 
     @abstractmethod
     def __call__(self, state: WorkflowState):

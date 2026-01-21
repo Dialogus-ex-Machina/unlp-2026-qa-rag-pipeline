@@ -15,11 +15,11 @@ def document_source_page_accuracy_metric(
     if question['doc_id'] != workflow_result['reference_document_id']:
         return MetricResult(0, 'not correct document_id')
 
-    reference_document_page = workflow_result['reference_document_page']
+    reference_document_page_num = workflow_result['reference_document_page_num']
     actual_document_page = question['page_num']
     n_pages = question['n_pages']
 
-    metric_value = 1 - abs(reference_document_page - actual_document_page) / n_pages
+    metric_value = 1 - abs(reference_document_page_num - actual_document_page) / n_pages
 
     return MetricResult(metric_value)
 
