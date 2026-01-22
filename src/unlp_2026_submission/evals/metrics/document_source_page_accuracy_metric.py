@@ -3,10 +3,14 @@ from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
 
 from unlp_2026_submission.entities import SingleAnswerQuestion
+from unlp_2026_submission.evals import EvaluationMetricName
 from unlp_2026_submission.workflow import WorkflowState
 
 
-@numeric_metric(name="document_source_page_accuracy", allowed_values=(0.0, 1.0))
+@numeric_metric(
+    name=EvaluationMetricName.DOCUMENT_SOURCE_PAGE_ACCURACY.value,
+    allowed_values=(0.0, 1.0)
+)
 def document_source_page_accuracy_metric(
         question: SingleAnswerQuestion,
         workflow_result: WorkflowState,

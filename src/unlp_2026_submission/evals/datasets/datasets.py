@@ -1,3 +1,6 @@
+from pathlib import Path
+import os
+
 import pandas as pd
 from pandas import DataFrame
 from ragas import Dataset
@@ -45,7 +48,9 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
     return pd.DataFrame(questions)
 
 def get_full_dataset():
-    df = pd.read_csv("datasets/dev_questions.csv")
+    datasets_root_dir = Path(__file__).resolve().parent
+
+    df = pd.read_csv(os.path.join(datasets_root_dir, "dev_questions.csv"))
 
     formatted_df = _format_dataframe(df)
 
@@ -60,7 +65,9 @@ def get_full_dataset():
 
 
 def get_sports_domain_dataset():
-    df = pd.read_csv("datasets/dev_questions.csv")
+    datasets_root_dir = Path(__file__).resolve().parent
+
+    df = pd.read_csv(os.path.join(datasets_root_dir, "dev_questions.csv"))
 
     sports_domain_df = df[df["Domain"].str.strip() == "domain_1"]
 
@@ -76,7 +83,9 @@ def get_sports_domain_dataset():
     return dataset
 
 def get_medical_domain_dataset():
-    df = pd.read_csv("datasets/dev_questions.csv")
+    datasets_root_dir = Path(__file__).resolve().parent
+
+    df = pd.read_csv(os.path.join(datasets_root_dir, "dev_questions.csv"))
 
     sports_domain_df = df[df["Domain"].str.strip() == "domain_2"]
 
