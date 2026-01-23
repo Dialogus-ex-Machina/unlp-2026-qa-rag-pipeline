@@ -3,10 +3,14 @@ from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
 
 from unlp_2026_submission.entities import SingleAnswerQuestion
+from unlp_2026_submission.evals.evaluation_metric_name import EvaluationMetricName
 from unlp_2026_submission.workflow import WorkflowState
 
 
-@numeric_metric(name="composite_accuracy", allowed_values=(0.0, 1.0))
+@numeric_metric(
+    name=EvaluationMetricName.COMPOSITE_ACCURACY.value,
+    allowed_values=(0.0, 1.0)
+)
 def composite_accuracy_metric(
     question: SingleAnswerQuestion,
     workflow_result: WorkflowState,

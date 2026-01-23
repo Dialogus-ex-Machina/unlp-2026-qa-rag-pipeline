@@ -2,7 +2,13 @@ from ragas import Experiment
 from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
 
-@numeric_metric(name="document_source_accuracy", allowed_values=(0.0, 1.0))
+from unlp_2026_submission.evals.evaluation_metric_name import EvaluationMetricName
+
+
+@numeric_metric(
+    name=EvaluationMetricName.DOCUMENT_SOURCE_ACCURACY.value,
+    allowed_values=(0.0, 1.0)
+)
 def document_source_accuracy_metric(prediction: str, actual: str) -> MetricResult:
     """Calculate accuracy of the prediction."""
     return (
