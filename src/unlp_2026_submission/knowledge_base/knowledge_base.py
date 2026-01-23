@@ -22,10 +22,9 @@ from llama_index.core.schema import NodeWithScore
 from llama_index.core.response import Response
 from typing import List
 from pathlib import Path
-from qdrant_client.http.models import FieldCondition, MatchValue, Range
 
 from unlp_2026_submission.embeddings import EmbeddingsModel
-from unlp_2026_submission.language_models import LlamaLanguageModel
+from unlp_2026_submission.language_models import LlamaIndexLanguageModel
 from unlp_2026_submission.config import KnowledgeBaseConfig
 
 
@@ -46,7 +45,7 @@ class KnowledgeBase:
     _storage_context: StorageContext
     _vector_store_index: VectorStoreIndex
 
-    _language_model: LlamaLanguageModel
+    _llama_index_language_model: LlamaIndexLanguageModel
     _embeddings_model: EmbeddingsModel
     _config: KnowledgeBaseConfig
 
@@ -57,13 +56,13 @@ class KnowledgeBase:
             self,
             storage_context: StorageContext,
             vector_store_index: VectorStoreIndex,
-            language_model: LlamaLanguageModel,
+            llama_index_language_model: LlamaIndexLanguageModel,
             embeddings_model: EmbeddingsModel,
             config: KnowledgeBaseConfig,
     ):
         self._storage_context = storage_context
         self._vector_store_index = vector_store_index
-        self._language_model = language_model
+        self._llama_index_language_model = llama_index_language_model
         self._embeddings_model = embeddings_model
         self._config = config
 
@@ -72,7 +71,7 @@ class KnowledgeBase:
         # TODO think about response synthesizer
         self._response_synthesizer = get_response_synthesizer(
             response_mode=ResponseMode.COMPACT,
-            llm=self._language_model,
+            llm=self._llama_index_language_model,
             # service_context=service_context,
             # text_qa_template=text_qa_template,
             # refine_template=refine_template,
@@ -165,7 +164,7 @@ class KnowledgeBase:
                 else self.response_synthesizer
             ),
             node_postprocessors=self.node_postprocessors,
-            llm=self._language_model,
+            llm=self._llama_index_language_model,
             embeddings_model=self._embeddings_model,
             vector_store_kwargs={"qdrant_filters": filters},
             hybrid_top_k=hybrid_top_k,
@@ -195,7 +194,7 @@ class KnowledgeBase:
     @classmethod
     def create_empty(
             cls,
-            language_model: LlamaLanguageModel,
+            llama_index_language_model: LlamaIndexLanguageModel,
             embeddings_model: EmbeddingsModel,
             config: KnowledgeBaseConfig,
             should_persist: bool = True,
@@ -229,7 +228,7 @@ class KnowledgeBase:
         )
 
         knowledge_base = cls(
-            language_model=language_model,
+            llama_index_language_model=llama_index_language_model,
             storage_context=storage_context,
             vector_store_index=vector_store_index,
             config=config,
@@ -246,14 +245,14 @@ class KnowledgeBase:
     @classmethod
     def load(
             cls,
-            language_model: LlamaLanguageModel,
+            llama_index_language_model: LlamaIndexLanguageModel,
             embeddings_model: EmbeddingsModel,
             config: KnowledgeBaseConfig,
             should_persist: bool = True,
     ):
         if not is_persisted_storage_context_exist(config.context_path):
             return KnowledgeBase.create_empty(
-                language_model=language_model,
+                llama_index_language_model=llama_index_language_model,
                 embeddings_model=embeddings_model,
                 config=config,
                 should_persist=should_persist,
@@ -279,7 +278,7 @@ class KnowledgeBase:
         )
 
         knowledge_base = cls(
-            language_model=language_model,
+            llama_index_language_model=llama_index_language_model,
             storage_context=storage_context,
             vector_store_index=vector_store_index,
             config=config,

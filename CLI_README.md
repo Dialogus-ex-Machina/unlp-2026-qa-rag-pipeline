@@ -35,6 +35,8 @@ $ unlp eval [OPTIONS] [METRIC]:[answer-accuracy|composite-accuracy|doc-source-ac
 **Options**:
 
 * `-ds, --dataset [full|sport|medicine]`: [default: full]
+* `-m, --model TEXT`
+* `-key, --api-key TEXT`
 * `--help`: Show this message and exit.
 
 ## `unlp invoke`
@@ -50,6 +52,8 @@ $ unlp invoke [OPTIONS]
 **Options**:
 
 * `-ds, --dataset [full|sport|medicine]`: [default: full]
+* `-m, --model TEXT`
+* `-key, --api-key TEXT`
 * `--help`: Show this message and exit.
 
 ## `unlp kb`
@@ -83,4 +87,6 @@ $ unlp kb create [OPTIONS]
 
 **Options**:
 
+* `-m, --model TEXT`
+* `-key, --api-key TEXT`
 * `--help`: Show this message and exit.

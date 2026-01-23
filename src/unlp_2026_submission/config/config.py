@@ -8,20 +8,48 @@ load_dotenv()
 
 class Config:
     language_model_name: str
+    language_model_context_window: int
     model_provider_api_key: str
     embeddings_model_name: str
+    downloaded_models_dir: str
+    downloaded_models_cache_dir: str
 
     knowledge_base: KnowledgeBaseConfig
 
-    def __init__(self):
-        self.language_model_name = os.getenv('LANGUAGE_MODEL_NAME')
-        self.model_provider_api_key = os.getenv('MODEL_PROVIDER_API_KEY')
-        self.embeddings_model_name = os.getenv('EMBEDDINGS_MODEL_NAME')
+    def __init__(
+            self,
+            language_model_name: str | None = None,
+            language_model_context_window: int | None = None,
+            model_provider_api_key: str | None = None,
+            embeddings_model_name: str | None = None
+    ):
+        self.language_model_name = self._resolve_value_with_priority(
+            language_model_name,
+            os.getenv(
+                'LANGUAGE_MODEL_NAME',
+                'INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0-GGUF/MamayLM-Gemma-3-4B-IT-v1.0.Q8_0.gguf'
+            ),
+        )
+        self.language_model_context_window = self._resolve_value_with_priority(
+            language_model_context_window,
+            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '10000')),
+        )
+        self.model_provider_api_key = self._resolve_value_with_priority(
+            model_provider_api_key,
+            os.getenv('MODEL_PROVIDER_API_KEY')
+        )
+        self.embeddings_model_name = self._resolve_value_with_priority(
+            embeddings_model_name,
+            os.getenv('EMBEDDINGS_MODEL_NAME', 'text-embedding-3-small'),
+        )
 
         # **/unlp-2026-submission/src/unlp_2026_submission
         package_root_dir = Path(__file__).resolve().parents[1]
         # **/unlp-2026-submission/src
         project_root_dir = package_root_dir.parent
+
+        self.downloaded_models_dir = os.getenv('DOWNLOADED_MODELS_DIR', project_root_dir / "models")
+        self.downloaded_models_cache_dir = os.getenv('DOWNLOADED_MODELS_CACHE_DIR', project_root_dir / "models/.cache")
 
         kb_store_root_dir = os.path.join(
             project_root_dir,
@@ -45,3 +73,9 @@ class Config:
             context_path=context_path,
             collection_name=collection_name
         )
+
+    def _resolve_value_with_priority(self, *values):
+        for v in values:
+            if v is not None:
+                return v
+        return None

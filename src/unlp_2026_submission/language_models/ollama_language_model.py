@@ -22,7 +22,7 @@ class OllamaLanguageModel(ChatOllama):
             **kwargs
         )
 
-class LlamaOllamaLanguageModel(Ollama):
+class LlamaIndexOllamaLanguageModel(Ollama):
     @staticmethod
     def create(
             config: Config,
