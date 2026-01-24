@@ -25,16 +25,16 @@ Run evaluation for a given metric
 **Usage**:
 
 ```console
-$ unlp eval [OPTIONS] [METRIC]:[answer-accuracy|composite-accuracy|doc-source-accuracy|doc-source-page-accuracy]
+$ unlp eval [OPTIONS] [METRIC]:[answer-accuracy|answer-faithfulness|composite-accuracy|doc-source-accuracy|doc-source-page-accuracy]
 ```
 
 **Arguments**:
 
-* `[METRIC]:[answer-accuracy|composite-accuracy|doc-source-accuracy|doc-source-page-accuracy]`: [default: answer-accuracy]
+* `[METRIC]:[answer-accuracy|answer-faithfulness|composite-accuracy|doc-source-accuracy|doc-source-page-accuracy]`: [default: answer-accuracy]
 
 **Options**:
 
-* `-ds, --dataset [full|sport|medicine]`: [default: full]
+* `-ds, --dataset [full-qa|sport-qa|medicine-qa|full-qa-with-context|sport-qa-with-context|medicine-qa-with-context]`: [default: full-qa]
 * `-m, --model TEXT`
 * `-key, --api-key TEXT`
 * `--help`: Show this message and exit.
@@ -51,7 +51,7 @@ $ unlp invoke [OPTIONS]
 
 **Options**:
 
-* `-ds, --dataset [full|sport|medicine]`: [default: full]
+* `-ds, --dataset [full-qa|sport-qa|medicine-qa|full-qa-with-context|sport-qa-with-context|medicine-qa-with-context]`: [default: full-qa]
 * `-m, --model TEXT`
 * `-key, --api-key TEXT`
 * `--help`: Show this message and exit.

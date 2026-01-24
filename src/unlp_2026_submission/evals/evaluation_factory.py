@@ -3,6 +3,7 @@ from typing import Any, Callable, Awaitable
 from langgraph.graph.state import CompiledStateGraph
 from ragas import Dataset
 
+from .evaluate_answers_faithfulness import evaluate_answers_faithfulness
 from .evaluation_metric_name import EvaluationMetricName
 from .evaluate_composite_accuracy import evaluate_composite_accuracy
 from .evaluate_answers_accuracy import evaluate_answers_accuracy
@@ -30,6 +31,8 @@ class EvaluationFactory:
                     return evaluate_documents_source_page_accuracy
                 case EvaluationMetricName.ANSWER_ACCURACY:
                     return evaluate_answers_accuracy
+                case EvaluationMetricName.ANSWER_FAITHFULNESS:
+                    return evaluate_answers_faithfulness
                 case _:
                     raise ValueError("Metric not found.")
 

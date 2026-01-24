@@ -1,14 +1,14 @@
 from langgraph.graph.state import CompiledStateGraph
 from ragas import experiment
 
-from unlp_2026_submission.entities import SingleAnswerQuestion
+from unlp_2026_submission.entities import Question
 from unlp_2026_submission.evals.metrics import answer_accuracy_metric
 from unlp_2026_submission.workflow import WorkflowState
 
 
 @experiment()
 async def answers_accuracy_experiment(
-        question: SingleAnswerQuestion,
+        question: Question,
         workflow: CompiledStateGraph
 ):
     correct_answer = question['correct_answer']

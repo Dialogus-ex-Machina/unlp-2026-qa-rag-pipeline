@@ -1,8 +1,11 @@
 from ragas import Dataset
-from unlp_2026_submission.evals.datasets.datasets import (
-    get_full_dataset,
-    get_sports_domain_dataset,
-    get_medical_domain_dataset
+from unlp_2026_submission.evals.datasets import (
+    get_sports_qa_with_context_dataset,
+    get_sports_qa_dataset,
+    get_full_qa_with_context_dataset,
+    get_medical_qa_with_context_dataset,
+    get_full_qa_dataset,
+    get_medical_qa_dataset
 )
 from unlp_2026_submission.evals.evaluation_dataset_name import EvaluationDatasetName
 
@@ -17,12 +20,18 @@ class EvaluationDatasetFactory:
 
         def get_dataset():
             match dataset_name:
-                case EvaluationDatasetName.FULL:
-                    return get_full_dataset()
-                case EvaluationDatasetName.SPORT:
-                    return get_sports_domain_dataset()
-                case EvaluationDatasetName.MEDICINE:
-                    return get_medical_domain_dataset()
+                case EvaluationDatasetName.FULL_QA:
+                    return get_full_qa_dataset()
+                case EvaluationDatasetName.SPORT_QA:
+                    return get_sports_qa_dataset()
+                case EvaluationDatasetName.MEDICINE_QA:
+                    return get_medical_qa_dataset()
+                case EvaluationDatasetName.FULL_QA_WITH_CONTEXT:
+                    return get_full_qa_with_context_dataset()
+                case EvaluationDatasetName.MEDICINE_QA_WITH_CONTEXT:
+                    return get_medical_qa_with_context_dataset()
+                case EvaluationDatasetName.SPORT_QA_WITH_CONTEXT:
+                    return get_sports_qa_with_context_dataset()
                 case _:
                     raise ValueError("Metric not found.")
 

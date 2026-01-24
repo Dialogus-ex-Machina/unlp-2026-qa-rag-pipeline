@@ -1,10 +1,10 @@
 from typing import TypedDict
 
-from unlp_2026_submission.entities import SingleAnswerQuestion, DocumentPage
+from unlp_2026_submission.entities import Question, DocumentPage
 
 
 class WorkflowState(TypedDict):
-    question: SingleAnswerQuestion
+    question: Question
 
     answer: str
     raw_answer: str

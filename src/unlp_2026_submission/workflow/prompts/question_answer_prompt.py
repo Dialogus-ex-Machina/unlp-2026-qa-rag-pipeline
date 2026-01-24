@@ -1,7 +1,7 @@
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
 
-from unlp_2026_submission.entities import SingleAnswerQuestion, DocumentPage
+from unlp_2026_submission.entities import Question, DocumentPage
 
 SYSTEM_PROMPT = """
 Ти — корисний асистент для вирішення завдань з вибором однієї правильної відповіді.
@@ -59,7 +59,7 @@ class QuestionAnswerPrompt:
 
     def format_messages(
             self,
-            question: SingleAnswerQuestion,
+            question: Question,
             document_page: DocumentPage | None = None
     ) -> list[BaseMessage]:
         question_text = question.get('question_text')

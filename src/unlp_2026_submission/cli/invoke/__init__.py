@@ -17,7 +17,7 @@ def invoke_command(
         dataset_name: Annotated[
             EvaluationDatasetName,
             typer.Option("--dataset", "-ds")
-        ] = EvaluationDatasetName.FULL,
+        ] = EvaluationDatasetName.FULL_QA,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
 ):

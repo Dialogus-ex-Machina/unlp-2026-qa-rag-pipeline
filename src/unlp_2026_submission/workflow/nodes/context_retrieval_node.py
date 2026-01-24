@@ -23,6 +23,12 @@ class ContextRetrievalNode(BaseNode):
     def __call__(self, state: WorkflowState):
         question = state['question']
 
+        is_ref_page_exist = bool(state.get('reference_document_page', None))
+
+        if is_ref_page_exist:
+            print('Reference page already exists. Skipping context retrieval.')
+            return {}
+
         page = self.knowledge_base.retrieve_page(
             search_query=question['question_text']
         )

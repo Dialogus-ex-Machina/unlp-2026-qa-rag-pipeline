@@ -2,7 +2,7 @@ from ragas import Experiment
 from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
 
-from unlp_2026_submission.entities import SingleAnswerQuestion
+from unlp_2026_submission.entities import Question
 from unlp_2026_submission.evals import EvaluationMetricName
 from unlp_2026_submission.workflow import WorkflowState
 
@@ -12,7 +12,7 @@ from unlp_2026_submission.workflow import WorkflowState
     allowed_values=(0.0, 1.0)
 )
 def document_source_page_accuracy_metric(
-        question: SingleAnswerQuestion,
+        question: Question,
         workflow_result: WorkflowState,
 ) -> MetricResult:
     """Calculate accuracy of the prediction."""

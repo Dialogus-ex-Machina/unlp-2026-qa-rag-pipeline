@@ -2,39 +2,24 @@ from llama_index.core.schema import NodeWithScore
 
 
 class DocumentPage:
-    file_name: str
+    document_id: str
     text: str
-    page_label: str
-    file_path: str
+    page_number: int
 
     def __init__(
             self,
-            file_name: str,
+            document_id: str,
             text: str,
-            page_label: str,
-            file_path: str
+            page_number: int,
     ):
-        self.file_name = file_name
+        self.document_id = document_id
         self.text = text
-        self.page_label = page_label
-        self.file_path = file_path
+        self.page_number = page_number
 
     @classmethod
     def get_from_node_with_sore(cls, node: NodeWithScore):
         return DocumentPage(
-            file_name=node.metadata['file_name'],
+            document_id=node.metadata['file_name'],
             text=node.text,
-            page_label=node.metadata['page_label'],
-            file_path=node.metadata['file_path'],
+            page_number=int(node.metadata['page_label']),
         )
-
-    @property
-    def document_id(self):
-        return self.file_name
-
-    @property
-    def page_number(self):
-        try:
-            return int(self.page_label)
-        except Exception as e:
-            return -1
