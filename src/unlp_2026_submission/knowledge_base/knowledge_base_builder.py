@@ -3,18 +3,18 @@ from unlp_2026_submission.embeddings import EmbeddingsModel
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.knowledge_base.documents import SimpleDirectoryReader
 from unlp_2026_submission.knowledge_base.ingestion_pipelines import IngestionPipeline
-from unlp_2026_submission.language_models import LlamaLanguageModel
+from unlp_2026_submission.language_models import LlamaIndexLanguageModel
 
 class KnowledgeBaseBuilder:
     @staticmethod
     def build(
-            language_model: LlamaLanguageModel,
+            llama_index_language_model: LlamaIndexLanguageModel,
             embeddings_model: EmbeddingsModel,
             config: KnowledgeBaseConfig,
             should_persist: bool = True,
     ):
         knowledge_base = KnowledgeBase.create_empty(
-            language_model=language_model,
+            llama_index_language_model=llama_index_language_model,
             embeddings_model=embeddings_model,
             config=config,
             should_persist=should_persist,
