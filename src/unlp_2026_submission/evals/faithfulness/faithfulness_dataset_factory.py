@@ -1,0 +1,34 @@
+from ragas import Dataset
+from .faithfulness_datasets import (
+    get_faithfulness_full_dataset,
+    get_faithfulness_sports_dataset,
+    get_faithfulness_medical_dataset
+)
+from .faithfulness_dataset_name import FaithfulnessDatasetName
+
+class FaithfulnessDatasetFactory:
+    _dataset: Dataset
+
+    def __init__(self, dataset: Dataset):
+        self._dataset = dataset
+
+    @staticmethod
+    def create(dataset_name: FaithfulnessDatasetName):
+
+        def get_dataset():
+            match dataset_name:
+                case FaithfulnessDatasetName.FULL:
+                    return get_faithfulness_full_dataset()
+                case FaithfulnessDatasetName.SPORT:
+                    return get_faithfulness_sports_dataset()
+                case FaithfulnessDatasetName.MEDICINE:
+                    return get_faithfulness_medical_dataset()
+                case _:
+                    raise ValueError("Metric not found.")
+
+        dataset = get_dataset()
+
+        return FaithfulnessDatasetFactory(dataset=dataset)
+
+    def get_dataset(self) -> Dataset:
+        return self._dataset

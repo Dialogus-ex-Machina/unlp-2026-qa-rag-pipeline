@@ -41,4 +41,6 @@ pip-wheel-metadata/
 # Docker overrides
 docker-compose.override.yaml
 
+/hf_cache
+
 # Project-specific

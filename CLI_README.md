@@ -14,27 +14,78 @@ $ unlp [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `eval`: Run evaluation for a given metric
+* `evaluate`
 * `invoke`: Run workflow for random sampled question...
 * `kb`: Knowledge base management commands
 
-## `unlp eval`
+## `unlp evaluate`
+
+**Usage**:
+
+```console
+$ unlp evaluate [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `accuracy`: Run evaluation for a given metric
+* `mteb`: Run mteb for a given tasks
+* `faithfulness`: Evaluate faithfulness of answers.
+
+### `unlp evaluate accuracy`
 
 Run evaluation for a given metric
 
 **Usage**:
 
 ```console
-$ unlp eval [OPTIONS] [METRIC]:[answer-accuracy|answer-faithfulness|composite-accuracy|doc-source-accuracy|doc-source-page-accuracy]
+$ unlp evaluate accuracy [OPTIONS] [METRIC]:[answers|composite|doc-sources|doc-source-pages]
 ```
 
 **Arguments**:
 
-* `[METRIC]:[answer-accuracy|answer-faithfulness|composite-accuracy|doc-source-accuracy|doc-source-page-accuracy]`: [default: answer-accuracy]
+* `[METRIC]:[answers|composite|doc-sources|doc-source-pages]`: [default: answers]
 
 **Options**:
 
-* `-ds, --dataset [full-qa|sport-qa|medicine-qa|full-qa-with-context|sport-qa-with-context|medicine-qa-with-context]`: [default: full-qa]
+* `-ds, --dataset [full|sport|medicine]`: [default: full]
+* `-m, --model TEXT`
+* `-key, --api-key TEXT`
+* `--help`: Show this message and exit.
+
+### `unlp evaluate mteb`
+
+Run mteb for a given tasks
+
+**Usage**:
+
+```console
+$ unlp evaluate mteb [OPTIONS]
+```
+
+**Options**:
+
+* `-em, --embedding-model TEXT`: [default: bflhc/Octen-Embedding-0.6B]
+* `-t, --task [all|belebele|web_faq|qa]`: [default: qa]
+* `--help`: Show this message and exit.
+
+### `unlp evaluate faithfulness`
+
+Evaluate faithfulness of answers.
+
+**Usage**:
+
+```console
+$ unlp evaluate faithfulness [OPTIONS]
+```
+
+**Options**:
+
+* `-ds, --dataset [full|sport|medicine]`: [default: full]
 * `-m, --model TEXT`
 * `-key, --api-key TEXT`
 * `--help`: Show this message and exit.
@@ -51,7 +102,7 @@ $ unlp invoke [OPTIONS]
 
 **Options**:
 
-* `-ds, --dataset [full-qa|sport-qa|medicine-qa|full-qa-with-context|sport-qa-with-context|medicine-qa-with-context]`: [default: full-qa]
+* `-ds, --dataset [full|sport|medicine]`: [default: full]
 * `-m, --model TEXT`
 * `-key, --api-key TEXT`
 * `--help`: Show this message and exit.

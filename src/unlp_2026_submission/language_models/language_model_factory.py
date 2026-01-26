@@ -9,7 +9,9 @@ from unlp_2026_submission.language_models import (
     OpenAILanguageModel,
     GeminiLanguageModel,
     OllamaLanguageModel,
-    LlamaIndexLlamaCppLanguageModel, LlamaIndexOpenAILanguageModel, LlamaIndexGeminiLanguageModel,
+    LlamaIndexLlamaCppLanguageModel,
+    LlamaIndexOpenAILanguageModel,
+    LlamaIndexGeminiLanguageModel,
     LlamaIndexOllamaLanguageModel,
 )
 
