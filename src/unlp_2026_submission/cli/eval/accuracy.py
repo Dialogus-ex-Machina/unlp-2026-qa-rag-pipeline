@@ -10,6 +10,7 @@ from unlp_2026_submission.evals.accuracy import (
     AccuracyDatasetName,
 )
 from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
+from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.workflow import WorkflowBuilder
 from unlp_2026_submission.config import Config
@@ -49,7 +50,13 @@ async def _evaluate(
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
 ):
-    # TODO add dynamic experiment_name creation logic or pass via options
+    experiment_name = create_experiment_name(
+        base_name='accuracy',
+        metric=metric.value,
+        dataset_name=dataset_name,
+        language_model_name=language_model_name,
+    )
+
     config = Config(
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key
@@ -83,6 +90,6 @@ async def _evaluate(
 
     await eval_factory.run(
         dataset=dataset,
-        experiment_name=f"{metric.value}_experiment",
+        experiment_name=experiment_name,
         workflow=workflow
     )

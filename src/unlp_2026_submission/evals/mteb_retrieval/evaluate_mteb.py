@@ -36,7 +36,7 @@ def evaluate_mteb(
         model,
         tasks=tasks,
         overwrite_strategy="always",
-        encode_kwargs={"batch_size": 6}
+        encode_kwargs={"batch_size": 18}
     )
 
     return evaluation_result

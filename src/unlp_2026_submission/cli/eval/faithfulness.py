@@ -4,6 +4,7 @@ import typer
 from typing import Annotated
 
 from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
+from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.evals.faithfulness import (
     evaluate_answers_faithfulness,
     FaithfulnessDatasetFactory,
@@ -45,7 +46,12 @@ async def _evaluate(
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
 ):
-    # TODO add dynamic experiment_name creation logic or pass via options
+    experiment_name = create_experiment_name(
+        base_name='faithfulness',
+        dataset_name=dataset_name,
+        language_model_name=language_model_name,
+    )
+
     config = Config(
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key
@@ -77,6 +83,6 @@ async def _evaluate(
 
     await evaluate_answers_faithfulness(
         dataset=dataset,
-        experiment_name="faithfulness_experiment",
+        experiment_name=experiment_name,
         workflow=workflow
     )

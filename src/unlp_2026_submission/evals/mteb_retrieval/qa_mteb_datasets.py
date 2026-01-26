@@ -74,9 +74,9 @@ def _prepare_dataframe(
     return unique_pages_df, row_index_to_representative_index
 
 def _build_retrieval_hf_dataset() -> dict[str, Dataset]:
-    datasets_root_dir = Path(__file__).resolve().parents[1]
+    datasets_root_dir = Path(__file__).resolve().parent
 
-    original_df = pd.read_csv(os.path.join(datasets_root_dir, "datasets", "dev_questions_with_context.csv"))
+    original_df = pd.read_csv(os.path.join(datasets_root_dir, "qa_questions.csv"))
 
     # --- Dedup pages ---
     unique_pages_df, row_to_representative_index_map = _prepare_dataframe(original_df)
