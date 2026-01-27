@@ -17,13 +17,17 @@ def evaluate_mteb(
     tasks = []
 
     if task_name == MTEBTaskName.ALL:
-        tasks=[BelebeleRetrieval(), WebFAQRetrieval(), QARetrievalTask()]
+        tasks=[
+            BelebeleRetrieval(),
+            WebFAQRetrieval(),
+            QARetrievalTask(config)
+        ]
     elif task_name == MTEBTaskName.BELEBELE:
         tasks=[BelebeleRetrieval()]
     elif task_name == MTEBTaskName.WEB_FAQ:
         tasks=[WebFAQRetrieval()]
     else:
-        tasks=[QARetrievalTask()]
+        tasks=[QARetrievalTask(config)]
 
     for task in tasks:
         task.filter_languages(

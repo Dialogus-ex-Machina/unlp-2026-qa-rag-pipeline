@@ -50,7 +50,10 @@ def invoke_command(
         .build()
     )
 
-    dataset = AccuracyDatasetFactory.create(dataset_name).get_dataset()
+    dataset = AccuracyDatasetFactory.create(
+        config=config,
+        dataset_name=dataset_name
+    ).get_dataset()
     question = random.choice(dataset)
 
     response = workflow.invoke(

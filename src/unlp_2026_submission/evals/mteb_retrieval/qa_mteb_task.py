@@ -2,6 +2,7 @@ from mteb.abstasks.retrieval import AbsTaskRetrieval
 from mteb.abstasks.retrieval_dataset_loaders import RetrievalSplitData
 from mteb.abstasks.task_metadata import TaskMetadata
 
+from unlp_2026_submission.config import Config
 from .qa_mteb_datasets import get_qa_mteb_dataset
 
 _EVAL_SPLIT = "test"
@@ -27,12 +28,21 @@ class QARetrievalTask(AbsTaskRetrieval):
         annotations_creators="expert-annotated",
         dialect=[],
     )
+    _config: Config
+
+    def __init__(
+            self,
+            config: Config,
+            **kwargs
+    ):
+        super().__init__(**kwargs)
+        self._config = config
 
     def load_data(self, num_proc: int = 1, **kwargs) -> None:
         if self.data_loaded:
             return
 
-        raw_dataset = get_qa_mteb_dataset()
+        raw_dataset = get_qa_mteb_dataset(self._config)
         queries_ds = raw_dataset['queries']
         corpus_ds = raw_dataset['corpus']
         qrels_ds = raw_dataset['qrels']

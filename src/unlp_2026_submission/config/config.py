@@ -10,9 +10,12 @@ class Config:
     language_model_name: str
     language_model_context_window: int
     model_provider_api_key: str
+    judge_language_model_name: str
+    judge_language_model_provider_api_key: str
     embeddings_model_name: str
     downloaded_models_dir: str
     downloaded_models_cache_dir: str
+    data_root_dir: str
 
     knowledge_base: KnowledgeBaseConfig
 
@@ -21,7 +24,9 @@ class Config:
             language_model_name: str | None = None,
             language_model_context_window: int | None = None,
             model_provider_api_key: str | None = None,
-            embeddings_model_name: str | None = None
+            embeddings_model_name: str | None = None,
+            judge_language_model_name: str | None = None,
+            judge_language_model_provider_api_key: str | None = None,
     ):
         self.language_model_name = self._resolve_value_with_priority(
             language_model_name,
@@ -42,12 +47,22 @@ class Config:
             embeddings_model_name,
             os.getenv('EMBEDDINGS_MODEL_NAME', 'text-embedding-3-small'),
         )
+        self.judge_language_model_name = self._resolve_value_with_priority(
+            judge_language_model_name,
+            os.getenv('JUDGE_LANGUAGE_MODEL_NAME', 'gemini-3-pro-preview')
+        )
+        self.judge_language_model_provider_api_key = self._resolve_value_with_priority(
+            judge_language_model_provider_api_key,
+            os.getenv('JUDGE_LANGUAGE_MODEL_PROVIDER_API_KEY')
+        )
 
         # **/unlp-2026-submission/src/unlp_2026_submission
         package_root_dir = Path(__file__).resolve().parents[1]
         # **/unlp-2026-submission/src
         project_src_dir = package_root_dir.parent
         project_root_dir = project_src_dir.parent
+
+        self.data_root_dir = os.getenv('INPUT_DATA_DIR', project_src_dir / "data")
 
         hf_home_dir = os.getenv('HF_HOME', os.path.join(project_root_dir, "hf_cache"))
         if os.environ.get("HF_HOME") is None:
@@ -66,7 +81,6 @@ class Config:
             project_src_dir,
             os.getenv('KB_DATA_ROOT_DIR', 'kb_data')
         )
-        data_root_dir = os.getenv('INPUT_DATA_DIR', project_src_dir / "data")
         vector_store_path = os.path.join(
             kb_store_root_dir,
             os.getenv('KB_VECTOR_STORE_PATH', 'db')
@@ -79,7 +93,6 @@ class Config:
 
         self.knowledge_base = KnowledgeBaseConfig(
             kb_store_root_dir=kb_store_root_dir,
-            data_root_dir=data_root_dir,
             vector_store_path=vector_store_path,
             context_path=context_path,
             collection_name=collection_name
