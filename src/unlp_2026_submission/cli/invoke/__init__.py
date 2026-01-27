@@ -8,16 +8,16 @@ from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow import WorkflowBuilder
-from unlp_2026_submission.evals import EvaluationDatasetFactory, EvaluationDatasetName
+from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
 
 app = typer.Typer()
 
 @app.command('invoke')
 def invoke_command(
         dataset_name: Annotated[
-            EvaluationDatasetName,
+            AccuracyDatasetName,
             typer.Option("--dataset", "-ds")
-        ] = EvaluationDatasetName.FULL,
+        ] = AccuracyDatasetName.FULL,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
 ):
@@ -50,7 +50,7 @@ def invoke_command(
         .build()
     )
 
-    dataset = EvaluationDatasetFactory.create(dataset_name).get_dataset()
+    dataset = AccuracyDatasetFactory.create(dataset_name).get_dataset()
     question = random.choice(dataset)
 
     response = workflow.invoke(

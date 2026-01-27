@@ -46,16 +46,27 @@ class Config:
         # **/unlp-2026-submission/src/unlp_2026_submission
         package_root_dir = Path(__file__).resolve().parents[1]
         # **/unlp-2026-submission/src
-        project_root_dir = package_root_dir.parent
+        project_src_dir = package_root_dir.parent
+        project_root_dir = project_src_dir.parent
 
-        self.downloaded_models_dir = os.getenv('DOWNLOADED_MODELS_DIR', project_root_dir / "models")
-        self.downloaded_models_cache_dir = os.getenv('DOWNLOADED_MODELS_CACHE_DIR', project_root_dir / "models/.cache")
+        hf_home_dir = os.getenv('HF_HOME', os.path.join(project_root_dir, "hf_cache"))
+        if os.environ.get("HF_HOME") is None:
+            os.environ["HF_HOME"] = hf_home_dir
+
+        self.downloaded_models_dir = os.getenv(
+            'DOWNLOADED_MODELS_DIR',
+            os.path.join(hf_home_dir, "models")
+        )
+        self.downloaded_models_cache_dir = os.getenv(
+            'DOWNLOADED_MODELS_CACHE_DIR',
+            os.path.join(project_src_dir, "models/.cache")
+        )
 
         kb_store_root_dir = os.path.join(
-            project_root_dir,
+            project_src_dir,
             os.getenv('KB_DATA_ROOT_DIR', 'kb_data')
         )
-        data_root_dir = os.getenv('INPUT_DATA_DIR', project_root_dir / "data")
+        data_root_dir = os.getenv('INPUT_DATA_DIR', project_src_dir / "data")
         vector_store_path = os.path.join(
             kb_store_root_dir,
             os.getenv('KB_VECTOR_STORE_PATH', 'db')
