@@ -1,3 +1,5 @@
 from langchain_core.embeddings import Embeddings as EmbeddingsModel
-from unlp_2026_submission.embeddings.google_embeddings_model import GoogleEmbeddingsModel
-from unlp_2026_submission.embeddings.open_ai_embeddings_model import OpenAIEmbeddingsModel
+from .google_embeddings_model import GoogleEmbeddingsModel
+from .open_ai_embeddings_model import OpenAIEmbeddingsModel
+from .sentence_transformer_embeddings_model import SentenceTransformerEmbeddingModel
+from .embeddings_model_factory import EmbeddingsModelFactory

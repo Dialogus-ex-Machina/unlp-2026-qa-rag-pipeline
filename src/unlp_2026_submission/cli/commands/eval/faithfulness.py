@@ -2,8 +2,9 @@ import asyncio
 
 import typer
 from typing import Annotated
+import logging
 
-from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
+from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.evals.faithfulness import (
     evaluate_answers_faithfulness,
@@ -29,15 +30,20 @@ def evaluate_faithfulness_command(
             typer.Option("--model", "-m")
         ] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
+        embeddings_model_name: Annotated[str, typer.Option("--embeddings-model", "-em")] = None,
+        logging_level: Annotated[int, typer.Option("--logs", "-l")] = logging.INFO,
 ):
     """
-        Run evaluation for a given metric
+        Evaluate faithfulness for a given dataset
     """
+    logging.basicConfig(level=logging_level)
+
     asyncio.run(
         _evaluate(
             dataset_name=dataset_name,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
+            embeddings_model_name=embeddings_model_name,
         )
     )
 
@@ -46,16 +52,19 @@ async def _evaluate(
         dataset_name: FaithfulnessDatasetName,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
+        embeddings_model_name: str | None = None,
 ):
     experiment_name = create_experiment_name(
         base_name='faithfulness',
-        dataset_name=dataset_name,
+        dataset_name=dataset_name.value,
         language_model_name=language_model_name,
+        embeddings_model_name=embeddings_model_name,
     )
 
     config = Config(
         language_model_name=language_model_name,
-        model_provider_api_key=model_provider_api_key
+        model_provider_api_key=model_provider_api_key,
+        embeddings_model_name=embeddings_model_name,
     )
     dataset = FaithfulnessDatasetFactory.create(
         config=config,
@@ -67,7 +76,11 @@ async def _evaluate(
         .create(config)
         .get_language_model()
     )
-    embeddings_model = OpenAIEmbeddingsModel.create(config)
+    embeddings_model = (
+        EmbeddingsModelFactory
+        .create(config)
+        .get_embeddings_model()
+    )
 
     knowledge_base = KnowledgeBase.load(
         llama_index_language_model=llama_index_language_model,
@@ -86,5 +99,5 @@ async def _evaluate(
     await evaluate_answers_faithfulness(
         dataset=dataset,
         experiment_name=experiment_name,
-        workflow=workflow
+        workflow=workflow,
     )

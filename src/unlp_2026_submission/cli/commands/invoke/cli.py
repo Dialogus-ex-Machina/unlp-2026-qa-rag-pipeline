@@ -1,3 +1,4 @@
+import logging
 import typer
 from typing import Annotated, Optional
 from rich import print as rprint
@@ -22,6 +23,10 @@ def run_command(
         Optional[str],
         typer.Option("--api-key", "-k", help="Provider API key."),
     ] = None,
+    embeddings_model_name: Annotated[
+        Optional[str],
+        typer.Option("--embeddings-model", "-em")
+    ] = None,
     seed: Annotated[
         Optional[int],
         typer.Option("--seed", help="Random seed for deterministic sampling."),
@@ -30,6 +35,10 @@ def run_command(
         Optional[str],
         typer.Option("--question", "-q", help="Run a specific question instead of sampling."),
     ] = None,
+    logging_level: Annotated[
+        Optional[int],
+        typer.Option("--logs", "-l")
+    ] = logging.INFO,
 ):
     """
     Run workflow for a sampled (or provided) question.
@@ -38,8 +47,10 @@ def run_command(
         dataset_name=dataset_name,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
+        embeddings_model_name=embeddings_model_name,
         seed=seed,
         question=question,
+        logging_level=logging_level,
     )
 
     rprint("[bold]Question:[/bold]", result.question)
