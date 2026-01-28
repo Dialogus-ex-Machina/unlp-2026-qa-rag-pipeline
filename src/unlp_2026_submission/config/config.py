@@ -74,7 +74,7 @@ class Config:
         )
         self.downloaded_models_cache_dir = os.getenv(
             'DOWNLOADED_MODELS_CACHE_DIR',
-            os.path.join(project_src_dir, "models/.cache")
+            os.path.join(hf_home_dir, "models/.cache")
         )
 
         kb_store_root_dir = os.path.join(
