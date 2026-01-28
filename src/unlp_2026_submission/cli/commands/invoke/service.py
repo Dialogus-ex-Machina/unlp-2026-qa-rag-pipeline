@@ -1,0 +1,76 @@
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass
+from typing import Optional, Tuple
+
+from unlp_2026_submission.config import Config
+from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
+from unlp_2026_submission.knowledge_base import KnowledgeBase
+from unlp_2026_submission.language_models import LanguageModelFactory
+from unlp_2026_submission.workflow import WorkflowBuilder
+from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
+
+
+@dataclass(frozen=True)
+class InvokeResult:
+    question: str
+    response: object
+
+
+def build_config(
+    language_model_name: Optional[str],
+    model_provider_api_key: Optional[str],
+) -> Config:
+    return Config(
+        language_model_name=language_model_name,
+        model_provider_api_key=model_provider_api_key,
+    )
+
+
+def build_workflow(config: Config):
+    language_model, llama_index_language_model = (
+        LanguageModelFactory.create(config).get_language_model()
+    )
+    embeddings_model = OpenAIEmbeddingsModel.create(config)
+
+    knowledge_base = KnowledgeBase.load(
+        llama_index_language_model=llama_index_language_model,
+        embeddings_model=embeddings_model,
+        config=config.knowledge_base,
+    )
+
+    workflow = (
+        WorkflowBuilder.create(config)
+        .with_language_model(language_model)
+        .with_knowledge_base(knowledge_base)
+        .build()
+    )
+    return workflow
+
+
+def sample_question(
+    dataset_name: AccuracyDatasetName,
+    seed: Optional[int] = None,
+) -> str:
+    dataset = AccuracyDatasetFactory.create(dataset_name).get_dataset()
+    if not dataset:
+        raise ValueError(f"Dataset {dataset_name} is empty.")
+
+    rng = random.Random(seed)
+    return rng.choice(dataset)
+
+
+def run_invoke(
+    dataset_name: AccuracyDatasetName,
+    language_model_name: Optional[str],
+    model_provider_api_key: Optional[str],
+    seed: Optional[int] = None,
+    question: Optional[str] = None,
+) -> InvokeResult:
+    config = build_config(language_model_name, model_provider_api_key)
+    workflow = build_workflow(config)
+
+    q = question or sample_question(dataset_name, seed=seed)
+    response = workflow.invoke(input={"question": q})
+    return InvokeResult(question=q, response=response)

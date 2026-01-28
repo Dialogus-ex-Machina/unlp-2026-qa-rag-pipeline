@@ -17,6 +17,7 @@ from unlp_2026_submission.language_models import LanguageModelFactory
 
 app = typer.Typer()
 
+
 @app.command('faithfulness', help='Evaluate faithfulness of answers.')
 def evaluate_faithfulness_command(
         dataset_name: Annotated[
