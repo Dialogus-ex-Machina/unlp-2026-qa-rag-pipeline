@@ -1,9 +1,11 @@
-from pathlib import Path
 import os
 import pandas as pd
-from datasets import Dataset, DatasetDict
+from datasets import Dataset
 import re
 from rapidfuzz import fuzz
+
+from unlp_2026_submission.config import Config
+
 
 def _normalize_text(s: str) -> str:
     s = (s or "").lower().strip()
@@ -73,10 +75,11 @@ def _prepare_dataframe(
 
     return unique_pages_df, row_index_to_representative_index
 
-def _build_retrieval_hf_dataset() -> dict[str, Dataset]:
-    datasets_root_dir = Path(__file__).resolve().parent
-
-    original_df = pd.read_csv(os.path.join(datasets_root_dir, "qa_questions.csv"))
+def _build_retrieval_hf_dataset(config: Config) -> dict[str, Dataset]:
+    original_df = pd.read_csv(os.path.join(
+        config.data_root_dir,
+        "dev_questions_with_context.csv"
+    ))
 
     # --- Dedup pages ---
     unique_pages_df, row_to_representative_index_map = _prepare_dataframe(original_df)
@@ -129,7 +132,7 @@ def _build_retrieval_hf_dataset() -> dict[str, Dataset]:
         "qrels": qrels_ds,
     }
 
-def get_qa_mteb_dataset() -> dict[str, Dataset]:
-    dataset = _build_retrieval_hf_dataset()
+def get_qa_mteb_dataset(config: Config) -> dict[str, Dataset]:
+    dataset = _build_retrieval_hf_dataset(config)
 
     return dataset

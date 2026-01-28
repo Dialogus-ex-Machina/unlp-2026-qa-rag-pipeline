@@ -5,6 +5,7 @@ import pandas as pd
 from pandas import DataFrame
 from ragas import Dataset
 
+from unlp_2026_submission.config import Config
 from unlp_2026_submission.entities import Question
 
 
@@ -47,10 +48,8 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
 
     return pd.DataFrame(questions)
 
-def get_accuracy_full_dataset():
-    datasets_root_dir = Path(__file__).resolve().parent
-
-    df = pd.read_csv(os.path.join(datasets_root_dir, "dev_questions.csv"))
+def get_accuracy_full_dataset(config: Config):
+    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions.csv"))
 
     formatted_df = _format_dataframe(df)
 
@@ -64,10 +63,8 @@ def get_accuracy_full_dataset():
     return dataset
 
 
-def get_accuracy_sports_dataset():
-    datasets_root_dir = Path(__file__).resolve().parent
-
-    df = pd.read_csv(os.path.join(datasets_root_dir, "dev_questions.csv"))
+def get_accuracy_sports_dataset(config: Config):
+    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions.csv"))
 
     sports_domain_df = df[df["Domain"].str.strip() == "domain_1"]
 
@@ -82,10 +79,8 @@ def get_accuracy_sports_dataset():
 
     return dataset
 
-def get_accuracy_medical_dataset():
-    datasets_root_dir = Path(__file__).resolve().parent
-
-    df = pd.read_csv(os.path.join(datasets_root_dir, "dev_questions.csv"))
+def get_accuracy_medical_dataset(config: Config):
+    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions.csv"))
 
     sports_domain_df = df[df["Domain"].str.strip() == "domain_2"]
 
