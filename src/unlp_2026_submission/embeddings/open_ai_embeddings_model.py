@@ -14,3 +14,14 @@ class OpenAIEmbeddingsModel(OpenAIEmbeddings):
         return OpenAIEmbeddingsModel(
             model=config.embeddings_model_name
         )
+
+    @staticmethod
+    def is_compatible_model(embeddings_model_name: str) -> bool:
+        if (
+                embeddings_model_name and
+                embeddings_model_name.lower().startswith("text-embedding")
+        ):
+            return True
+        return False
+
+

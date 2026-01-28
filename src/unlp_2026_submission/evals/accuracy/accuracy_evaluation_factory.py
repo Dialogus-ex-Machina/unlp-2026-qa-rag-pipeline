@@ -8,6 +8,7 @@ from .evaluate_composite_accuracy import evaluate_composite_accuracy
 from .evaluate_answers_accuracy import evaluate_answers_accuracy
 from .evaluate_documents_source_accuracy import evaluate_documents_source_accuracy
 from .evaluate_documents_source_page_accuracy import evaluate_documents_source_page_accuracy
+from .evaluate_documents_source_composite_accuracy import evaluate_documents_source_composite_accuracy
 
 class AccuracyEvaluationFactory:
     evaluation_fn: Callable[
@@ -28,6 +29,8 @@ class AccuracyEvaluationFactory:
                     return evaluate_documents_source_accuracy
                 case AccuracyMetricName.DOCUMENT_SOURCE_PAGES:
                     return evaluate_documents_source_page_accuracy
+                case AccuracyMetricName.DOCUMENT_SOURCES_COMPOSITE:
+                    return evaluate_documents_source_composite_accuracy
                 case AccuracyMetricName.ANSWERS:
                     return evaluate_answers_accuracy
                 case _:

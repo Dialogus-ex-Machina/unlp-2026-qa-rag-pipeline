@@ -2,13 +2,14 @@ import asyncio
 
 import typer
 from typing import Annotated
+import logging
 
 from unlp_2026_submission.evals.accuracy import (
     AccuracyMetricName,
     AccuracyDatasetFactory,
     AccuracyDatasetName,
 )
-from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
+from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.context_recall import evaluate_context_recall
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.knowledge_base import KnowledgeBase
@@ -30,6 +31,7 @@ def evaluate_context_recall_command(
         ] = AccuracyDatasetName.FULL,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
+        embeddings_model_name: Annotated[str, typer.Option("--embeddings-model", "-em")] = None,
         judge_language_model_name: Annotated[
             str,
             typer.Option("--judge-model")
@@ -38,16 +40,20 @@ def evaluate_context_recall_command(
             str,
             typer.Option("--judge-api-key")
         ] = None,
+        logging_level: Annotated[int, typer.Option("--logs", "-l")] = logging.INFO,
 ):
     """
-        Run evaluation for a given metric
+        Evaluate context recall for a given dataset
     """
+    logging.basicConfig(level=logging_level)
+
     asyncio.run(
         _evaluate(
             metric=metric,
             dataset_name=dataset_name,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
+            embeddings_model_name=embeddings_model_name,
             judge_language_model_name=judge_language_model_name,
             judge_model_provider_api_key=judge_model_provider_api_key,
         )
@@ -59,20 +65,23 @@ async def _evaluate(
         dataset_name: AccuracyDatasetName,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
+        embeddings_model_name: str | None = None,
         judge_language_model_name: str | None = None,
         judge_model_provider_api_key: str | None = None,
 ):
     experiment_name = create_experiment_name(
         base_name='context-recall',
         metric=metric.value,
-        dataset_name=dataset_name,
+        dataset_name=dataset_name.value,
         language_model_name=language_model_name,
+        embeddings_model_name=embeddings_model_name,
         judge_language_model_name=judge_language_model_name
     )
 
     config = Config(
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
+        embeddings_model_name=embeddings_model_name,
         judge_language_model_name=judge_language_model_name,
         judge_language_model_provider_api_key=judge_model_provider_api_key
     )
@@ -86,7 +95,11 @@ async def _evaluate(
         .create(config)
         .get_language_model()
     )
-    embeddings_model = OpenAIEmbeddingsModel.create(config)
+    embeddings_model = (
+        EmbeddingsModelFactory
+        .create(config)
+        .get_embeddings_model()
+    )
     judge_language_model = (
         JudgeLanguageModelFactory
         .create(config)

@@ -14,3 +14,12 @@ class GoogleEmbeddingsModel(GoogleGenerativeAIEmbeddings):
         return GoogleEmbeddingsModel(
             model=config.embeddings_model_name,
         )
+
+    @staticmethod
+    def is_compatible_model(embeddings_model_name: str) -> bool:
+        if (
+                embeddings_model_name and
+                embeddings_model_name.lower().startswith("gemini-embedding")
+        ):
+            return True
+        return False

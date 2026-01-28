@@ -45,7 +45,7 @@ class Config:
         )
         self.embeddings_model_name = self._resolve_value_with_priority(
             embeddings_model_name,
-            os.getenv('EMBEDDINGS_MODEL_NAME', 'text-embedding-3-small'),
+            os.getenv('EMBEDDINGS_MODEL_NAME', 'bflhc/Octen-Embedding-0.6B'),
         )
         self.judge_language_model_name = self._resolve_value_with_priority(
             judge_language_model_name,

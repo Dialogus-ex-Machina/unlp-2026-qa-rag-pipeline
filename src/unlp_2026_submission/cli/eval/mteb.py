@@ -1,5 +1,5 @@
 from typing import Annotated
-
+import logging
 import math
 import typer
 from mteb.results import ModelResult
@@ -14,7 +14,7 @@ app = typer.Typer()
 
 @app.command('mteb')
 def evaluate_mteb_command(
-        embedding_model_name: Annotated[
+        embeddings_model_name: Annotated[
             str,
             typer.Option("--embedding-model", "-em")
         ] = None,
@@ -22,12 +22,15 @@ def evaluate_mteb_command(
             MTEBTaskName,
             typer.Option("--task", "-t")
         ] = MTEBTaskName.QA,
+        logging_level: Annotated[int, typer.Option("--logs", "-l")] = logging.INFO,
 ):
     """
         Run mteb for a given tasks
     """
+    logging.basicConfig(level=logging_level)
+
     config = Config(
-        embeddings_model_name=embedding_model_name
+        embeddings_model_name=embeddings_model_name
     )
     result = evaluate_mteb(
         config=config,
