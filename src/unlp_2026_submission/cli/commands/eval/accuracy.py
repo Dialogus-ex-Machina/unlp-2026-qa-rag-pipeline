@@ -19,6 +19,7 @@ from unlp_2026_submission.language_models import LanguageModelFactory
 
 app = typer.Typer()
 
+
 @app.command('accuracy')
 def evaluate_accuracy_command(
         metric: Annotated[

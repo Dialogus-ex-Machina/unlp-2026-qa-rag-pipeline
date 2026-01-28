@@ -12,6 +12,7 @@ from unlp_2026_submission.evals.mteb_retrieval import evaluate_mteb, MTEBTaskNam
 
 app = typer.Typer()
 
+
 @app.command('mteb')
 def evaluate_mteb_command(
         embeddings_model_name: Annotated[
