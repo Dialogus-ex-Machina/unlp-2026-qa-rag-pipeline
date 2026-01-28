@@ -1,8 +1,11 @@
 import os
 from typing import Any
+
+from openai import AsyncOpenAI
+from ragas.llms import llm_factory, InstructorBaseRagasLLM
 from typing_extensions import TypedDict, Unpack
 from langchain_openai import ChatOpenAI
-from llama_index.llms.openai import OpenAI
+from llama_index.llms.openai import OpenAI as LlamaIndexOpenAI
 
 from unlp_2026_submission.config import Config
 
@@ -36,19 +39,42 @@ class OpenAILanguageModel(ChatOpenAI):
         return False
 
 
-class LlamaIndexOpenAILanguageModel(OpenAI):
+class LlamaIndexOpenAILanguageModel(LlamaIndexOpenAI):
     @staticmethod
     def create(
             config: Config,
             **kwargs: Unpack[OpenAILanguageModelKArgs],
-    ) -> OpenAI:
+    ) -> LlamaIndexOpenAI:
         if not config.model_provider_api_key:
             raise ValueError("Model provider API key not found")
 
         if os.environ.get("OPENAI_API_KEY") is None:
             os.environ["OPENAI_API_KEY"] = config.model_provider_api_key
 
-        return OpenAI(
+        return LlamaIndexOpenAI(
             model=config.language_model_name,
             **kwargs
         )
+
+class OpenAIJudgeLanguageModel:
+    @staticmethod
+    def create(
+            config: Config
+    ) -> InstructorBaseRagasLLM:
+        if (
+                not config.judge_language_model_provider_api_key
+                and os.environ.get("OPENAI_API_KEY") is None
+        ):
+            raise ValueError("Judge model provider API key not found")
+
+        if os.environ.get("OPENAI_API_KEY") is None:
+            client = AsyncOpenAI(api_key=config.judge_language_model_provider_api_key)
+        else:
+            client = AsyncOpenAI()
+
+        llm = llm_factory(
+            config.judge_language_model_name,
+            client=client,
+        )
+
+        return llm

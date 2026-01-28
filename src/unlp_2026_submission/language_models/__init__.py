@@ -1,21 +1,18 @@
 from langchain_core.language_models import BaseChatModel as LanguageModel
 from llama_index.core.llms import LLM as LlamaIndexLanguageModel
+from ragas.llms import InstructorBaseRagasLLM as JudgeLanguageModel
 
-from unlp_2026_submission.language_models.ollama_language_model import (
-    OllamaLanguageModel,
-    LlamaIndexOllamaLanguageModel
-)
-from unlp_2026_submission.language_models.gemini_language_model import (
+from .ollama_language_model import OllamaLanguageModel, LlamaIndexOllamaLanguageModel
+from .gemini_language_model import (
     GeminiLanguageModel,
-    LlamaIndexGeminiLanguageModel
+    LlamaIndexGeminiLanguageModel,
+    GeminiJudgeLanguageModel,
 )
-
-from unlp_2026_submission.language_models.open_ai_language_model import (
+from .open_ai_language_model import (
     OpenAILanguageModel,
-    LlamaIndexOpenAILanguageModel
+    LlamaIndexOpenAILanguageModel,
+    OpenAIJudgeLanguageModel,
 )
-from unlp_2026_submission.language_models.llama_cpp_language_model import (
-    LlamaCppLanguageModel,
-    LlamaIndexLlamaCppLanguageModel
-)
-from unlp_2026_submission.language_models.language_model_factory import LanguageModelFactory
+from .llama_cpp_language_model import LlamaCppLanguageModel, LlamaIndexLlamaCppLanguageModel
+from .language_model_factory import LanguageModelFactory
+from .judge_language_model_factory import JudgeLanguageModelFactory

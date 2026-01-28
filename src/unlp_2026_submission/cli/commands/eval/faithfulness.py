@@ -58,6 +58,7 @@ async def _evaluate(
         model_provider_api_key=model_provider_api_key
     )
     dataset = FaithfulnessDatasetFactory.create(
+        config=config,
         dataset_name=dataset_name
     ).get_dataset()
 

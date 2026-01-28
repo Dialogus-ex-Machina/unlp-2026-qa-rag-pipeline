@@ -4,7 +4,9 @@ from .accuracy_datasets import (
     get_accuracy_sports_dataset,
     get_accuracy_medical_dataset
 )
+from unlp_2026_submission.config import Config
 from .accuracy_dataset_name import AccuracyDatasetName
+
 
 class AccuracyDatasetFactory:
     _dataset: Dataset
@@ -13,16 +15,19 @@ class AccuracyDatasetFactory:
         self._dataset = dataset
 
     @staticmethod
-    def create(dataset_name: AccuracyDatasetName):
+    def create(
+            config: Config,
+            dataset_name: AccuracyDatasetName
+    ):
 
         def get_dataset():
             match dataset_name:
                 case AccuracyDatasetName.FULL:
-                    return get_accuracy_full_dataset()
+                    return get_accuracy_full_dataset(config)
                 case AccuracyDatasetName.SPORT:
-                    return get_accuracy_sports_dataset()
+                    return get_accuracy_sports_dataset(config)
                 case AccuracyDatasetName.MEDICINE:
-                    return get_accuracy_medical_dataset()
+                    return get_accuracy_medical_dataset(config)
                 case _:
                     raise ValueError("Metric not found.")
 

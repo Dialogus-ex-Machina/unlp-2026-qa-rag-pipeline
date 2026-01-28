@@ -1,5 +1,7 @@
 import os
 from typing import Any
+from google import genai
+from ragas.llms import llm_factory, InstructorBaseRagasLLM
 from typing_extensions import TypedDict, Unpack
 from langchain_google_genai import ChatGoogleGenerativeAI
 from llama_index.llms.google_genai import GoogleGenAI
@@ -51,3 +53,27 @@ class LlamaIndexGeminiLanguageModel(GoogleGenAI):
             model=config.language_model_name,
             **kwargs
         )
+
+class GeminiJudgeLanguageModel:
+    @staticmethod
+    def create(
+            config: Config
+    ) -> InstructorBaseRagasLLM:
+        if (
+                not config.judge_language_model_provider_api_key
+                and os.environ.get("GOOGLE_API_KEY") is None
+        ):
+            raise ValueError("Judge model provider API key not found")
+
+        if os.environ.get("GOOGLE_API_KEY") is None:
+            client = genai.Client(api_key=config.judge_language_model_provider_api_key)
+        else:
+            client = genai.Client()
+
+        llm = llm_factory(
+            config.judge_language_model_name,
+            provider="google",
+            client=client
+        )
+
+        return llm

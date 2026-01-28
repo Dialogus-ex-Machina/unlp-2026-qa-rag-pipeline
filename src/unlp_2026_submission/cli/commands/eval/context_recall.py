@@ -4,23 +4,22 @@ import typer
 from typing import Annotated
 
 from unlp_2026_submission.evals.accuracy import (
-    AccuracyEvaluationFactory,
     AccuracyMetricName,
     AccuracyDatasetFactory,
     AccuracyDatasetName,
 )
 from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
+from unlp_2026_submission.evals.context_recall import evaluate_context_recall
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.workflow import WorkflowBuilder
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.language_models import LanguageModelFactory
+from unlp_2026_submission.language_models import LanguageModelFactory, JudgeLanguageModelFactory
 
 app = typer.Typer()
 
-
-@app.command('accuracy')
-def evaluate_accuracy_command(
+@app.command('context-recall')
+def evaluate_context_recall_command(
         metric: Annotated[
             AccuracyMetricName,
             typer.Argument()
@@ -31,6 +30,14 @@ def evaluate_accuracy_command(
         ] = AccuracyDatasetName.FULL,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
+        judge_language_model_name: Annotated[
+            str,
+            typer.Option("--judge-model")
+        ] = None,
+        judge_model_provider_api_key: Annotated[
+            str,
+            typer.Option("--judge-api-key")
+        ] = None,
 ):
     """
         Run evaluation for a given metric
@@ -41,6 +48,8 @@ def evaluate_accuracy_command(
             dataset_name=dataset_name,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
+            judge_language_model_name=judge_language_model_name,
+            judge_model_provider_api_key=judge_model_provider_api_key,
         )
     )
 
@@ -50,17 +59,22 @@ async def _evaluate(
         dataset_name: AccuracyDatasetName,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
+        judge_language_model_name: str | None = None,
+        judge_model_provider_api_key: str | None = None,
 ):
     experiment_name = create_experiment_name(
-        base_name='accuracy',
+        base_name='context-recall',
         metric=metric.value,
         dataset_name=dataset_name,
         language_model_name=language_model_name,
+        judge_language_model_name=judge_language_model_name
     )
 
     config = Config(
         language_model_name=language_model_name,
-        model_provider_api_key=model_provider_api_key
+        model_provider_api_key=model_provider_api_key,
+        judge_language_model_name=judge_language_model_name,
+        judge_language_model_provider_api_key=judge_model_provider_api_key
     )
     dataset = AccuracyDatasetFactory.create(
         config=config,
@@ -73,6 +87,11 @@ async def _evaluate(
         .get_language_model()
     )
     embeddings_model = OpenAIEmbeddingsModel.create(config)
+    judge_language_model = (
+        JudgeLanguageModelFactory
+        .create(config)
+        .get_language_model()
+    )
 
     knowledge_base = KnowledgeBase.load(
         llama_index_language_model=llama_index_language_model,
@@ -88,10 +107,9 @@ async def _evaluate(
         .build()
     )
 
-    eval_factory = AccuracyEvaluationFactory.create(metric)
-
-    await eval_factory.run(
+    await evaluate_context_recall(
         dataset=dataset,
         experiment_name=experiment_name,
-        workflow=workflow
+        workflow=workflow,
+        judge_language_model=judge_language_model,
     )

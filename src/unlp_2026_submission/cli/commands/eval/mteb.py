@@ -18,7 +18,7 @@ def evaluate_mteb_command(
         embedding_model_name: Annotated[
             str,
             typer.Option("--embedding-model", "-em")
-        ] = 'bflhc/Octen-Embedding-0.6B',
+        ] = None,
         task_name: Annotated[
             MTEBTaskName,
             typer.Option("--task", "-t")
