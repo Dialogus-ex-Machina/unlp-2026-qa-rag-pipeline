@@ -52,7 +52,7 @@ class LlamaIndexHuggingFaceLanguageModel(HuggingFaceLLM):
             model=model,
             tokenizer=tokenizer,
             generate_kwargs=dict(
-                max_new_tokens=2048,  # Choose maximum generation tokens
+                max_new_tokens=2048,
                 temperature=0.1,
                 top_k=25,
                 top_p=1,
