@@ -21,7 +21,7 @@ async def evaluate_composite_accuracy(
         experiment_results
     )
 
-    print("\nExperiment completed!")
+    print(f"\nExperiment {experiment_name} completed!")
     print(f"Total questions: {len(experiment_results)}")
     print(f"Total score: {composite_accuracy_result['total_score']}")
     print(f"Composite accuracy: {composite_accuracy_result['accuracy']:.5%}")

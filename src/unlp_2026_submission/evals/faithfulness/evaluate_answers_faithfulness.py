@@ -22,7 +22,7 @@ async def evaluate_answers_faithfulness(
         experiment_results
     )
 
-    print("\nExperiment completed!")
+    print(f"\nExperiment {experiment_name} completed!")
     print(f"Total questions: {len(experiment_results)}")
     print(f"Correct answers: {answers_faithfulness_result['correct']}")
     print(f"Answers faithfulness: {answers_faithfulness_result['faithfulness']:.5%}")

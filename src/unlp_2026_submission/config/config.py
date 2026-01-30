@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-from unlp_2026_submission.config.knowledge_base_config import KnowledgeBaseConfig
+from unlp_2026_submission.workflow.prompts import QAPromptType
+from .knowledge_base_config import KnowledgeBaseConfig
 
 load_dotenv()
 
@@ -17,6 +18,8 @@ class Config:
     downloaded_models_cache_dir: str
     data_root_dir: str
 
+    qa_prompt_type: QAPromptType
+
     knowledge_base: KnowledgeBaseConfig
 
     def __init__(
@@ -27,6 +30,7 @@ class Config:
             embeddings_model_name: str | None = None,
             judge_language_model_name: str | None = None,
             judge_language_model_provider_api_key: str | None = None,
+            qa_prompt_type: QAPromptType = QAPromptType.SIMPLE,
     ):
         self.language_model_name = self._resolve_value_with_priority(
             language_model_name,
@@ -55,6 +59,7 @@ class Config:
             judge_language_model_provider_api_key,
             os.getenv('JUDGE_LANGUAGE_MODEL_PROVIDER_API_KEY')
         )
+        self.qa_prompt_type = qa_prompt_type
 
         # **/unlp-2026-submission/src/unlp_2026_submission
         package_root_dir = Path(__file__).resolve().parents[1]

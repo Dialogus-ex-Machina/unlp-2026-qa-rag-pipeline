@@ -6,6 +6,7 @@ from langchain_core.messages import AIMessage
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.language_models import LanguageModel
 from unlp_2026_submission.config import Config
+from unlp_2026_submission.workflow.prompts.prompts_factory import PromptsFactory
 from unlp_2026_submission.workflow.state import WorkflowState
 
 class BaseNode(ABC):
@@ -13,6 +14,7 @@ class BaseNode(ABC):
     config: Config
     language_model: LanguageModel
     knowledge_base: KnowledgeBase
+    prompts_factory: PromptsFactory
 
     def __init__(
             self,
@@ -20,11 +22,13 @@ class BaseNode(ABC):
             config: Config,
             language_model: LanguageModel,
             knowledge_base: KnowledgeBase,
+            prompts_factory: PromptsFactory,
     ):
         self.name = name
         self.config = config
         self.language_model = language_model
         self.knowledge_base = knowledge_base
+        self.prompts_factory = prompts_factory
 
     @abstractmethod
     def __call__(self, state: WorkflowState):

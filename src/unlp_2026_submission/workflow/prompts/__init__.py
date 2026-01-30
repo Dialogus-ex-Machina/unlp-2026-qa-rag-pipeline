@@ -1,1 +1,2 @@
-from unlp_2026_submission.workflow.prompts.question_answer_prompt import QuestionAnswerPrompt
+from .qa_prompt_type import QAPromptType
+from .prompts_factory import PromptsFactory

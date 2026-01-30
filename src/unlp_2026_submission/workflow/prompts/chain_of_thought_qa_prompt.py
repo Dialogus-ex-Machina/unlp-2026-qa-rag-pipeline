@@ -4,48 +4,41 @@ from langchain_core.prompts import ChatPromptTemplate
 from unlp_2026_submission.entities import Question, DocumentPage
 
 SYSTEM_PROMPT = """
-Ти — корисний асистент для вирішення завдань з вибором однієї правильної відповіді.
-Відповідай лише літерою варіанту (A, B, C, D, E або F).
+Ти — асистент для розв'язання завдань з вибором однієї правильної відповіді.
+
+Твої дії:
+- покроково знайди відповідь відповідно до контексту
+- перевір свої міркування
+- звір результат з варіантами відповідей
+- обери правильний варіант
+
+Важливо:
+ти МАЄШ виводити свої міркування.
+В кінці ти ПОВИНЕН вивести літеру варіанту: (A, B, C, D, E або F).
+
 {% if context %}
 Відповідай **тільки** на основі наведеного контексту.
 Контекст:
 {{ context }}
 {% endif %}
 """.strip()
-# TODO remove ABCDEFGHIJKLMNOPQRSTUVWXYZ from prompt
+
 USER_PROMPT = """
 Завдання:
 {{ question | trim }}
 Варіанти:
-{% set letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" -%}
 {% for ans in answers -%}
-{{ letters[loop.index0] }}. {{ ans }}
+{{ loop.index }}. {{ ans }}
 {% endfor -%}
-Відповідай лише літерою варіанту.
+Уважно подумай і перевір свій результат.
+Додай в кінці літеру правильного варіанту.
+
+Важливо:
+Якщо жоден варіант точно не відповідає обчисленому результату, перевір усі обчислення ще раз.
+Один із варіантів завжди є правильним.
 """.strip()
 
-SYSTEM_PROMPT_EN = """
-You are a helpful assistant for multiple-choice questions.
-Reply with only the option letter (A, B, C, D, E or F).
-{% if context %}
-Answer **only** based on the context below.  
-Context:
-{{ context }}
-{% endif %}
-""".strip()
-
-USER_PROMPT_EN = """
-Question:
-{{ question | trim }}
-Options:
-{% set letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" -%}
-{% for ans in answers -%}
-{{ letters[loop.index0] }}. {{ ans }}
-{% endfor -%}
-Respond with only the option letter.
-""".strip()
-
-class QuestionAnswerPrompt:
+class ChainOfThoughtQAPrompt:
     _template: ChatPromptTemplate
 
     def __init__(self):

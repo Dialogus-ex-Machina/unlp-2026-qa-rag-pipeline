@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import random
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
@@ -11,6 +11,7 @@ from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow import WorkflowBuilder
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
+from unlp_2026_submission.workflow.prompts import QAPromptType
 
 
 @dataclass(frozen=True)
@@ -20,11 +21,13 @@ class InvokeResult:
 
 
 def build_config(
+    qa_prompt_type: QAPromptType,
     language_model_name: Optional[str],
     model_provider_api_key: Optional[str],
     embeddings_model_name: Optional[str] = None,
 ) -> Config:
     return Config(
+        qa_prompt_type=qa_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
@@ -74,6 +77,7 @@ def sample_question(
 
 def run_invoke(
     dataset_name: AccuracyDatasetName,
+    qa_prompt_type: QAPromptType,
     language_model_name: Optional[str],
     model_provider_api_key: Optional[str],
     embeddings_model_name: Optional[str] = None,
@@ -84,12 +88,17 @@ def run_invoke(
     logging.basicConfig(level=logging_level)
 
     config = build_config(
+        qa_prompt_type=qa_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
     )
     workflow = build_workflow(config)
 
-    q = question or sample_question(dataset_name, seed=seed)
+    q = question or sample_question(
+        config=config,
+        dataset_name=dataset_name,
+        seed=seed
+    )
     response = workflow.invoke(input={"question": q})
     return InvokeResult(question=q, response=response)

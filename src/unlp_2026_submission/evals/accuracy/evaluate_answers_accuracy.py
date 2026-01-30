@@ -22,7 +22,7 @@ async def evaluate_answers_accuracy(
         experiment_results
     )
 
-    print("\nExperiment completed!")
+    print(f"\nExperiment {experiment_name} completed!")
     print(f"Total questions: {len(experiment_results)}")
     print(f"Correct answers: {answers_accuracy_result['correct']}")
     print(f"Answers accuracy: {answers_accuracy_result['accuracy']:.5%}")

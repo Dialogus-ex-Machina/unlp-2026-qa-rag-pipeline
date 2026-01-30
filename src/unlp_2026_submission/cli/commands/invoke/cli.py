@@ -4,6 +4,7 @@ from typing import Annotated, Optional
 from rich import print as rprint
 
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetName
+from unlp_2026_submission.workflow.prompts import QAPromptType
 from .service import run_invoke
 
 app = typer.Typer(no_args_is_help=True)
@@ -15,6 +16,10 @@ def run_command(
         AccuracyDatasetName,
         typer.Option("--dataset", "-d", help="Which dataset to sample from."),
     ] = AccuracyDatasetName.FULL,
+    qa_prompt_type: Annotated[
+        Optional[QAPromptType],
+        typer.Option("--qa-prompt")
+    ] = QAPromptType.SIMPLE,
     language_model_name: Annotated[
         Optional[str],
         typer.Option("--model", "-m", help="Language model name."),
@@ -45,6 +50,7 @@ def run_command(
     """
     result = run_invoke(
         dataset_name=dataset_name,
+        qa_prompt_type=qa_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
