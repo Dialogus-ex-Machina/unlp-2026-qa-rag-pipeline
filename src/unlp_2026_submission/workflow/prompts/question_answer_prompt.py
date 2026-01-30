@@ -51,8 +51,8 @@ class QuestionAnswerPrompt:
     def __init__(self):
         self._template = ChatPromptTemplate.from_messages(
             messages=[
-                ("system", SYSTEM_PROMPT_EN),
-                ("human", USER_PROMPT_EN),
+                ("system", SYSTEM_PROMPT),
+                ("human", USER_PROMPT),
             ],
             template_format="jinja2"
         )
