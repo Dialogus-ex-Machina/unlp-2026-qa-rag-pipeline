@@ -24,7 +24,7 @@ async def evaluate_context_recall(
         experiment_results
     )
 
-    print("\nExperiment completed!")
+    print(f"\nExperiment {experiment_name} completed!")
     print(f"Total questions: {len(experiment_results)}")
     print(f"Total score: {context_recall_result['total_score']}")
     print(f"Context recall: {context_recall_result['recall']:.5%}")

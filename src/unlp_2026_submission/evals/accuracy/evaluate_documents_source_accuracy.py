@@ -22,7 +22,7 @@ async def evaluate_documents_source_accuracy(
         experiment_results
     )
 
-    print("\nExperiment completed!")
+    print(f"\nExperiment {experiment_name} completed!")
     print(f"Total questions: {len(experiment_results)}")
     print(f"Correct sources: {documents_accuracy_result['correct']}")
     print(f"Sources accuracy: {documents_accuracy_result['accuracy']:.5%}")

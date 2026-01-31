@@ -2,18 +2,24 @@ import re
 from typing import Tuple, Optional
 
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.language_models import (
-    LanguageModel,
-    LlamaIndexLanguageModel,
-    LlamaCppLanguageModel,
-    OpenAILanguageModel,
+from .gemini_language_model import (
     GeminiLanguageModel,
-    OllamaLanguageModel,
-    LlamaIndexLlamaCppLanguageModel,
-    LlamaIndexOpenAILanguageModel,
-    LlamaIndexGeminiLanguageModel,
-    LlamaIndexOllamaLanguageModel,
+    LlamaIndexGeminiLanguageModel
 )
+from .open_ai_language_model import (
+    OpenAILanguageModel,
+    LlamaIndexOpenAILanguageModel,
+)
+from .llama_cpp_language_model import (
+    LlamaCppLanguageModel,
+    LlamaIndexLlamaCppLanguageModel,
+)
+from .hugging_face_language_model import (
+    HuggingFaceLanguageModel,
+    LlamaIndexHuggingFaceLanguageModel,
+)
+from .language_model import LanguageModel, LlamaIndexLanguageModel
+
 
 class LanguageModelFactory:
     _config: Config
@@ -54,8 +60,8 @@ class LanguageModelFactory:
 
             return language_model, llama_index_language_model
 
-        language_model = OllamaLanguageModel.create(self._config)
-        llama_index_language_model = LlamaIndexOllamaLanguageModel.create(self._config)
+        language_model = HuggingFaceLanguageModel.create(self._config)
+        llama_index_language_model = LlamaIndexHuggingFaceLanguageModel.create(self._config)
 
         return language_model, llama_index_language_model
 

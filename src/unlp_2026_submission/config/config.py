@@ -2,13 +2,23 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-from unlp_2026_submission.config.knowledge_base_config import KnowledgeBaseConfig
+from unlp_2026_submission.workflow.prompts.qa_prompt_type import QAPromptType
+from .knowledge_base_config import KnowledgeBaseConfig
 
 load_dotenv()
 
 class Config:
     language_model_name: str
     language_model_context_window: int
+    language_model_max_tokens: int
+    language_model_temperature: float
+    language_model_top_p: float
+    language_model_top_k: int
+    language_model_repeat_penalty: float
+    language_model_stop_tokens: list[str]
+    language_model_n_batch: int
+    language_model_n_gpu_layers: int
+
     model_provider_api_key: str
     judge_language_model_name: str
     judge_language_model_provider_api_key: str
@@ -16,6 +26,7 @@ class Config:
     downloaded_models_dir: str
     downloaded_models_cache_dir: str
     data_root_dir: str
+    qa_prompt_type: QAPromptType
 
     knowledge_base: KnowledgeBaseConfig
 
@@ -23,10 +34,19 @@ class Config:
             self,
             language_model_name: str | None = None,
             language_model_context_window: int | None = None,
+            language_model_max_tokens: int | None = None,
+            language_model_temperature: float | None = None,
+            language_model_top_p: float | None = None,
+            language_model_top_k: int | None = None,
+            language_model_repeat_penalty: float | None = None,
+            language_model_stop_tokens: list[str] | None = None,
+            language_model_n_batch: int | None = None,
+            language_model_n_gpu_layers: int | None = None,
             model_provider_api_key: str | None = None,
             embeddings_model_name: str | None = None,
             judge_language_model_name: str | None = None,
             judge_language_model_provider_api_key: str | None = None,
+            qa_prompt_type: QAPromptType | None = None,
     ):
         self.language_model_name = self._resolve_value_with_priority(
             language_model_name,
@@ -37,12 +57,45 @@ class Config:
         )
         self.language_model_context_window = self._resolve_value_with_priority(
             language_model_context_window,
-            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '10000')),
+            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '8192')),
         )
         self.model_provider_api_key = self._resolve_value_with_priority(
             model_provider_api_key,
             os.getenv('MODEL_PROVIDER_API_KEY')
         )
+        self.language_model_max_tokens = self._resolve_value_with_priority(
+            language_model_max_tokens,
+            int(os.getenv('LANGUAGE_MODEL_MAX_TOKENS', '2048'))
+        )
+        self.language_model_temperature = self._resolve_value_with_priority(
+            language_model_temperature,
+            float(os.getenv('LANGUAGE_MODEL_TEMPERATURE', '0.1'))
+        )
+        self.language_model_top_p = self._resolve_value_with_priority(
+            language_model_top_p,
+            float(os.getenv('LANGUAGE_MODEL_TOP_P', '0.9'))
+        )
+        self.language_model_top_k = self._resolve_value_with_priority(
+            language_model_top_k,
+            int(os.getenv('LANGUAGE_MODEL_TOP_K', '40'))
+        )
+        self.language_model_repeat_penalty = self._resolve_value_with_priority(
+            language_model_repeat_penalty,
+            float(os.getenv('LANGUAGE_MODEL_REPEAT_PENALTY', '1.0'))
+        )
+        self.language_model_stop_tokens = self._resolve_value_with_priority(
+            language_model_stop_tokens,
+            os.getenv('LANGUAGE_MODEL_STOP_TOKENS', '<eos> <end_of_turn>').split()
+        )
+        self.language_model_n_batch = self._resolve_value_with_priority(
+            language_model_n_batch,
+            int(os.getenv('LANGUAGE_MODEL_N_BATCH', '512'))
+        )
+        self.language_model_n_gpu_layers = self._resolve_value_with_priority(
+            language_model_n_gpu_layers,
+            int(os.getenv('LANGUAGE_MODEL_N_GPU_LAYERS', '-1'))
+        )
+
         self.embeddings_model_name = self._resolve_value_with_priority(
             embeddings_model_name,
             os.getenv('EMBEDDINGS_MODEL_NAME', 'bflhc/Octen-Embedding-0.6B'),
@@ -55,6 +108,7 @@ class Config:
             judge_language_model_provider_api_key,
             os.getenv('JUDGE_LANGUAGE_MODEL_PROVIDER_API_KEY')
         )
+        self.qa_prompt_type = qa_prompt_type
 
         # **/unlp-2026-submission/src/unlp_2026_submission
         package_root_dir = Path(__file__).resolve().parents[1]

@@ -13,9 +13,10 @@ from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.context_recall import evaluate_context_recall
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.knowledge_base import KnowledgeBase
-from unlp_2026_submission.workflow import WorkflowBuilder
+from unlp_2026_submission.workflow.workflow_builder import WorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory, JudgeLanguageModelFactory
+from unlp_2026_submission.workflow.prompts import QAPromptType
 
 app = typer.Typer()
 
@@ -29,6 +30,10 @@ def evaluate_context_recall_command(
             AccuracyDatasetName,
             typer.Option("--dataset", "-ds")
         ] = AccuracyDatasetName.FULL,
+        qa_prompt_type: Annotated[
+            QAPromptType,
+            typer.Option("--qa-prompt")
+        ] = QAPromptType.SIMPLE,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
         embeddings_model_name: Annotated[str, typer.Option("--embeddings-model", "-em")] = None,
@@ -51,6 +56,7 @@ def evaluate_context_recall_command(
         _evaluate(
             metric=metric,
             dataset_name=dataset_name,
+            qa_prompt_type=qa_prompt_type,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
             embeddings_model_name=embeddings_model_name,
@@ -63,6 +69,7 @@ def evaluate_context_recall_command(
 async def _evaluate(
         metric: AccuracyMetricName,
         dataset_name: AccuracyDatasetName,
+        qa_prompt_type: QAPromptType,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
         embeddings_model_name: str | None = None,
@@ -73,9 +80,10 @@ async def _evaluate(
         base_name='context-recall',
         metric=metric.value,
         dataset_name=dataset_name.value,
+        qa_prompt_type=qa_prompt_type.value,
         language_model_name=language_model_name,
         embeddings_model_name=embeddings_model_name,
-        judge_language_model_name=judge_language_model_name
+        judge_language_model_name=judge_language_model_name,
     )
 
     config = Config(
@@ -83,7 +91,8 @@ async def _evaluate(
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
         judge_language_model_name=judge_language_model_name,
-        judge_language_model_provider_api_key=judge_model_provider_api_key
+        judge_language_model_provider_api_key=judge_model_provider_api_key,
+        qa_prompt_type=qa_prompt_type,
     )
     dataset = AccuracyDatasetFactory.create(
         config=config,

@@ -3,7 +3,7 @@ from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
 
 from unlp_2026_submission.entities import Question
-from unlp_2026_submission.workflow import WorkflowState
+from unlp_2026_submission.workflow.state import WorkflowState
 
 from .accuracy_metric_name import AccuracyMetricName
 

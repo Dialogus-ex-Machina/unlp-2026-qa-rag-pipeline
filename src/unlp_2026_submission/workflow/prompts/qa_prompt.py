@@ -24,35 +24,14 @@ USER_PROMPT = """
 Відповідай лише літерою варіанту.
 """.strip()
 
-SYSTEM_PROMPT_EN = """
-You are a helpful assistant for multiple-choice questions.
-Reply with only the option letter (A, B, C, D, E or F).
-{% if context %}
-Answer **only** based on the context below.  
-Context:
-{{ context }}
-{% endif %}
-""".strip()
-
-USER_PROMPT_EN = """
-Question:
-{{ question | trim }}
-Options:
-{% set letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" -%}
-{% for ans in answers -%}
-{{ letters[loop.index0] }}. {{ ans }}
-{% endfor -%}
-Respond with only the option letter.
-""".strip()
-
-class QuestionAnswerPrompt:
+class QAPrompt:
     _template: ChatPromptTemplate
 
     def __init__(self):
         self._template = ChatPromptTemplate.from_messages(
             messages=[
-                ("system", SYSTEM_PROMPT_EN),
-                ("human", USER_PROMPT_EN),
+                ("system", SYSTEM_PROMPT),
+                ("human", USER_PROMPT),
             ],
             template_format="jinja2"
         )
