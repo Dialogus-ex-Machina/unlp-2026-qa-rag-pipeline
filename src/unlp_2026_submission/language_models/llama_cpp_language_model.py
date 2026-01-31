@@ -5,7 +5,6 @@ import json
 import fnmatch
 
 from langchain_community.chat_models import ChatLlamaCpp
-from llama_index.llms.llama_cpp import LlamaCPP
 from huggingface_hub import hf_hub_download, HfFileSystem
 from huggingface_hub.utils import validate_repo_id, enable_progress_bars
 
@@ -237,45 +236,3 @@ class LlamaCppLanguageModel(ChatLlamaCpp):
         if language_model_name and language_model_name.lower().endswith(".gguf"):
             return True
         return False
-
-class LlamaIndexLlamaCppLanguageModel(LlamaCPP):
-    @staticmethod
-    def create_from_hf_hub(
-            config: Config,
-            repo_id: str,
-            filename: Optional[str],
-            additional_files: Optional[List] = None,
-            **kwargs: Unpack[LlamaCppLanguageModelKArgs],
-    ) -> LlamaCPP:
-        if config.model_provider_api_key:
-            if os.environ.get("HF_TOKEN") is None:
-                os.environ["HF_TOKEN"] = config.model_provider_api_key
-
-        model_path = _resolve_model_hf_hub(
-            config=config,
-            repo_id=repo_id,
-            filename=filename,
-            additional_files=additional_files
-        )
-        return LlamaCPP(
-            model_path=model_path,
-            context_window=config.language_model_context_window,
-            max_new_tokens=config.language_model_max_tokens,
-            temperature=config.language_model_temperature,
-            model_kwargs=dict(
-                n_batch=config.language_model_n_batch,
-                n_ctx=config.language_model_context_window,
-                n_gpu_layers=config.language_model_n_gpu_layers,
-                penalize_nl=False,
-                rope_freq_base=0.0,
-                rope_freq_scale=0.0,
-            ),
-            generate_kwargs=dict(
-                max_tokens=config.language_model_max_tokens,
-                temperature=config.language_model_temperature,
-                top_p=config.language_model_top_p,
-                repeat_penalty=config.language_model_repeat_penalty,
-                stop=config.language_model_stop_tokens
-            ),
-            **kwargs
-        )
