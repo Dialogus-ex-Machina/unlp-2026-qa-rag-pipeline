@@ -1,10 +1,10 @@
+from langchain_core.embeddings import Embeddings
+
 from ...embeddings import (
     EmbeddingsModelProvider,
     EmbeddingsModelSpec,
     SentenceTransformerEmbeddingsModel
 )
-
-from langchain_core.embeddings import Embeddings
 
 
 class SentenceTransformerEmbeddingsModelProvider(EmbeddingsModelProvider):
