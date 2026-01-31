@@ -1,5 +1,4 @@
 from langchain_ollama import ChatOllama
-from llama_index.llms.ollama import Ollama
 from typing import Any, TypedDict, Unpack
 
 from unlp_2026_submission.config import Config
@@ -18,17 +17,6 @@ class OllamaLanguageModel(ChatOllama):
             **kwargs: Unpack[OllamaLanguageModelKArgs],
     ):
         return ChatOllama(
-            model=config.language_model_name,
-            **kwargs
-        )
-
-class LlamaIndexOllamaLanguageModel(Ollama):
-    @staticmethod
-    def create(
-            config: Config,
-            **kwargs: Unpack[OllamaLanguageModelKArgs],
-    ) -> Ollama:
-        return Ollama(
             model=config.language_model_name,
             **kwargs
         )

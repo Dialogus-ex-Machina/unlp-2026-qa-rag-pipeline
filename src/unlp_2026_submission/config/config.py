@@ -57,7 +57,7 @@ class Config:
         )
         self.language_model_context_window = self._resolve_value_with_priority(
             language_model_context_window,
-            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '8192')),
+            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '4096')),
         )
         self.model_provider_api_key = self._resolve_value_with_priority(
             model_provider_api_key,
@@ -108,7 +108,10 @@ class Config:
             judge_language_model_provider_api_key,
             os.getenv('JUDGE_LANGUAGE_MODEL_PROVIDER_API_KEY')
         )
-        self.qa_prompt_type = qa_prompt_type
+        self.qa_prompt_type = self._resolve_value_with_priority(
+            qa_prompt_type,
+            QAPromptType.SIMPLE
+        )
 
         # **/unlp-2026-submission/src/unlp_2026_submission
         package_root_dir = Path(__file__).resolve().parents[1]

@@ -19,17 +19,12 @@ dependencies = [
     "llama-index (>=0.14.12,<0.15.0)",
     "llama-index-embeddings-langchain (>=0.4.1,<0.5.0)",
     "llama-index-vector-stores-qdrant (>=0.9.1,<0.10.0)",
-    "llama-index-llms-openai (>=0.6.13,<0.7.0)",
     "langchain-google-genai (>=4.2.0,<5.0.0)",
-    "llama-index-llms-ollama (>=0.9.1,<0.10.0)",
     "fastembed (>=0.7.4,<0.8.0)",
     "typer (>=0.21.1,<0.22.0)",
     "llama-cpp-python (>=0.3.16,<0.4.0)",
     "langchain-community (>=0.4.1,<0.5.0)",
-    "llama-index-embeddings-huggingface (>=0.6.1,<0.7.0)",
-    "llama-index-llms-llama-cpp (>=0.5.1,<0.6.0)",
     "huggingface-hub (>=0.33.4,<1.0.0)",
-    "llama-index-llms-google-genai (>=0.8.4,<0.9.0)",
     "mteb (>=2.7.10,<3.0.0)",
     "rapidfuzz (>=3.14.3,<4.0.0)",
     "tabulate (>=0.9.0,<0.10.0)",
@@ -37,7 +32,6 @@ dependencies = [
     "jsonref (>=1.1.0,<2.0.0)",
     "langchain-huggingface (>=1.2.0,<2.0.0)",
     "accelerate (>=1.12.0,<2.0.0)",
-    "llama-index-llms-huggingface (>=0.6.1,<0.7.0)"
 ]
 
 [tool.poetry]
