@@ -13,7 +13,7 @@ from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.context_recall import evaluate_context_recall
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.knowledge_base import KnowledgeBase
-from unlp_2026_submission.workflow import WorkflowBuilder
+from unlp_2026_submission.workflow.workflow_builder import WorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory, JudgeLanguageModelFactory
 from unlp_2026_submission.workflow.prompts import QAPromptType

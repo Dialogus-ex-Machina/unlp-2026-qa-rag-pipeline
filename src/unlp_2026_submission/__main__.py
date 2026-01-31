@@ -1,10 +1,10 @@
 import asyncio
 
-from unlp_2026_submission.config.config import Config
+from unlp_2026_submission.config import Config
 from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.language_models import LanguageModelFactory
-from unlp_2026_submission.workflow import WorkflowBuilder
+from unlp_2026_submission.workflow.workflow_builder import WorkflowBuilder
 
 
 async def main():

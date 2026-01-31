@@ -6,7 +6,7 @@ from langchain_core.messages import AIMessage
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.language_models import LanguageModel
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.workflow.prompts.prompts_factory import PromptsFactory
+from unlp_2026_submission.workflow.prompts import PromptsFactory
 from unlp_2026_submission.workflow.state import WorkflowState
 
 class BaseNode(ABC):

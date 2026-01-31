@@ -217,7 +217,18 @@ class LlamaCppLanguageModel(ChatLlamaCpp):
         # loading the first file of a sharded GGUF loads all remaining shard files in the subfolder
         return ChatLlamaCpp(
             model_path=model_path,
+            max_tokens=config.language_model_max_tokens,
+            n_batch=config.language_model_n_batch,
             n_ctx=config.language_model_context_window,
+            n_gpu_layers=config.language_model_n_gpu_layers,
+            repeat_penalty=config.language_model_repeat_penalty,
+            rope_freq_base=0.0,
+            rope_freq_scale=0.0,
+            stop=config.language_model_stop_tokens,
+            temperature=config.language_model_temperature,
+            top_p=config.language_model_top_p,
+            top_k=config.language_model_top_k,
+            model_kwargs={ "penalize_nl": False },
             **kwargs,
         )
 
@@ -249,5 +260,22 @@ class LlamaIndexLlamaCppLanguageModel(LlamaCPP):
         return LlamaCPP(
             model_path=model_path,
             context_window=config.language_model_context_window,
+            max_new_tokens=config.language_model_max_tokens,
+            temperature=config.language_model_temperature,
+            model_kwargs=dict(
+                n_batch=config.language_model_n_batch,
+                n_ctx=config.language_model_context_window,
+                n_gpu_layers=config.language_model_n_gpu_layers,
+                penalize_nl=False,
+                rope_freq_base=0.0,
+                rope_freq_scale=0.0,
+            ),
+            generate_kwargs=dict(
+                max_tokens=config.language_model_max_tokens,
+                temperature=config.language_model_temperature,
+                top_p=config.language_model_top_p,
+                repeat_penalty=config.language_model_repeat_penalty,
+                stop=config.language_model_stop_tokens
+            ),
             **kwargs
         )
