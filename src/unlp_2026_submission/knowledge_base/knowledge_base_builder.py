@@ -5,6 +5,7 @@ from unlp_2026_submission.knowledge_base.documents import SimpleDirectoryReader
 from unlp_2026_submission.knowledge_base.ingestion_pipelines import IngestionPipeline
 from unlp_2026_submission.language_models import LlamaIndexLanguageModel
 
+
 class KnowledgeBaseBuilder:
     @staticmethod
     def build(

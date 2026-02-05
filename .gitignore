@@ -43,4 +43,4 @@ docker-compose.override.yaml
 
 # Project-specific
 /hf_cache
-/scripts
+/scripts/vector_dbs
