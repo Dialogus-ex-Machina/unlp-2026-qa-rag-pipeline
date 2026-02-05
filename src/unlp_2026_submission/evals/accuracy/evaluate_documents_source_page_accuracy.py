@@ -21,7 +21,7 @@ async def evaluate_documents_source_page_accuracy(
         experiment_results
     )
 
-    print("\nExperiment completed!")
+    print(f"\nExperiment {experiment_name} completed!")
     print(f"Total questions: {len(experiment_results)}")
     print(f"Total score: {documents_page_accuracy_result['total_score']}")
     print(f"Pages accuracy: {documents_page_accuracy_result['accuracy']:.5%}")

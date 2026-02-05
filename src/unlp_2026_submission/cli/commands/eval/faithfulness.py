@@ -12,9 +12,10 @@ from unlp_2026_submission.evals.faithfulness import (
     FaithfulnessDatasetName
 )
 from unlp_2026_submission.knowledge_base import KnowledgeBase
-from unlp_2026_submission.workflow import WorkflowBuilder
+from unlp_2026_submission.workflow.workflow_builder import WorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
+from unlp_2026_submission.workflow.prompts import QAPromptType
 
 app = typer.Typer()
 
@@ -25,6 +26,10 @@ def evaluate_faithfulness_command(
             FaithfulnessDatasetName,
             typer.Option("--dataset", "-ds")
         ] = FaithfulnessDatasetName.FULL,
+        qa_prompt_type: Annotated[
+            QAPromptType,
+            typer.Option("--qa-prompt")
+        ] = QAPromptType.SIMPLE,
         language_model_name: Annotated[
             str,
             typer.Option("--model", "-m")
@@ -41,6 +46,7 @@ def evaluate_faithfulness_command(
     asyncio.run(
         _evaluate(
             dataset_name=dataset_name,
+            qa_prompt_type=qa_prompt_type,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
             embeddings_model_name=embeddings_model_name,
@@ -50,6 +56,7 @@ def evaluate_faithfulness_command(
 
 async def _evaluate(
         dataset_name: FaithfulnessDatasetName,
+        qa_prompt_type: QAPromptType,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
         embeddings_model_name: str | None = None,
@@ -57,11 +64,13 @@ async def _evaluate(
     experiment_name = create_experiment_name(
         base_name='faithfulness',
         dataset_name=dataset_name.value,
+        qa_prompt_type=qa_prompt_type.value,
         language_model_name=language_model_name,
         embeddings_model_name=embeddings_model_name,
     )
 
     config = Config(
+        qa_prompt_type=qa_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,

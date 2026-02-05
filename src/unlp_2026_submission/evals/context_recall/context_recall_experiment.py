@@ -4,7 +4,7 @@ from typing import Optional
 
 from unlp_2026_submission.entities import QuestionWithContext
 from unlp_2026_submission.language_models import JudgeLanguageModel
-from unlp_2026_submission.workflow import WorkflowState
+from unlp_2026_submission.workflow.state import WorkflowState
 from .context_recall_metric import ContextRecall
 
 def _answer_to_index(choice: str) -> Optional[int]:

@@ -5,7 +5,6 @@ from openai import AsyncOpenAI
 from ragas.llms import llm_factory, InstructorBaseRagasLLM
 from typing_extensions import TypedDict, Unpack
 from langchain_openai import ChatOpenAI
-from llama_index.llms.openai import OpenAI as LlamaIndexOpenAI
 
 from unlp_2026_submission.config import Config
 
@@ -37,24 +36,6 @@ class OpenAILanguageModel(ChatOpenAI):
         if language_model_name and language_model_name.lower().startswith("gpt"):
             return True
         return False
-
-
-class LlamaIndexOpenAILanguageModel(LlamaIndexOpenAI):
-    @staticmethod
-    def create(
-            config: Config,
-            **kwargs: Unpack[OpenAILanguageModelKArgs],
-    ) -> LlamaIndexOpenAI:
-        if not config.model_provider_api_key:
-            raise ValueError("Model provider API key not found")
-
-        if os.environ.get("OPENAI_API_KEY") is None:
-            os.environ["OPENAI_API_KEY"] = config.model_provider_api_key
-
-        return LlamaIndexOpenAI(
-            model=config.language_model_name,
-            **kwargs
-        )
 
 class OpenAIJudgeLanguageModel:
     @staticmethod

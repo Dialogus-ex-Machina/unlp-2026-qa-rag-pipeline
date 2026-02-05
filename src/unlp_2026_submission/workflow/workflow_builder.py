@@ -3,8 +3,9 @@ from langgraph.graph import StateGraph
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.language_models import LanguageModel
-from unlp_2026_submission.workflow.nodes import QuestionAnswerNode, ContextRetrievalNode
-from unlp_2026_submission.workflow.state.workflow_state import WorkflowState
+from .nodes import QuestionAnswerNode, ContextRetrievalNode
+from .prompts import PromptsFactory
+from .state.workflow_state import WorkflowState
 
 
 class WorkflowBuilder:
@@ -29,6 +30,10 @@ class WorkflowBuilder:
         return self
 
     def build(self):
+        prompts_factory = PromptsFactory.create(
+            qa_prompt_type=self._config.qa_prompt_type
+        )
+
         self._state_graph = StateGraph(
             state_schema=WorkflowState
         )
@@ -36,12 +41,14 @@ class WorkflowBuilder:
         context_retrieval_node = ContextRetrievalNode(
             config=self._config,
             language_model=self._language_model,
-            knowledge_base=self._knowledge_base
+            knowledge_base=self._knowledge_base,
+            prompts_factory=prompts_factory,
         )
         question_answer_node = QuestionAnswerNode(
             config=self._config,
             language_model=self._language_model,
-            knowledge_base=self._knowledge_base
+            knowledge_base=self._knowledge_base,
+            prompts_factory=prompts_factory,
         )
 
         self._state_graph.add_node(question_answer_node.name, question_answer_node)

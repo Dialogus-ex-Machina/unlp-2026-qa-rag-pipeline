@@ -2,18 +2,13 @@ import re
 from typing import Tuple, Optional
 
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.language_models import (
-    LanguageModel,
-    LlamaIndexLanguageModel,
-    LlamaCppLanguageModel,
-    OpenAILanguageModel,
-    GeminiLanguageModel,
-    OllamaLanguageModel,
-    LlamaIndexLlamaCppLanguageModel,
-    LlamaIndexOpenAILanguageModel,
-    LlamaIndexGeminiLanguageModel,
-    LlamaIndexOllamaLanguageModel,
-)
+from . import FakeLlamaIndexLanguageModel
+from .gemini_language_model import GeminiLanguageModel
+from .open_ai_language_model import OpenAILanguageModel
+from .llama_cpp_language_model import LlamaCppLanguageModel
+from .hugging_face_language_model import HuggingFaceLanguageModel
+from .language_model import LanguageModel, LlamaIndexLanguageModel
+
 
 class LanguageModelFactory:
     _config: Config
@@ -34,28 +29,24 @@ class LanguageModelFactory:
                 repo_id=repo_id,
                 filename=filename
             )
-            llama_index_language_model = LlamaIndexLlamaCppLanguageModel.create_from_hf_hub(
-                config=self._config,
-                repo_id=repo_id,
-                filename=filename
-            )
+            llama_index_language_model = FakeLlamaIndexLanguageModel()
 
             return language_model, llama_index_language_model
 
         if OpenAILanguageModel.is_compatible_model(self._config.language_model_name):
             language_model = OpenAILanguageModel.create(self._config)
-            llama_index_language_model = LlamaIndexOpenAILanguageModel.create(self._config)
+            llama_index_language_model = FakeLlamaIndexLanguageModel()
 
             return language_model, llama_index_language_model
 
         if GeminiLanguageModel.is_compatible_model(self._config.language_model_name):
             language_model = GeminiLanguageModel.create(self._config)
-            llama_index_language_model = LlamaIndexGeminiLanguageModel.create(self._config)
+            llama_index_language_model = FakeLlamaIndexLanguageModel()
 
             return language_model, llama_index_language_model
 
-        language_model = OllamaLanguageModel.create(self._config)
-        llama_index_language_model = LlamaIndexOllamaLanguageModel.create(self._config)
+        language_model = HuggingFaceLanguageModel.create(self._config)
+        llama_index_language_model = FakeLlamaIndexLanguageModel()
 
         return language_model, llama_index_language_model
 

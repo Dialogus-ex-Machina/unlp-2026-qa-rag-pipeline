@@ -1,6 +1,7 @@
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
+from unlp_2026_submission.workflow.prompts import PromptsFactory
 from unlp_2026_submission.workflow.state import WorkflowState
 from unlp_2026_submission.language_models import LanguageModel
 
@@ -12,12 +13,14 @@ class ContextRetrievalNode(BaseNode):
             config: Config,
             language_model: LanguageModel,
             knowledge_base: KnowledgeBase,
+            prompts_factory: PromptsFactory,
     ):
         super().__init__(
             name=CONTEXT_RETRIEVAL_NODE_NAME,
             config=config,
             language_model=language_model,
-            knowledge_base=knowledge_base
+            knowledge_base=knowledge_base,
+            prompts_factory=prompts_factory,
         )
 
     def __call__(self, state: WorkflowState):

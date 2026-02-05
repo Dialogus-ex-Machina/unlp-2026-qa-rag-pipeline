@@ -13,9 +13,10 @@ from unlp_2026_submission.evals.accuracy import (
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.knowledge_base import KnowledgeBase
-from unlp_2026_submission.workflow import WorkflowBuilder
+from unlp_2026_submission.workflow.workflow_builder import WorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
+from unlp_2026_submission.workflow.prompts import QAPromptType
 
 app = typer.Typer()
 
@@ -30,6 +31,10 @@ def evaluate_accuracy_command(
             AccuracyDatasetName,
             typer.Option("--dataset", "-ds")
         ] = AccuracyDatasetName.FULL,
+        qa_prompt_type: Annotated[
+            QAPromptType,
+            typer.Option("--qa-prompt")
+        ] = QAPromptType.SIMPLE,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
         embeddings_model_name: Annotated[str, typer.Option("--embeddings-model", "-em")] = None,
@@ -44,6 +49,7 @@ def evaluate_accuracy_command(
         _evaluate(
             metric=metric,
             dataset_name=dataset_name,
+            qa_prompt_type=qa_prompt_type,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
             embeddings_model_name=embeddings_model_name,
@@ -54,19 +60,22 @@ def evaluate_accuracy_command(
 async def _evaluate(
         metric: AccuracyMetricName,
         dataset_name: AccuracyDatasetName,
+        qa_prompt_type: QAPromptType,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
-        embeddings_model_name: str | None = None
+        embeddings_model_name: str | None = None,
 ):
     experiment_name = create_experiment_name(
         base_name='accuracy',
         metric=metric.value,
-        dataset_name=dataset_name,
+        dataset_name=dataset_name.value,
+        qa_prompt_type=qa_prompt_type.value,
         language_model_name=language_model_name,
         embeddings_model_name=embeddings_model_name,
     )
 
     config = Config(
+        qa_prompt_type=qa_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
@@ -106,5 +115,5 @@ async def _evaluate(
     await eval_factory.run(
         dataset=dataset,
         experiment_name=experiment_name,
-        workflow=workflow
+        workflow=workflow,
     )

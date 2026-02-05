@@ -3,7 +3,7 @@ from ragas import experiment
 
 from unlp_2026_submission.entities import Question
 from unlp_2026_submission.evals.accuracy.metrics import document_source_page_accuracy_metric
-from unlp_2026_submission.workflow import WorkflowState
+from unlp_2026_submission.workflow.state import WorkflowState
 
 
 @experiment()
