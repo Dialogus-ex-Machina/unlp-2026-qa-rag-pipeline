@@ -1,18 +1,15 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters.base import TextSplitter
 
 from merlin.rag.index.index_state import IndexState
 
 
 class SplitNode:
+    def __init__(self, splitter: TextSplitter):
+        self.splitter = splitter
+
     def __call__(self, state: IndexState) -> IndexState:
         documents = state["documents"]
 
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=400,
-            chunk_overlap=0,
-            add_start_index=True,
-        )
-
-        splits = text_splitter.split_documents(documents)
+        splits = splitter.split_documents(documents)
 
         return {"splits": splits}
