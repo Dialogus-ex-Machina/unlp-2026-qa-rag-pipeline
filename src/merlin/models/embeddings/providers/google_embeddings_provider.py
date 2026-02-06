@@ -1,16 +1,17 @@
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_core.embeddings import Embeddings
 
 from ...embeddings import (
-    EmbeddingsModelProvider,
-    EmbeddingsModelSpec
+    EmbeddingsProvider,
+    EmbeddingsSpec
 )
 
 
-class GoogleEmbeddingsModelProvider(EmbeddingsModelProvider):
-    def can_create(self, spec: EmbeddingsModelSpec) -> bool:
+class GoogleEmbeddingsProvider(EmbeddingsProvider):
+    def can_create(self, spec: EmbeddingsSpec) -> bool:
         return spec.provider == "google" and (spec.model_name or "").lower().startswith("gemini-embedding")
 
-    def create(self, spec: EmbeddingsModelSpec) -> EmbeddingsModel:
+    def create(self, spec: EmbeddingsSpec) -> Embeddings:
         return GoogleGenerativeAIEmbeddings(
             model=spec.model_name,
             api_key=spec.api_key
