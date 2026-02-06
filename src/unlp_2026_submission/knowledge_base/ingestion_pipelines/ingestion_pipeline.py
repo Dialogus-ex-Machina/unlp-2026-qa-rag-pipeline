@@ -5,10 +5,11 @@ from llama_index.core.ingestion import IngestionPipeline as BaseIngestionPipelin
 from llama_index.core.vector_stores.types import BasePydanticVectorStore
 from llama_index.core.storage.docstore import BaseDocumentStore
 from llama_index.embeddings.langchain import LangchainEmbedding
+from llama_index.core.node_parser import LangchainNodeParser
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from unlp_2026_submission.config import KnowledgeBaseConfig
 from unlp_2026_submission.knowledge_base.documents import Document
-from unlp_2026_submission.knowledge_base.transformations import SentenceSplitter
 from unlp_2026_submission.embeddings import EmbeddingsModel
 
 class IngestionPipeline(BaseIngestionPipeline):
@@ -42,8 +43,10 @@ class IngestionPipeline(BaseIngestionPipeline):
             doc_store: Optional[BaseDocumentStore] = None,
     ):
         transformations = [
-            SentenceSplitter(),
-            LangchainEmbedding(embeddings_model),
+            LangchainNodeParser(
+                RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=0),
+            ),
+            LangchainEmbedding(langchain_embeddings=embeddings_model, embed_batch_size=10),
         ]
 
         ingestion_pipeline = IngestionPipeline(

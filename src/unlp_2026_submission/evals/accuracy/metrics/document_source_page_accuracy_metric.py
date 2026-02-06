@@ -1,6 +1,7 @@
 from ragas import Experiment
 from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
+from pathlib import Path
 
 from unlp_2026_submission.entities import Question
 from unlp_2026_submission.workflow.state import WorkflowState
@@ -17,7 +18,10 @@ def document_source_page_accuracy_metric(
         workflow_result: WorkflowState,
 ) -> MetricResult:
     """Calculate accuracy of the prediction."""
-    if question['doc_id'] != workflow_result['reference_document_id']:
+    predicted_document_id_stem = Path(workflow_result['reference_document_id']).stem
+    correct_document_id_stem = Path(question['doc_id']).stem
+
+    if correct_document_id_stem != predicted_document_id_stem:
         return MetricResult(0, 'not correct document_id')
 
     reference_document_page_num = workflow_result['reference_document_page_num']

@@ -1,6 +1,7 @@
 from ragas import Experiment
 from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
+from pathlib import Path
 
 from .accuracy_metric_name import AccuracyMetricName
 
@@ -11,9 +12,12 @@ from .accuracy_metric_name import AccuracyMetricName
 )
 def document_source_accuracy_metric(prediction: str, actual: str) -> MetricResult:
     """Calculate accuracy of the prediction."""
+    prediction_stem = Path(prediction).stem
+    actual_stem = Path(actual).stem
+
     return (
         MetricResult(value=1, reason="")
-        if prediction == actual
+        if prediction_stem == actual_stem
         else MetricResult(value=0, reason="")
     )
 
