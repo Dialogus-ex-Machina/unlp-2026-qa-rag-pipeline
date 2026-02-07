@@ -10,6 +10,6 @@ class SplitNode:
     def __call__(self, state: IndexState) -> IndexState:
         documents = state["documents"]
 
-        splits = splitter.split_documents(documents)
+        splits = self.splitter.split_documents(documents)
 
         return {"splits": splits}
