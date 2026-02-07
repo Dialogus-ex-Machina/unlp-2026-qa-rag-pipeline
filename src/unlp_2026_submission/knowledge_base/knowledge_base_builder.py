@@ -6,6 +6,7 @@ from unlp_2026_submission.knowledge_base.ingestion_pipelines import IngestionPip
 from unlp_2026_submission.language_models import LlamaIndexLanguageModel
 from unlp_2026_submission.knowledge_base.documents.readers import DelimitedPageTxtReader
 
+
 class KnowledgeBaseBuilder:
     @staticmethod
     def build(

@@ -33,6 +33,7 @@ STORAGE_CONTEXT_REQUIRED_FILES = {
     "index_store.json",
 }
 
+
 def is_persisted_storage_context_exist(persist_dir: str) -> bool:
     p = Path(persist_dir)
     if not p.exists() or not p.is_dir():
@@ -40,6 +41,7 @@ def is_persisted_storage_context_exist(persist_dir: str) -> bool:
 
     existing = {f.name for f in p.iterdir() if f.is_file()}
     return STORAGE_CONTEXT_REQUIRED_FILES.issubset(existing)
+
 
 class KnowledgeBase:
     _storage_context: StorageContext
