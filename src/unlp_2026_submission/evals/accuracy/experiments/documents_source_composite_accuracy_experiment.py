@@ -2,7 +2,7 @@ from langgraph.graph.state import CompiledStateGraph
 from ragas import experiment
 
 from unlp_2026_submission.entities import Question
-from unlp_2026_submission.evals.accuracy.metrics import composite_accuracy_metric
+from unlp_2026_submission.evals.accuracy.metrics import document_source_composite_accuracy_metric
 from unlp_2026_submission.workflow.state import WorkflowState
 
 
@@ -15,7 +15,7 @@ async def documents_source_composite_accuracy_experiment(
         input={ 'question': question }
     )
 
-    score = await composite_accuracy_metric.ascore(
+    score = await document_source_composite_accuracy_metric.ascore(
         question=question,
         workflow_result=result
     )
@@ -31,6 +31,7 @@ async def documents_source_composite_accuracy_experiment(
         'answer': result['answer'],
         'reference_document_id': result['reference_document_id'],
         'reference_document_page_num': result['reference_document_page_num'],
+        'reference_document_page_text': result['reference_document_page'].text,
         "score": score.value,
     }
 

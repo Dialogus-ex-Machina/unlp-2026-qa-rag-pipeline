@@ -134,9 +134,9 @@ class KnowledgeBase:
         nodes = self.retrieve(
             search_query=search_query,
             filters=filters,
-            hybrid_top_k=hybrid_top_k,
+            # hybrid_top_k=hybrid_top_k,
             similarity_top_k=similarity_top_k,
-            sparse_top_k=sparse_top_k,
+            # sparse_top_k=sparse_top_k,
         )
 
         postprocessed_nodes = postprocessor.postprocess_nodes(
@@ -169,9 +169,9 @@ class KnowledgeBase:
             llm=self._llama_index_language_model,
             embeddings_model=self._embeddings_model,
             vector_store_kwargs={"qdrant_filters": filters},
-            hybrid_top_k=hybrid_top_k,
+            # hybrid_top_k=hybrid_top_k,
             similarity_top_k=similarity_top_k,
-            sparse_top_k=sparse_top_k
+            # sparse_top_k=sparse_top_k
         )
 
         return query_engine.query(search_query)
@@ -186,9 +186,9 @@ class KnowledgeBase:
     ) -> list[NodeWithScore]:
         retriever = self.vector_store_index.as_retriever(
             vector_store_kwargs={"qdrant_filters": filters},
-            hybrid_top_k=hybrid_top_k,
+            # hybrid_top_k=hybrid_top_k,
             similarity_top_k=similarity_top_k,
-            sparse_top_k=sparse_top_k
+            # sparse_top_k=sparse_top_k
         )
 
         return retriever.retrieve(search_query)
@@ -205,6 +205,7 @@ class KnowledgeBase:
             Path(config.kb_store_root_dir).mkdir(exist_ok=True)
 
             qdrant_client = QdrantClient(path=config.vector_store_path)
+            # qdrant_client = QdrantClient(host="localhost", port=6333)
         else:
             qdrant_client = QdrantClient(location=":memory:")
 
@@ -212,8 +213,8 @@ class KnowledgeBase:
         vector_store = QdrantVectorStore(
             client=qdrant_client,
             collection_name=config.collection_name,
-            enable_hybrid=True,
-            fastembed_sparse_model="Qdrant/bm25",
+            # enable_hybrid=True,
+            # fastembed_sparse_model="Qdrant/bm25",
         )
 
         storage_context = StorageContext.from_defaults(
@@ -261,12 +262,13 @@ class KnowledgeBase:
             )
 
         qdrant_client = QdrantClient(path=config.vector_store_path)
+        # qdrant_client = QdrantClient(host="localhost", port=6333)
 
         vector_store = QdrantVectorStore(
             client=qdrant_client,
             collection_name=config.collection_name,
-            enable_hybrid=True,
-            fastembed_sparse_model="Qdrant/bm25",
+            # enable_hybrid=True,
+            # fastembed_sparse_model="Qdrant/bm25",
         )
 
         storage_context = StorageContext.from_defaults(

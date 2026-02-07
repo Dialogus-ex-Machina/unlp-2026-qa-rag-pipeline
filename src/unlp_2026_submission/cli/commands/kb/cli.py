@@ -15,7 +15,7 @@ def create_knowledge_base_command(
         language_model_name: Annotated[Optional[str], typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[Optional[str], typer.Option("--api-key", "-key")] = None,
         embeddings_model_name: Annotated[Optional[str], typer.Option("--embeddings-model", "-em")] = None,
-        logging_level: Annotated[Optional[str], typer.Option("--logs", "-l")] = logging.INFO,
+        logging_level: Annotated[Optional[int], typer.Option("--logs", "-l")] = logging.INFO,
 ):
     """
         Creates knowledge base.

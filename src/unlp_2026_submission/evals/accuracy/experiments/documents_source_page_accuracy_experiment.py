@@ -29,6 +29,7 @@ async def documents_source_page_accuracy_experiment(
         'raw_answer': result.get('raw_answer'),
         'reference_document_id': result['reference_document_id'],
         'reference_document_page_num': result['reference_document_page_num'],
+        'reference_document_page_text': result['reference_document_page'].text,
         "score": score.value,
     }
 

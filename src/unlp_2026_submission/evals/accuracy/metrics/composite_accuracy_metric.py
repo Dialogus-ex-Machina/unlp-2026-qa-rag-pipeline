@@ -1,6 +1,7 @@
 from ragas import Experiment
 from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
+from pathlib import Path
 
 from unlp_2026_submission.entities import Question
 from unlp_2026_submission.workflow.state import WorkflowState
@@ -28,12 +29,14 @@ def composite_accuracy_metric(
     # --- d_i: correct document id ---
     predicted_document_id = workflow_result['reference_document_id']
     correct_document_id = question['doc_id']
+    predicted_document_id_stem = Path(predicted_document_id).stem
+    correct_document_id_stem = Path(correct_document_id).stem
 
-    d_i = 1.0 if correct_document_id == predicted_document_id else 0.0
+    d_i = 1.0 if correct_document_id_stem == predicted_document_id_stem else 0.0
 
     # --- p_i: page proximity ---
     p_i = 0.0
-    if correct_document_id == predicted_document_id:
+    if correct_document_id_stem == predicted_document_id_stem:
         predicted_document_page = workflow_result['reference_document_page_num']
         correct_document_page = question['page_num']
         n_pages = question['n_pages']

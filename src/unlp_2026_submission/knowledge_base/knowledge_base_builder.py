@@ -4,6 +4,7 @@ from unlp_2026_submission.knowledge_base import KnowledgeBase
 from unlp_2026_submission.knowledge_base.documents import SimpleDirectoryReader
 from unlp_2026_submission.knowledge_base.ingestion_pipelines import IngestionPipeline
 from unlp_2026_submission.language_models import LlamaIndexLanguageModel
+from unlp_2026_submission.knowledge_base.documents.readers import DelimitedPageTxtReader
 
 
 class KnowledgeBaseBuilder:
@@ -24,7 +25,8 @@ class KnowledgeBaseBuilder:
         reader = SimpleDirectoryReader(
             input_dir=config.data_root_dir,
             recursive=True,
-            required_exts=['.pdf']
+            required_exts=['.txt'],
+            file_extractor={".txt": DelimitedPageTxtReader()}
         )
         # Custom metadata extraction?
         documents = reader.load_data(
@@ -40,7 +42,7 @@ class KnowledgeBaseBuilder:
 
         nodes = ingestion_pipeline.run(
             documents=documents,
-            show_progress=True
+            show_progress=True,
         )
 
         print(f"Knowledge base build succeed. Added {len(nodes)} nodes.")
