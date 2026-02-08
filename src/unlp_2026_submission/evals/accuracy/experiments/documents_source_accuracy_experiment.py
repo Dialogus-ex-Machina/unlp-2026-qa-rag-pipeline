@@ -22,6 +22,9 @@ async def documents_source_accuracy_experiment(
         actual=correct_document_id,
     )
 
+    reference_page = result.get('reference_document_page')
+    reference_page_text = reference_page.text if reference_page else ""
+
     experiment_view = {
         'question_id': question['question_id'],
         'question_text': question['question_text'],
@@ -30,7 +33,7 @@ async def documents_source_accuracy_experiment(
         'raw_answer': result.get('raw_answer'),
         'reference_document_id': result['reference_document_id'],
         'reference_document_page_num': result['reference_document_page_num'],
-        'reference_document_page_text': result['reference_document_page'].text,
+        'reference_document_page_text': reference_page_text,
         "score": score.value,
     }
 

@@ -24,7 +24,8 @@ async def context_recall_experiment(
     result: WorkflowState = workflow.invoke(
         input={ 'question': question }
     )
-    retrieved_contexts = [result['reference_document_page'].text]
+    reference_page = result.get('reference_document_page')
+    retrieved_contexts = [reference_page.text] if reference_page else [""]
     correct_answer_text = question['answers'][_answer_to_index(correct_answer)]
 
     scorer = ContextRecall(llm=judge_language_model)

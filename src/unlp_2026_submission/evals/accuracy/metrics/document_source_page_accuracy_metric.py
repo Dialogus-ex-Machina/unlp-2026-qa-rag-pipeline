@@ -36,7 +36,7 @@ def calculate_total_documents_source_page_accuracy(
         experiment_results: Experiment
 ):
     total = len(experiment_results)
-    total_score = sum(r["score"] for r in experiment_results)
+    total_score = sum((r["score"] or 0) for r in experiment_results)
     accuracy = total_score / total if total > 0 else 0
 
     return {
