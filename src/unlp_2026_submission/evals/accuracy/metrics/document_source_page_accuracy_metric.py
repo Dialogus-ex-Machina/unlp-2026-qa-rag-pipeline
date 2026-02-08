@@ -28,9 +28,20 @@ def document_source_page_accuracy_metric(
     actual_document_page = question['page_num']
     n_pages = question['n_pages']
 
-    metric_value = 1 - abs(reference_document_page_num - actual_document_page) / n_pages
+    try:
+        reference_document_page_num = int(reference_document_page_num)
+        actual_document_page = int(actual_document_page)
+        n_pages = int(n_pages)
+    except (TypeError, ValueError):
+        return MetricResult(value=0.0, reason="invalid page data")
 
-    return MetricResult(metric_value)
+    if n_pages <= 0:
+        return MetricResult(value=0.0, reason="invalid n_pages")
+
+    metric_value = 1.0 - abs(reference_document_page_num - actual_document_page) / float(n_pages)
+    metric_value = max(0.0, min(1.0, float(metric_value)))
+
+    return MetricResult(value=metric_value)
 
 def calculate_total_documents_source_page_accuracy(
         experiment_results: Experiment
