@@ -1,3 +1,5 @@
+import os
+
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Filter
 from llama_index.core import VectorStoreIndex, load_index_from_storage
@@ -26,6 +28,9 @@ from pathlib import Path
 from unlp_2026_submission.embeddings import EmbeddingsModel
 from unlp_2026_submission.language_models import LlamaIndexLanguageModel
 from unlp_2026_submission.config import KnowledgeBaseConfig
+from unlp_2026_submission.knowledge_base.langchain_knowledge_base import (
+    LangchainKnowledgeBase,
+)
 
 
 STORAGE_CONTEXT_REQUIRED_FILES = {
@@ -253,6 +258,24 @@ class KnowledgeBase:
             config: KnowledgeBaseConfig,
             should_persist: bool = True,
     ):
+        backend = os.getenv("KB_BACKEND", "").strip().lower()
+        if backend in {"langchain", "lc"}:
+            return LangchainKnowledgeBase.load(
+                llama_index_language_model=llama_index_language_model,
+                embeddings_model=embeddings_model,
+                config=config,
+                should_persist=should_persist,
+            )
+        if backend == "auto" and not is_persisted_storage_context_exist(
+            config.context_path
+        ):
+            return LangchainKnowledgeBase.load(
+                llama_index_language_model=llama_index_language_model,
+                embeddings_model=embeddings_model,
+                config=config,
+                should_persist=should_persist,
+            )
+
         if not is_persisted_storage_context_exist(config.context_path):
             return KnowledgeBase.create_empty(
                 llama_index_language_model=llama_index_language_model,
