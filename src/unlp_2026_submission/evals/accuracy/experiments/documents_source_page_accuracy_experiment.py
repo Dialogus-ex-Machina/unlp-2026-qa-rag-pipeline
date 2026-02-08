@@ -19,6 +19,11 @@ async def documents_source_page_accuracy_experiment(
         question=question,
         workflow_result=result
     )
+    if score.value is None:
+        score = document_source_page_accuracy_metric(
+            question=question,
+            workflow_result=result
+        )
 
     reference_page = result.get('reference_document_page')
     reference_page_text = reference_page.text if reference_page else ""
@@ -27,6 +32,7 @@ async def documents_source_page_accuracy_experiment(
         'question_id': question['question_id'],
         'question_text': question['question_text'],
         'answers': question['answers'],
+        'correct_answer': question.get('correct_answer'),
         'correct_document_id': question['doc_id'],
         'correct_document_page': question['page_num'],
         'raw_answer': result.get('raw_answer'),
