@@ -4,26 +4,37 @@ import re
 from collections import defaultdict
 from typing import Any, DefaultDict, Dict, List, Optional, Tuple
 
+from docling.datamodel.accelerator_options import AcceleratorOptions
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions, ThreadedPdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling.chunking import HybridChunker
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_docling import DoclingLoader
 from langchain_docling.loader import ExportType
 from transformers import AutoTokenizer
 
-from docling.chunking import HybridChunker
-
 from merlin.rag.index.index_state import IndexState
 
 
 class DoclingPageLoadNode:
     def __init__(
-            self,
-            embeddings: Embeddings,
-            max_tokens: int = 450,
-            merge_peers: bool = True,
-            zero_based_pages: bool = True,
-            join_sep: str = "\n\n",
-            strip_repeated_headings: bool = True
+        self,
+        embeddings: Embeddings,
+        max_tokens: int = 450,
+        merge_peers: bool = True,
+        zero_based_pages: bool = True,
+        join_sep: str = "\n\n",
+        strip_repeated_headings: bool = True,
+        device: str = "auto",
+        threaded: bool = True,
+        do_ocr: bool = False,
+        ocr_backend: str = "torch",
+        layout_batch_size: int = 2,
+        ocr_batch_size: int = 2,
+        table_batch_size: int = 1,
+        warmup: bool = False,
     ):
         self.embeddings = embeddings
         self.max_tokens = max_tokens
@@ -33,6 +44,16 @@ class DoclingPageLoadNode:
         self.strip_repeated_headings = strip_repeated_headings
 
         self._chunker = self._build_chunker_from_embeddings(embeddings)
+        self._converter = self._build_converter(
+            device=device,
+            threaded=threaded,
+            do_ocr=do_ocr,
+            ocr_backend=ocr_backend,
+            layout_batch_size=layout_batch_size,
+            ocr_batch_size=ocr_batch_size,
+            table_batch_size=table_batch_size,
+            warmup=warmup,
+        )
 
     def __call__(self, state: IndexState) -> IndexState:
         filepaths = state["filepaths"]
@@ -43,6 +64,7 @@ class DoclingPageLoadNode:
             file_path=filepaths,
             export_type=ExportType.DOC_CHUNKS,
             chunker=self._chunker,
+            converter=self._converter,
         )
         raw_chunks: List[Document] = loader.load()
 
@@ -50,6 +72,67 @@ class DoclingPageLoadNode:
         pages = self._group_chunks_to_pages(normalized)
 
         return {"documents": pages}
+
+    def _build_converter(
+        self,
+        device: str,
+        threaded: bool,
+        do_ocr: bool,
+        ocr_backend: str,
+        layout_batch_size: int,
+        ocr_batch_size: int,
+        table_batch_size: int,
+        warmup: bool,
+    ):
+        device_value: Any = device
+        try:
+            from docling.datamodel.accelerator_options import AcceleratorDevice
+
+            d = device.lower()
+            if d.startswith("cuda"):
+                device_value = AcceleratorDevice.CUDA
+            elif d == "cpu":
+                device_value = AcceleratorDevice.CPU
+            elif d == "mps":
+                device_value = AcceleratorDevice.MPS
+            elif d == "xpu":
+                device_value = AcceleratorDevice.XPU
+        except Exception:
+            pass
+
+        pipeline_cls = None
+        if threaded:
+            from docling.pipeline.threaded_standard_pdf_pipeline import ThreadedStandardPdfPipeline
+
+            pipeline_cls = ThreadedStandardPdfPipeline
+            pipeline_options = ThreadedPdfPipelineOptions(
+                accelerator_options=AcceleratorOptions(device=device_value),
+                layout_batch_size=layout_batch_size,
+                ocr_batch_size=ocr_batch_size,
+                table_batch_size=table_batch_size,
+            )
+        else:
+            pipeline_options = PdfPipelineOptions(accelerator_options=AcceleratorOptions(device=device_value))
+
+        pipeline_options.do_ocr = do_ocr
+        if do_ocr:
+            from docling.datamodel.pipeline_options import RapidOcrOptions
+
+            pipeline_options.ocr_options = RapidOcrOptions(backend=ocr_backend)
+
+        converter = DocumentConverter(
+            format_options={
+                InputFormat.PDF: PdfFormatOption(
+                    pipeline_cls=pipeline_cls,
+                    pipeline_options=pipeline_options,
+                )
+            }
+        )
+
+        if warmup:
+            converter.initialize_pipeline(InputFormat.PDF)
+
+        return converter
 
     def _build_chunker_from_embeddings(self, embeddings: Embeddings) -> HybridChunker:
         client = getattr(embeddings, "client", None)
@@ -125,11 +208,7 @@ class DoclingPageLoadNode:
         return page_docs
 
     @staticmethod
-    def _strip_repeated_heading_prefix(
-            text: str,
-            headings: Any,
-            seen: set[str],
-    ) -> str:
+    def _strip_repeated_heading_prefix(text: str, headings: Any, seen: set[str]) -> str:
         if not isinstance(headings, list) or not headings:
             return text
 
@@ -140,8 +219,8 @@ class DoclingPageLoadNode:
                 continue
 
             h_norm = h.strip()
-
             prefix_pattern = r"^\s*" + re.escape(h_norm) + r"\s*\n+"
+
             if re.match(prefix_pattern, out):
                 if h_norm in seen:
                     out = re.sub(prefix_pattern, "", out, count=1)
@@ -165,6 +244,7 @@ class DoclingPageLoadNode:
     def _extract_page_no(dl_meta: Dict[str, Any]) -> Optional[int]:
         items = dl_meta.get("doc_items") or []
         page_nos: List[int] = []
+
         for it in items:
             for prov in (it.get("prov") or []):
                 pn = prov.get("page_no")
