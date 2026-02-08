@@ -1,5 +1,10 @@
 from typing import List, Optional, Dict, Any
 
+from docling.datamodel.accelerator_options import AcceleratorOptions
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions, ThreadedPdfPipelineOptions
+from docling.datamodel.pipeline_options import RapidOcrOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.chunking import HybridChunker
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
@@ -17,6 +22,14 @@ class DoclingLoadSplitNode:
         max_tokens: int = 450,
         merge_peers: bool = True,
         zero_based_pages: bool = True,
+        device: str = "auto",
+        threaded: bool = True,
+        do_ocr: bool = False,
+        ocr_backend: str = "torch",
+        layout_batch_size: int = 64,
+        ocr_batch_size: int = 64,
+        table_batch_size: int = 4,
+        warmup: bool = False,
     ):
         self.embeddings = embeddings
         self.max_tokens = max_tokens
@@ -24,6 +37,16 @@ class DoclingLoadSplitNode:
         self.zero_based_pages = zero_based_pages
 
         self._chunker = self._build_chunker_from_embeddings(embeddings)
+        self._converter = self._build_converter(
+            device=device,
+            threaded=threaded,
+            do_ocr=do_ocr,
+            ocr_backend=ocr_backend,
+            layout_batch_size=layout_batch_size,
+            ocr_batch_size=ocr_batch_size,
+            table_batch_size=table_batch_size,
+            warmup=warmup,
+        )
 
     def __call__(self, state: IndexState) -> IndexState:
         filepaths = state["filepaths"]
@@ -33,13 +56,59 @@ class DoclingLoadSplitNode:
         loader = DoclingLoader(
             file_path=filepaths,
             export_type=ExportType.DOC_CHUNKS,
-            chunker=self._chunker
+            chunker=self._chunker,
+            converter=self._converter
         )
         raw_chunks: List[Document] = loader.load()
 
         splits = [self._normalize_chunk(raw_chunk) for raw_chunk in raw_chunks]
 
         return {"splits": splits}
+
+    @staticmethod
+    def _build_converter(
+        device: str,
+        threaded: bool,
+        do_ocr: bool,
+        ocr_backend: str,
+        layout_batch_size: int,
+        ocr_batch_size: int,
+        table_batch_size: int,
+        warmup: bool,
+    ):
+        pipeline_cls = None
+        if threaded:
+            from docling.pipeline.threaded_standard_pdf_pipeline import ThreadedStandardPdfPipeline
+            pipeline_cls = ThreadedStandardPdfPipeline
+
+        if threaded:
+            pipeline_options = ThreadedPdfPipelineOptions(
+                accelerator_options=AcceleratorOptions(device=device),
+                layout_batch_size=layout_batch_size,
+                ocr_batch_size=ocr_batch_size,
+                table_batch_size=table_batch_size,
+            )
+        else:
+            pipeline_options = PdfPipelineOptions()
+            pipeline_options.accelerator_options = AcceleratorOptions(device=device)
+
+        pipeline_options.do_ocr = do_ocr
+        if do_ocr:
+            pipeline_options.ocr_options = RapidOcrOptions(backend=ocr_backend)
+
+        converter = DocumentConverter(
+            format_options={
+                InputFormat.PDF: PdfFormatOption(
+                    pipeline_cls=pipeline_cls,
+                    pipeline_options=pipeline_options,
+                )
+            }
+        )
+
+        if warmup:
+            converter.initialize_pipeline(InputFormat.PDF)
+
+        return converter
 
     def _build_chunker_from_embeddings(self, embeddings: Embeddings):
         client = getattr(embeddings, "client", None)

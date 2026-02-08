@@ -13,7 +13,7 @@ embeddings = EmbeddingsFactory.create_all_embeddings_factory().create(spec)
 2) Embed+Store: Qdrand(Octen-Embedding-0.6B)
 """
 nodes = [
-    DoclingLoadSplitNode(embeddings),
+    DoclingLoadSplitNode(embeddings, device="cpu"),
     EmbedStoreNode(embeddings)
 ]
 
