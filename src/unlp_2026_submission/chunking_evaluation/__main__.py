@@ -1,28 +1,29 @@
 """
 /unlp-2026-submission/src/unlp_2026_submission/chunking_evaluation/__main__.py
 
-Page-aware semantic chunking pipeline (stable):
+Page-aware semantic chunking pipeline (stable) using LlamaIndex SimpleDirectoryReader:
 
-1) Load a .txt where page delimiter appears at END of each page:
-   "===== Page N ====="
-2) Remove delimiters, build:
-   - clean_text
-   - page_ranges = [(start_char, end_char, page_number), ...] in clean_text
-3) Run semantic chunking via existing ClusterSemanticChunker
+1) Load .txt files via SimpleDirectoryReader (LlamaIndex parsing)
+2) For each file, parse "===== Page N =====" delimiters that appear at END of each page:
+   - build clean_text (delimiters removed, pages joined by "\\n\\n")
+   - build page_ranges = [(start_char, end_char, page_number), ...] in clean_text
+3) Run semantic chunking via existing ClusterSemanticChunker on clean_text
 4) For each semantic chunk, find its span stably (whitespace-insensitive + fuzzy sentence fallback)
    and assign page_number = page that overlaps the chunk span the most.
+5) Return chunk Documents with metadata:
+   {"page_label": page_num, "file_name": <name>, "start": <int|None>, "end": <int|None>}
 """
 
 from __future__ import annotations
 
 import argparse
 import re
-from dataclasses import dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import List, Optional, Tuple
 
 from chromadb.utils import embedding_functions
+from llama_index.core import Document, SimpleDirectoryReader
 
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.chunking_evaluation.chunking import ClusterSemanticChunker
@@ -34,30 +35,16 @@ PAGE_DELIMITER_RE = re.compile(r"===== Page (\d+) =====")
 
 
 # -----------------------------
-# Data model
+# Step 1: Parse raw text into clean_text + page_ranges
 # -----------------------------
-@dataclass(frozen=True)
-class ChunkWithMetadata:
-    text: str
-    page_number: Optional[int] = None
-    start: Optional[int] = None
-    end: Optional[int] = None
-
-
-# -----------------------------
-# Step 1: Load & remove delimiters + page ranges
-# -----------------------------
-def load_file_with_pages(file_path: str | Path) -> Tuple[str, List[Tuple[int, int, int]]]:
+def load_text_with_pages(raw: str) -> Tuple[str, List[Tuple[int, int, int]]]:
     """
-    Reads a .txt where the delimiter "===== Page N =====" appears at the END of page N.
+    Reads raw text where the delimiter "===== Page N =====" appears at the END of page N.
 
     Returns:
       - clean_text: full text with delimiters removed (pages joined by "\\n\\n")
       - page_ranges: list of (start_char, end_char, page_number) spans in clean_text
     """
-    path = Path(file_path)
-    raw = path.read_text(encoding="utf-8")
-
     matches = list(PAGE_DELIMITER_RE.finditer(raw))
     if not matches:
         clean = raw.strip()
@@ -192,7 +179,11 @@ def _sentence_spans(text: str) -> List[Tuple[int, int]]:
     return spans
 
 
-def rigorous_document_search_span(document: str, target: str, min_score: float = 98.0) -> Optional[Tuple[int, int]]:
+def rigorous_document_search_span(
+    document: str,
+    target: str,
+    min_score: float = 98.0,
+) -> Optional[Tuple[int, int]]:
     """
     Stable search for target inside document.
     1) Exact search (fast)
@@ -241,22 +232,25 @@ def rigorous_document_search_span(document: str, target: str, min_score: float =
 
 
 # -----------------------------
-# Attach page metadata to chunks
+# Attach page metadata to chunks (return Documents)
 # -----------------------------
-def add_page_metadata_to_chunks(
+def add_page_metadata_to_chunks_from_filename(
     clean_text: str,
     chunks: List[str],
     page_ranges: List[Tuple[int, int, int]],
+    file_name: str,
     min_fuzzy_score: float = 98.0,
-) -> List[ChunkWithMetadata]:
+) -> List[Document]:
     """
-    For each chunk, locate it in clean_text (stable), then assign dominant page_number.
+    For each chunk, locate it in clean_text (stable),
+    assign dominant page_number, and return LlamaIndex Documents.
+
+    NOTE: start/end are stored in metadata (Document has no .start/.end attrs).
     """
-    out: List[ChunkWithMetadata] = []
-    hint = 0  # helps keep search monotonic
+    documents: List[Document] = []
+    hint = 0
 
     for chunk in chunks:
-        # Prefer searching from hint forward (performance + stability)
         suffix = clean_text[hint:]
         span = rigorous_document_search_span(suffix, chunk, min_score=min_fuzzy_score)
 
@@ -265,47 +259,83 @@ def add_page_metadata_to_chunks(
         else:
             span2 = rigorous_document_search_span(clean_text, chunk, min_score=min_fuzzy_score)
             if span2 is None:
-                out.append(ChunkWithMetadata(text=chunk, page_number=None))
+                documents.append(
+                    Document(
+                        text=chunk,
+                        metadata={
+                            "page_label": None,
+                            "file_name": file_name,
+                            "start": None,
+                            "end": None,
+                        },
+                    )
+                )
                 continue
             start, end = span2
 
         page_num = dominant_page_for_span(start, end, page_ranges)
-        out.append(ChunkWithMetadata(text=chunk, page_number=page_num, start=start, end=end))
+
+        documents.append(
+            Document(
+                text=chunk,
+                metadata={
+                    "page_label": page_num,
+                    "file_name": file_name,
+                    "start": start,
+                    "end": end,
+                },
+            )
+        )
+
         hint = max(hint, start + 1)
 
-    return out
+    return documents
 
 
-def run_page_aware_semantic_chunking(
-    file_path: str | Path,
+def _infer_file_name_from_doc(doc: Document) -> str:
+    md = doc.metadata or {}
+    return (
+        md.get("file_name")
+        or md.get("filename")
+        or (Path(md["file_path"]).name if "file_path" in md else None)
+        or "unknown.txt"
+    )
+
+
+def run_page_aware_semantic_chunking_from_document(
+    source_doc: Document,
     chunker: ClusterSemanticChunker,
     min_fuzzy_score: float = 98.0,
-) -> List[ChunkWithMetadata]:
-    """
-    Full pipeline:
-    1) Load file with page delimiters, remove delimiters, build page ranges.
-    2) Semantic chunking on clean_text.
-    3) Attach dominant page_number per chunk (stable span finding).
-    """
-    clean_text, page_ranges = load_file_with_pages(file_path)
+) -> List[Document]:
+    raw_text = source_doc.text or ""
+    file_name = _infer_file_name_from_doc(source_doc)
+
+    clean_text, page_ranges = load_text_with_pages(raw_text)
     chunks = chunker.split_text(clean_text)
-    return add_page_metadata_to_chunks(clean_text, chunks, page_ranges, min_fuzzy_score=min_fuzzy_score)
+
+    return add_page_metadata_to_chunks_from_filename(
+        clean_text=clean_text,
+        chunks=chunks,
+        page_ranges=page_ranges,
+        file_name=file_name,
+        min_fuzzy_score=min_fuzzy_score,
+    )
 
 
 # -----------------------------
 # CLI entrypoint
 # -----------------------------
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Page-aware semantic chunking (stable span mapping)")
+    parser = argparse.ArgumentParser(description="Page-aware semantic chunking (stable span mapping) via SimpleDirectoryReader")
     parser.add_argument(
-        "--file",
-        type=str,
+        "--files",
+        nargs="*",
         default=None,
-        help="Path to .txt with '===== Page N =====' delimiters (end-of-page).",
+        help="Explicit list of .txt files. If omitted, falls back to a default test file under Config.data_root_dir.",
     )
     parser.add_argument("--max-chunk", type=int, default=1600)
     parser.add_argument("--min-chunk", type=int, default=500)
-    parser.add_argument("--batch-size", type=int, default=10)
+    parser.add_argument("--batch-size", type=int, default=40)
     parser.add_argument("--preview", type=int, default=10, help="How many chunks to print")
     parser.add_argument("--min-fuzzy-score", type=float, default=98.0, help="Threshold for fuzzy fallback (0..100)")
     args = parser.parse_args()
@@ -313,20 +343,33 @@ def main() -> None:
     config = Config()
     data_dir = Path(config.data_root_dir)
 
-    if args.file:
-        input_file = Path(args.file)
+    # Resolve input files
+    if args.files and len(args.files) > 0:
+        input_files = [str(Path(p)) for p in args.files]
     else:
-        input_file = data_dir / "test" / "0ec2a844ab5e5f66bfff7d66dbd5b33bca34cc94.txt"
-        if not input_file.exists():
-            input_file = data_dir / "0ec2a844ab5e5f66bfff7d66dbd5b33bca34cc94.txt"
+        default_file = data_dir / "test" / "0ec2a844ab5e5f66bfff7d66dbd5b33bca34cc94.txt"
+        if not default_file.exists():
+            default_file = data_dir / "0ec2a844ab5e5f66bfff7d66dbd5b33bca34cc94.txt"
+        if not default_file.exists():
+            raise FileNotFoundError(
+                f"Default input file not found: {default_file}\n"
+                f"Provide --files /path/a.txt /path/b.txt"
+            )
+        input_files = [str(default_file)]
 
-    if not input_file.exists():
-        raise FileNotFoundError(
-            f"Input file not found: {input_file}\n"
-            f"Provide --file /path/to/file.txt or fix Config.data_root_dir."
-        )
+    # Load via LlamaIndex reader
+    reader = SimpleDirectoryReader(
+        input_dir=config.data_root_dir,
+        recursive=True,
+        # required_exts=['.txt'],
+        input_files=[
+            '/Users/kolanosenko/Projects/unlp-2026-submission/src/data/test/t1.txt',
+            '/Users/kolanosenko/Projects/unlp-2026-submission/src/data/test/t2.txt',
+        ]
+    )
+    source_documents = reader.load_data()
 
-    # You can swap this out for your own embedding function if needed.
+    # Embedding function for your ClusterSemanticChunker
     embedding_function = embedding_functions.GoogleGenaiEmbeddingFunction(
         model_name="gemini-embedding-001"
     )
@@ -338,23 +381,37 @@ def main() -> None:
         batch_size=args.batch_size,
     )
 
-    chunks_with_meta = run_page_aware_semantic_chunking(
-        input_file,
-        chunker,
-        min_fuzzy_score=args.min_fuzzy_score,
-    )
+    # Run pipeline per loaded doc
+    all_chunk_docs: List[Document] = []
+    for src in source_documents:
+        all_chunk_docs.extend(
+            run_page_aware_semantic_chunking_from_document(
+                src,
+                chunker,
+                min_fuzzy_score=args.min_fuzzy_score,
+            )
+        )
 
-    print("Input:", input_file)
-    print("Chunks:", len(chunks_with_meta))
+    print("Loaded files:", len(source_documents))
+    for d in source_documents:
+        print(" -", _infer_file_name_from_doc(d))
+    print("Total chunks:", len(all_chunk_docs))
 
-    n = min(args.preview, len(chunks_with_meta))
+    # Preview
+    n = min(args.preview, len(all_chunk_docs))
     for i in range(n):
-        c = chunks_with_meta[i]
-        print(f"\n--- Chunk {i+1} | page_number={c.page_number} | span=({c.start},{c.end}) ---")
-        print(c.text)
+        d = all_chunk_docs[i]
+        meta = d.metadata or {}
+        print(
+            f"\n--- Chunk {i+1} | "
+            f"file={meta.get('file_name')} | "
+            f"page_number={meta.get('page_label')} | "
+            f"span=({meta.get('start')},{meta.get('end')}) ---"
+        )
+        print(d.text)
 
-    if len(chunks_with_meta) > n:
-        print(f"\n... and {len(chunks_with_meta) - n} more chunks")
+    if len(all_chunk_docs) > n:
+        print(f"\n... and {len(all_chunk_docs) - n} more chunks")
 
 
 if __name__ == "__main__":
