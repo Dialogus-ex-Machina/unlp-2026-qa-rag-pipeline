@@ -5,7 +5,11 @@ from langchain_qdrant import QdrantVectorStore
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
 from unlp_2026_submission.language_models import LanguageModelFactory
-from unlp_2026_submission.workflow.nodes import SinglePageAugmentationNode
+from unlp_2026_submission.workflow.nodes import (
+    MostRelevantDocumentAugmentationNode,
+    SimpleDocumentsRetrievalNode,
+    QuestionAnswerNode,
+)
 from unlp_2026_submission.workflow.prompts import PromptsFactory
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 
@@ -27,20 +31,25 @@ async def main():
     )
 
     vector_store = QdrantVectorStore.from_existing_collection(
-        collection_name=config.knowledge_base.collection_name,
-        path=config.knowledge_base.vector_store_path,
         embedding=embeddings_model,
+        **config.vector_store,
     )
 
     workflow = (
         QAWorkflowBuilder.create()
         .with_documents_retrieval_node(
-            vector_store=vector_store,
+            SimpleDocumentsRetrievalNode(
+                vector_store=vector_store,
+            ),
         )
-        .with_augmentation_node(SinglePageAugmentationNode())
+        .with_augmentation_node(
+            MostRelevantDocumentAugmentationNode()
+        )
         .with_question_answering_node(
-            language_model=language_model,
-            prompt=qa_prompt,
+            QuestionAnswerNode(
+                language_model=language_model,
+                prompt=qa_prompt,
+            )
         )
         .build()
     )

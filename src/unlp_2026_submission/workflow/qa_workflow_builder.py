@@ -1,16 +1,12 @@
-from langchain_core.vectorstores import VectorStore
 from langgraph.graph import StateGraph
 
-from unlp_2026_submission.language_models import LanguageModel
-from .nodes import QuestionAnswerNode, BaseNode
-from .nodes.documents_retrieval_node import DocumentsRetrievalNode
-from .prompts.base_qa_prompt import BaseQAPrompt
+from .nodes import BaseNode
 from .state.qa_workflow_state import QAWorkflowState
 
 
 class QAWorkflowBuilder:
-    _question_answer_node: QuestionAnswerNode
-    _documents_retrieval_node: DocumentsRetrievalNode
+    _question_answer_node: BaseNode
+    _documents_retrieval_node: BaseNode
     _augmentation_node: BaseNode
 
     _state_graph: StateGraph
@@ -21,24 +17,16 @@ class QAWorkflowBuilder:
 
     def with_question_answering_node(
             self,
-            prompt: BaseQAPrompt,
-            language_model: LanguageModel,
+            question_answer_node: BaseNode,
     ) -> 'QAWorkflowBuilder':
-        self._question_answer_node = QuestionAnswerNode(
-            language_model=language_model,
-            prompt=prompt,
-        )
+        self._question_answer_node = question_answer_node
         return self
 
     def with_documents_retrieval_node(
             self,
-            vector_store: VectorStore,
-            top_k: int | None = None,
+            document_retrieval_node: BaseNode,
     ) -> 'QAWorkflowBuilder':
-        self._documents_retrieval_node = DocumentsRetrievalNode(
-            vector_store=vector_store,
-            top_k=top_k
-        )
+        self._documents_retrieval_node = document_retrieval_node
         return self
 
     def with_augmentation_node(self, augmentation_node: BaseNode):

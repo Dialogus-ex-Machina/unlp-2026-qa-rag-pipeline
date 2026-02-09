@@ -1,4 +1,4 @@
 from .base_node import BaseNode
 from .question_answer_node import QuestionAnswerNode
-from .documents_retrieval_node import DocumentsRetrievalNode
-from .single_page_augmentation_node import SinglePageAugmentationNode
+from .simple_documents_retrieval_node import SimpleDocumentsRetrievalNode
+from .most_relevant_document_augmentation_node import MostRelevantDocumentAugmentationNode

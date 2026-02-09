@@ -1,11 +1,9 @@
-from pathlib import Path
 import os
 
 import pandas as pd
 from pandas import DataFrame
 from ragas import Dataset
 
-from unlp_2026_submission.config import Config
 from unlp_2026_submission.entities import QuestionWithContext
 
 
@@ -58,8 +56,10 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
 
     return pd.DataFrame(questions)
 
-def get_faithfulness_full_dataset(config: Config):
-    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions_with_context.csv"))
+def get_faithfulness_full_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
 
     formatted_df = _format_dataframe(df)
 
@@ -73,8 +73,10 @@ def get_faithfulness_full_dataset(config: Config):
     return dataset
 
 
-def get_faithfulness_sports_dataset(config: Config):
-    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions_with_context.csv"))
+def get_faithfulness_sports_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
 
     sports_domain_df = df[df["Domain"].str.strip() == "domain_1"]
 
@@ -89,8 +91,10 @@ def get_faithfulness_sports_dataset(config: Config):
 
     return dataset
 
-def get_faithfulness_medical_dataset(config: Config):
-    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions_with_context.csv"))
+def get_faithfulness_medical_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
 
     sports_domain_df = df[df["Domain"].str.strip() == "domain_2"]
 

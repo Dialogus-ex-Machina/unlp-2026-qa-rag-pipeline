@@ -16,18 +16,18 @@ class AccuracyDatasetFactory:
 
     @staticmethod
     def create(
-            config: Config,
+            data_root_dir: str,
             dataset_name: AccuracyDatasetName
     ):
 
         def get_dataset():
             match dataset_name:
                 case AccuracyDatasetName.FULL:
-                    return get_accuracy_full_dataset(config)
+                    return get_accuracy_full_dataset(data_root_dir)
                 case AccuracyDatasetName.SPORT:
-                    return get_accuracy_sports_dataset(config)
+                    return get_accuracy_sports_dataset(data_root_dir)
                 case AccuracyDatasetName.MEDICINE:
-                    return get_accuracy_medical_dataset(config)
+                    return get_accuracy_medical_dataset(data_root_dir)
                 case _:
                     raise ValueError("Metric not found.")
 

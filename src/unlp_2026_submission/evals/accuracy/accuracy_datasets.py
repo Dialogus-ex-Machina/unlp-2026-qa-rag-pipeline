@@ -1,4 +1,3 @@
-from pathlib import Path
 import os
 
 import pandas as pd
@@ -48,8 +47,10 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
 
     return pd.DataFrame(questions)
 
-def get_accuracy_full_dataset(config: Config):
-    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions.csv"))
+def get_accuracy_full_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
 
     formatted_df = _format_dataframe(df)
 
@@ -63,8 +64,10 @@ def get_accuracy_full_dataset(config: Config):
     return dataset
 
 
-def get_accuracy_sports_dataset(config: Config):
-    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions.csv"))
+def get_accuracy_sports_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
 
     sports_domain_df = df[df["Domain"].str.strip() == "domain_1"]
 
@@ -79,8 +82,10 @@ def get_accuracy_sports_dataset(config: Config):
 
     return dataset
 
-def get_accuracy_medical_dataset(config: Config):
-    df = pd.read_csv(os.path.join(config.data_root_dir, "dev_questions.csv"))
+def get_accuracy_medical_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
 
     sports_domain_df = df[df["Domain"].str.strip() == "domain_2"]
 
