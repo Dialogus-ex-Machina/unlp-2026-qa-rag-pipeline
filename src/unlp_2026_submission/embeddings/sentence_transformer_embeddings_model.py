@@ -107,14 +107,14 @@ class SentenceTransformerEmbeddingModel(BaseModel, Embeddings):
 
         if self.multi_process:
             pool = self._transformer.start_multi_process_pool()
-            embeddings = self._transformer.encode_document(
+            embeddings = self._transformer.encode_query(
                 sentences=preprocessed_texts,
                 pool=pool,
                 **embed_kwargs
             )
             SentenceTransformer.stop_multi_process_pool(pool)
         else:
-            embeddings = self._transformer.encode_document(
+            embeddings = self._transformer.encode_query(
                 sentences=preprocessed_texts,
                 show_progress_bar=self.show_progress,
                 **embed_kwargs,

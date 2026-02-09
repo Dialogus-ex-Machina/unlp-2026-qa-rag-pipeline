@@ -13,7 +13,7 @@ from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
-    QuestionAnswerNode
+    SimpleQuestionAnswerNode
 )
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
@@ -72,7 +72,7 @@ def build_workflow(config: Config):
             MostRelevantDocumentAugmentationNode()
         )
         .with_question_answering_node(
-            QuestionAnswerNode(
+            SimpleQuestionAnswerNode(
                 language_model=language_model,
                 prompt=qa_prompt,
             )

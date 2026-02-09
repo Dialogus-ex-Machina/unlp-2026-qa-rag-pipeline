@@ -16,7 +16,7 @@ from unlp_2026_submission.evals.faithfulness import (
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
-    QuestionAnswerNode,
+    SimpleQuestionAnswerNode,
 )
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
@@ -119,7 +119,7 @@ async def _evaluate(
             MostRelevantDocumentAugmentationNode()
         )
         .with_question_answering_node(
-            QuestionAnswerNode(
+            SimpleQuestionAnswerNode(
                 language_model=language_model,
                 prompt=qa_prompt,
             )

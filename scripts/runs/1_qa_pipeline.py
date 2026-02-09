@@ -9,7 +9,7 @@ from unlp_2026_submission.language_models import LlamaCppLanguageModel
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
-    QuestionAnswerNode,
+    SimpleQuestionAnswerNode,
 )
 from unlp_2026_submission.workflow.prompts.qa_prompt import QAPrompt
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
@@ -44,7 +44,7 @@ def main():
             MostRelevantDocumentAugmentationNode()
         )
         .with_question_answering_node(
-            QuestionAnswerNode(
+            SimpleQuestionAnswerNode(
                 language_model=language_model,
                 prompt=qa_prompt,
             )
