@@ -4,14 +4,13 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-from llama_index.core import Document
-from llama_index.core.readers.base import BaseReader
+from langchain_core.documents import Document
 
+from merlin.rag.index import IndexState
 
 PAGE_DELIMITER_PATTERN = re.compile(r"^===== Page (\d+) =====$")
 
-
-class DelimitedPageTxtReader(BaseReader):
+class DelimitedPageLoadNode:
     """
     Reader for `.txt` files where pages are separated with lines like:
 
@@ -23,6 +22,17 @@ class DelimitedPageTxtReader(BaseReader):
       - `page_label`: page number as a string (to mirror PDF reader behaviour)
       - any `extra_info` passed to `load_data`
     """
+
+    def __call__(self, state: IndexState) -> IndexState:
+        filepaths = state["filepaths"]
+
+        documents: List[Document] = []
+
+        for filepath in filepaths:
+            document_pages = self.load_data(filepath)
+            documents.extend(document_pages)
+
+        return {"documents": documents}
 
     def load_data(
         self,
@@ -47,12 +57,12 @@ class DelimitedPageTxtReader(BaseReader):
                     page_num = match.group(1)
                     metadata: Dict[str, str] = {
                         "page_label": page_num,
-                        "file_name": path.name,
+                        "source": str(path),
                     }
                     if extra_info:
                         metadata.update(extra_info)
 
-                    docs.append(Document(text=page_text, metadata=metadata))
+                    docs.append(Document(page_content=page_text, metadata=metadata))
 
                 # Reset for the next page's content.
                 page_lines = []

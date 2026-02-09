@@ -3,7 +3,7 @@ from ragas import experiment
 
 from unlp_2026_submission.entities import Question
 from unlp_2026_submission.evals.accuracy.metrics import composite_accuracy_metric
-from unlp_2026_submission.workflow.state import WorkflowState
+from unlp_2026_submission.workflow.state import QAWorkflowState
 
 
 @experiment()
@@ -11,7 +11,7 @@ async def composite_accuracy_experiment(
         question: Question,
         workflow: CompiledStateGraph
 ):
-    result: WorkflowState = workflow.invoke(
+    result: QAWorkflowState = workflow.invoke(
         input={ 'question': question }
     )
 
@@ -29,8 +29,8 @@ async def composite_accuracy_experiment(
         'correct_document_page': question['page_num'],
         'raw_answer': result.get('raw_answer'),
         'answer': result['answer'],
-        'reference_document_id': result['reference_document_id'],
-        'reference_document_page_num': result['reference_document_page_num'],
+        'relevant_document_id': result['relevant_document_id'],
+        'relevant_document_page_num': result['relevant_document_page_num'],
         "score": score.value,
     }
 

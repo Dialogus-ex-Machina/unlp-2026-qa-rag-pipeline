@@ -2,12 +2,11 @@ import re
 from typing import Tuple, Optional
 
 from unlp_2026_submission.config import Config
-from . import FakeLlamaIndexLanguageModel
 from .gemini_language_model import GeminiLanguageModel
 from .open_ai_language_model import OpenAILanguageModel
 from .llama_cpp_language_model import LlamaCppLanguageModel
 from .hugging_face_language_model import HuggingFaceLanguageModel
-from .language_model import LanguageModel, LlamaIndexLanguageModel
+from .language_model import LanguageModel
 
 
 class LanguageModelFactory:
@@ -20,7 +19,7 @@ class LanguageModelFactory:
     def create(config: Config):
         return LanguageModelFactory(config)
 
-    def get_language_model(self) -> tuple[LanguageModel, LlamaIndexLanguageModel]:
+    def get_language_model(self) -> LanguageModel:
         if LlamaCppLanguageModel.is_compatible_model(self._config.language_model_name):
             repo_id, filename = self._parse_hf_repo_and_filename(self._config.language_model_name)
 
@@ -29,26 +28,22 @@ class LanguageModelFactory:
                 repo_id=repo_id,
                 filename=filename
             )
-            llama_index_language_model = FakeLlamaIndexLanguageModel()
 
-            return language_model, llama_index_language_model
+            return language_model
 
         if OpenAILanguageModel.is_compatible_model(self._config.language_model_name):
             language_model = OpenAILanguageModel.create(self._config)
-            llama_index_language_model = FakeLlamaIndexLanguageModel()
 
-            return language_model, llama_index_language_model
+            return language_model
 
         if GeminiLanguageModel.is_compatible_model(self._config.language_model_name):
             language_model = GeminiLanguageModel.create(self._config)
-            llama_index_language_model = FakeLlamaIndexLanguageModel()
 
-            return language_model, llama_index_language_model
+            return language_model
 
         language_model = HuggingFaceLanguageModel.create(self._config)
-        llama_index_language_model = FakeLlamaIndexLanguageModel()
 
-        return language_model, llama_index_language_model
+        return language_model
 
     def _parse_hf_repo_and_filename(self, ref: str) -> Tuple[str, Optional[str]]:
         """

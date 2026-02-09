@@ -4,7 +4,7 @@ from typing import Optional
 
 from unlp_2026_submission.entities import QuestionWithContext
 from unlp_2026_submission.language_models import JudgeLanguageModel
-from unlp_2026_submission.workflow.state import WorkflowState
+from unlp_2026_submission.workflow.state import QAWorkflowState
 from .context_recall_metric import ContextRecall
 
 def _answer_to_index(choice: str) -> Optional[int]:
@@ -21,10 +21,10 @@ async def context_recall_experiment(
     correct_answer = question['correct_answer']
     question_text = question['question_text']
 
-    result: WorkflowState = workflow.invoke(
+    result: QAWorkflowState = workflow.invoke(
         input={ 'question': question }
     )
-    retrieved_contexts = [result['reference_document_page'].text]
+    retrieved_contexts = [result['relevant_context']]
     correct_answer_text = question['answers'][_answer_to_index(correct_answer)]
 
     scorer = ContextRecall(llm=judge_language_model)
