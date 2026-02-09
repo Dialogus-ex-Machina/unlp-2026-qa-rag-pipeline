@@ -1,9 +1,7 @@
-import asyncio
-
 from langchain_qdrant import QdrantVectorStore
 
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel
+from unlp_2026_submission.embeddings import OpenAIEmbeddingsModel, EmbeddingsModelFactory
 from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
@@ -14,7 +12,7 @@ from unlp_2026_submission.workflow.prompts import PromptsFactory
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 
 
-async def main():
+def main():
     config = Config()
 
     language_model = (
@@ -22,7 +20,11 @@ async def main():
             .create(config)
             .get_language_model()
     )
-    embeddings_model = OpenAIEmbeddingsModel.create(config)
+    embeddings_model = (
+        EmbeddingsModelFactory
+        .create(config)
+        .get_embeddings_model()
+    )
 
     qa_prompt = (
         PromptsFactory
@@ -54,7 +56,7 @@ async def main():
         .build()
     )
 
-    response = await workflow.ainvoke(
+    response = workflow.invoke(
         input={
             'question': {
                 'question_id': 0,
@@ -79,4 +81,4 @@ async def main():
     print('Response:', response)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
