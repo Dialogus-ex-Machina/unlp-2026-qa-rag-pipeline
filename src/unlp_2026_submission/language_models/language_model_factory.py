@@ -1,6 +1,3 @@
-import re
-from typing import Tuple, Optional
-
 from unlp_2026_submission.config import Config
 from .gemini_language_model import GeminiLanguageModel
 from .open_ai_language_model import OpenAILanguageModel
@@ -21,13 +18,7 @@ class LanguageModelFactory:
 
     def get_language_model(self) -> LanguageModel:
         if LlamaCppLanguageModel.is_compatible_model(self._config.language_model_name):
-            repo_id, filename = self._parse_hf_repo_and_filename(self._config.language_model_name)
-
-            language_model = LlamaCppLanguageModel.create_from_hf_hub(
-                config=self._config,
-                repo_id=repo_id,
-                filename=filename
-            )
+            language_model = LlamaCppLanguageModel.create(self._config)
 
             return language_model
 
@@ -44,27 +35,3 @@ class LanguageModelFactory:
         language_model = HuggingFaceLanguageModel.create(self._config)
 
         return language_model
-
-    def _parse_hf_repo_and_filename(self, ref: str) -> Tuple[str, Optional[str]]:
-        """
-        Returns (repo_id, filename)
-
-        Examples:
-          - org/repo
-          - org/repo/file.gguf
-          - https://huggingface.co/org/repo/blob/main/file.gguf
-        """
-        ref = ref.strip()
-
-        # remove HF URL if present
-        ref = re.sub(r"^https?://huggingface\.co/", "", ref)
-        ref = ref.replace("/blob/main/", "/").replace("/resolve/main/", "/")
-
-        parts = [p for p in ref.split("/") if p]
-        if len(parts) < 2:
-            raise ValueError(f"Invalid Hugging Face reference: {ref}")
-
-        repo_id = f"{parts[0]}/{parts[1]}"
-        filename = parts[2] if len(parts) > 2 else None
-
-        return repo_id, filename
