@@ -103,7 +103,7 @@ def get_accuracy_medicine_dataset(
 
     return dataset
 
-def get_accuracy_history_dataset(
+def get_accuracy_other_dataset(
         data_root_dir: str
 ):
     df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
@@ -114,7 +114,7 @@ def get_accuracy_history_dataset(
 
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
-        name="accuracy_history_dataset",
+        name="accuracy_other_dataset",
         backend="local/csv",
         root_dir=''
     )

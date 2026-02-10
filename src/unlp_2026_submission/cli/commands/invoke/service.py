@@ -16,9 +16,10 @@ from unlp_2026_submission.workflow.nodes import (
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode
 )
+from unlp_2026_submission.workflow.prompts.domain_classification_prompt_type import DomainClassificationPromptType
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
-from unlp_2026_submission.workflow.prompts import QAPromptType, PromptsFactory, ENDomainClassificationPrompt
+from unlp_2026_submission.workflow.prompts import QAPromptType, PromptsFactory
 
 
 @dataclass(frozen=True)
@@ -28,20 +29,22 @@ class InvokeResult:
 
 
 def build_config(
-    qa_prompt_type: QAPromptType,
     language_model_name: Optional[str],
     model_provider_api_key: Optional[str],
     embeddings_model_name: Optional[str] = None,
 ) -> Config:
     return Config(
-        qa_prompt_type=qa_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
     )
 
 
-def build_workflow(config: Config):
+def build_workflow(
+        config: Config,
+        qa_prompt_type: QAPromptType,
+        domain_classification_prompt_type: DomainClassificationPromptType,
+):
     language_model = (
         LanguageModelFactory.create(config).get_language_model()
     )
@@ -53,12 +56,12 @@ def build_workflow(config: Config):
 
     qa_prompt = (
         PromptsFactory
-        .get_qa_prompt(config.qa_prompt_type)
+        .get_qa_prompt(qa_prompt_type)
     )
     domain_classification_prompt = (
         PromptsFactory
         .get_domain_classification_prompt(
-            config.domain_classification_prompt_type
+            domain_classification_prompt_type
         )
     )
 
@@ -112,6 +115,7 @@ def sample_question(
 def run_invoke(
     dataset_name: AccuracyDatasetName,
     qa_prompt_type: QAPromptType,
+    domain_classification_prompt_type: DomainClassificationPromptType,
     language_model_name: Optional[str],
     model_provider_api_key: Optional[str],
     embeddings_model_name: Optional[str] = None,
@@ -122,12 +126,15 @@ def run_invoke(
     logging.basicConfig(level=logging_level)
 
     config = build_config(
-        qa_prompt_type=qa_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
     )
-    workflow = build_workflow(config)
+    workflow = build_workflow(
+        config=config,
+        qa_prompt_type=qa_prompt_type,
+        domain_classification_prompt_type=domain_classification_prompt_type,
+    )
 
     q = question or sample_question(
         config=config,

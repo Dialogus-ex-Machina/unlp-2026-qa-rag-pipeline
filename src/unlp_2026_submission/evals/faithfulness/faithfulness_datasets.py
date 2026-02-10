@@ -112,7 +112,7 @@ def get_faithfulness_medicine_dataset(
 
     return dataset
 
-def get_faithfulness_history_dataset(
+def get_faithfulness_other_dataset(
         data_root_dir: str
 ):
     df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
@@ -123,7 +123,7 @@ def get_faithfulness_history_dataset(
 
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
-        name="history_qa_with_context",
+        name="other_qa_with_context",
         backend="local/csv",
         root_dir=''
     )

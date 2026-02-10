@@ -1,4 +1,4 @@
-from . import UADomainClassificationPrompt
+from .ua_domain_classification_prompt import UADomainClassificationPrompt
 from .en_domain_classification_prompt import ENDomainClassificationPrompt
 from .domain_classification_prompt_type import DomainClassificationPromptType
 from .en_qa_prompt import EnQAPrompt

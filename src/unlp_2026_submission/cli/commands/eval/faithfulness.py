@@ -41,7 +41,7 @@ def evaluate_faithfulness_command(
         domain_classification_prompt_type: Annotated[
             DomainClassificationPromptType,
             typer.Option("--classify-prompt")
-        ] = DomainClassificationPromptType.SIMPLE_UA,
+        ] = DomainClassificationPromptType.SIMPLE_EN,
         language_model_name: Annotated[
             str,
             typer.Option("--model", "-m")
@@ -85,8 +85,6 @@ async def _evaluate(
     )
 
     config = Config(
-        qa_prompt_type=qa_prompt_type,
-        domain_classification_prompt_type=domain_classification_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
@@ -109,12 +107,12 @@ async def _evaluate(
 
     qa_prompt = (
         PromptsFactory
-        .get_qa_prompt(config.qa_prompt_type)
+        .get_qa_prompt(qa_prompt_type)
     )
     domain_classification_prompt = (
         PromptsFactory
         .get_domain_classification_prompt(
-            config.domain_classification_prompt_type
+            domain_classification_prompt_type
         )
     )
 
