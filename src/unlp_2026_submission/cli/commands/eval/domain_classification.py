@@ -7,42 +7,33 @@ import logging
 from langchain_qdrant import QdrantVectorStore
 
 from unlp_2026_submission.evals.accuracy import (
-    AccuracyEvaluationFactory,
-    AccuracyMetricName,
     AccuracyDatasetFactory,
     AccuracyDatasetName,
 )
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
+from unlp_2026_submission.evals.domain_classification import evaluate_domain_classification
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
-    SimpleQuestionAnswerNode,
     LLMDomainRoutingNode,
+    FakeQuestionAnswerNode,
 )
+from unlp_2026_submission.workflow.prompts import PromptsFactory
 from unlp_2026_submission.workflow.prompts.domain_classification_prompt_type import DomainClassificationPromptType
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
-from unlp_2026_submission.workflow.prompts import QAPromptType, PromptsFactory
 
 app = typer.Typer()
 
 
-@app.command('accuracy')
-def evaluate_accuracy_command(
-        metric: Annotated[
-            AccuracyMetricName,
-            typer.Argument()
-        ] = AccuracyMetricName.ANSWERS,
+@app.command('domain-classification')
+def evaluate_domain_classification_command(
         dataset_name: Annotated[
             AccuracyDatasetName,
             typer.Option("--dataset", "-ds")
         ] = AccuracyDatasetName.FULL,
-        qa_prompt_type: Annotated[
-            QAPromptType,
-            typer.Option("--qa-prompt")
-        ] = QAPromptType.SIMPLE,
         domain_classification_prompt_type: Annotated[
             DomainClassificationPromptType,
             typer.Option("--classify-prompt")
@@ -53,15 +44,13 @@ def evaluate_accuracy_command(
         logging_level: Annotated[int, typer.Option("--logs", "-l")] = logging.INFO,
 ):
     """
-        Evaluate accuracy for a given metric
+        Evaluate domain classification
     """
     logging.basicConfig(level=logging_level)
 
     asyncio.run(
         _evaluate(
-            metric=metric,
             dataset_name=dataset_name,
-            qa_prompt_type=qa_prompt_type,
             domain_classification_prompt_type=domain_classification_prompt_type,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
@@ -71,26 +60,21 @@ def evaluate_accuracy_command(
 
 
 async def _evaluate(
-        metric: AccuracyMetricName,
         dataset_name: AccuracyDatasetName,
-        qa_prompt_type: QAPromptType,
         domain_classification_prompt_type: DomainClassificationPromptType,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
         embeddings_model_name: str | None = None,
 ):
     experiment_name = create_experiment_name(
-        base_name='accuracy',
-        metric=metric.value,
+        base_name='domain_classification',
         dataset_name=dataset_name.value,
-        qa_prompt_type=qa_prompt_type.value,
-        domain_classification_prompt_type=domain_classification_prompt_type.value,
+        domain_classification_prompt_type=domain_classification_prompt_type,
         language_model_name=language_model_name,
         embeddings_model_name=embeddings_model_name,
     )
 
     config = Config(
-        qa_prompt_type=qa_prompt_type,
         domain_classification_prompt_type=domain_classification_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
@@ -112,10 +96,11 @@ async def _evaluate(
         .get_embeddings_model()
     )
 
-    qa_prompt = (
-        PromptsFactory
-        .get_qa_prompt(config.qa_prompt_type)
+    vector_store = QdrantVectorStore.from_existing_collection(
+        embedding=embeddings_model,
+        **config.vector_store,
     )
+
     domain_classification_prompt = (
         PromptsFactory
         .get_domain_classification_prompt(
@@ -123,20 +108,12 @@ async def _evaluate(
         )
     )
 
-    vector_store = QdrantVectorStore.from_existing_collection(
-        embedding=embeddings_model,
-        **config.vector_store,
-    )
-
     domain_pipeline_nodes = [
         SimpleDocumentsRetrievalNode(
             vector_store=vector_store,
         ),
         MostRelevantDocumentAugmentationNode(),
-        SimpleQuestionAnswerNode(
-            language_model=language_model,
-            prompt=qa_prompt,
-        )
+        FakeQuestionAnswerNode()
     ]
     workflow = (
         QAWorkflowBuilder.create()
@@ -152,9 +129,7 @@ async def _evaluate(
         .build()
     )
 
-    eval_factory = AccuracyEvaluationFactory.create(metric)
-
-    await eval_factory.run(
+    await evaluate_domain_classification(
         dataset=dataset,
         experiment_name=experiment_name,
         workflow=workflow,

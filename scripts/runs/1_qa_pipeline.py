@@ -10,7 +10,9 @@ from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
     SimpleQuestionAnswerNode,
+    LLMDomainRoutingNode,
 )
+from unlp_2026_submission.workflow.prompts import ENDomainClassificationPrompt
 from unlp_2026_submission.workflow.prompts.qa_prompt import QAPrompt
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 
@@ -27,28 +29,34 @@ def main():
     embeddings_model = SentenceTransformerEmbeddingModel.create(config)
 
     qa_prompt = QAPrompt()
+    domain_classification_prompt = ENDomainClassificationPrompt()
 
     vector_store = QdrantVectorStore.from_existing_collection(
         embedding=embeddings_model,
         **config.vector_store,
     )
 
+    domain_pipeline_nodes = [
+        SimpleDocumentsRetrievalNode(
+            vector_store=vector_store,
+        ),
+        MostRelevantDocumentAugmentationNode(),
+        SimpleQuestionAnswerNode(
+            language_model=language_model,
+            prompt=qa_prompt,
+        )
+    ]
     workflow = (
         QAWorkflowBuilder.create()
-        .with_documents_retrieval_node(
-            SimpleDocumentsRetrievalNode(
-                vector_store=vector_store,
-            ),
-        )
-        .with_augmentation_node(
-            MostRelevantDocumentAugmentationNode()
-        )
-        .with_question_answering_node(
-            SimpleQuestionAnswerNode(
+        .with_domain_routing_node(
+            LLMDomainRoutingNode(
                 language_model=language_model,
-                prompt=qa_prompt,
+                prompt=domain_classification_prompt,
             )
         )
+        .add_sport_domain_nodes(domain_pipeline_nodes)
+        .add_medicine_domain_nodes(domain_pipeline_nodes)
+        .add_other_domain_nodes(domain_pipeline_nodes)
         .build()
     )
 

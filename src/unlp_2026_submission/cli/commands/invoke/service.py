@@ -13,11 +13,12 @@ from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
-    SimpleQuestionAnswerNode
+    SimpleQuestionAnswerNode,
+    LLMDomainRoutingNode
 )
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
-from unlp_2026_submission.workflow.prompts import QAPromptType, PromptsFactory
+from unlp_2026_submission.workflow.prompts import QAPromptType, PromptsFactory, ENDomainClassificationPrompt
 
 
 @dataclass(frozen=True)
@@ -52,8 +53,13 @@ def build_workflow(config: Config):
 
     qa_prompt = (
         PromptsFactory
-        .create(config.qa_prompt_type)
-        .get_qa_prompt()
+        .get_qa_prompt(config.qa_prompt_type)
+    )
+    domain_classification_prompt = (
+        PromptsFactory
+        .get_domain_classification_prompt(
+            config.domain_classification_prompt_type
+        )
     )
 
     vector_store = QdrantVectorStore.from_existing_collection(
@@ -61,22 +67,27 @@ def build_workflow(config: Config):
         **config.vector_store,
     )
 
+    domain_pipeline_nodes = [
+        SimpleDocumentsRetrievalNode(
+            vector_store=vector_store,
+        ),
+        MostRelevantDocumentAugmentationNode(),
+        SimpleQuestionAnswerNode(
+            language_model=language_model,
+            prompt=qa_prompt,
+        )
+    ]
     workflow = (
         QAWorkflowBuilder.create()
-        .with_documents_retrieval_node(
-            SimpleDocumentsRetrievalNode(
-                vector_store=vector_store,
-            ),
-        )
-        .with_augmentation_node(
-            MostRelevantDocumentAugmentationNode()
-        )
-        .with_question_answering_node(
-            SimpleQuestionAnswerNode(
+        .with_domain_routing_node(
+            LLMDomainRoutingNode(
                 language_model=language_model,
-                prompt=qa_prompt,
+                prompt=domain_classification_prompt
             )
         )
+        .add_sport_domain_nodes(domain_pipeline_nodes)
+        .add_medicine_domain_nodes(domain_pipeline_nodes)
+        .add_other_domain_nodes(domain_pipeline_nodes)
         .build()
     )
     return workflow

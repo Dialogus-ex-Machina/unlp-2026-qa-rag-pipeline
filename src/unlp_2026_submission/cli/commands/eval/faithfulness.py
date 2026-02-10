@@ -17,7 +17,9 @@ from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
     SimpleQuestionAnswerNode,
+    LLMDomainRoutingNode,
 )
+from unlp_2026_submission.workflow.prompts.domain_classification_prompt_type import DomainClassificationPromptType
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
@@ -36,6 +38,10 @@ def evaluate_faithfulness_command(
             QAPromptType,
             typer.Option("--qa-prompt")
         ] = QAPromptType.SIMPLE,
+        domain_classification_prompt_type: Annotated[
+            DomainClassificationPromptType,
+            typer.Option("--classify-prompt")
+        ] = DomainClassificationPromptType.SIMPLE_UA,
         language_model_name: Annotated[
             str,
             typer.Option("--model", "-m")
@@ -53,6 +59,7 @@ def evaluate_faithfulness_command(
         _evaluate(
             dataset_name=dataset_name,
             qa_prompt_type=qa_prompt_type,
+            domain_classification_prompt_type=domain_classification_prompt_type,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
             embeddings_model_name=embeddings_model_name,
@@ -63,6 +70,7 @@ def evaluate_faithfulness_command(
 async def _evaluate(
         dataset_name: FaithfulnessDatasetName,
         qa_prompt_type: QAPromptType,
+        domain_classification_prompt_type: DomainClassificationPromptType,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
         embeddings_model_name: str | None = None,
@@ -71,12 +79,14 @@ async def _evaluate(
         base_name='faithfulness',
         dataset_name=dataset_name.value,
         qa_prompt_type=qa_prompt_type.value,
+        domain_classification_prompt_type=domain_classification_prompt_type.value,
         language_model_name=language_model_name,
         embeddings_model_name=embeddings_model_name,
     )
 
     config = Config(
         qa_prompt_type=qa_prompt_type,
+        domain_classification_prompt_type=domain_classification_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
@@ -99,8 +109,13 @@ async def _evaluate(
 
     qa_prompt = (
         PromptsFactory
-        .create(config.qa_prompt_type)
-        .get_qa_prompt()
+        .get_qa_prompt(config.qa_prompt_type)
+    )
+    domain_classification_prompt = (
+        PromptsFactory
+        .get_domain_classification_prompt(
+            config.domain_classification_prompt_type
+        )
     )
 
     vector_store = QdrantVectorStore.from_existing_collection(
@@ -108,22 +123,27 @@ async def _evaluate(
         **config.vector_store,
     )
 
+    domain_pipeline_nodes = [
+        SimpleDocumentsRetrievalNode(
+            vector_store=vector_store,
+        ),
+        MostRelevantDocumentAugmentationNode(),
+        SimpleQuestionAnswerNode(
+            language_model=language_model,
+            prompt=qa_prompt,
+        )
+    ]
     workflow = (
         QAWorkflowBuilder.create()
-        .with_documents_retrieval_node(
-            SimpleDocumentsRetrievalNode(
-                vector_store=vector_store,
-            ),
-        )
-        .with_augmentation_node(
-            MostRelevantDocumentAugmentationNode()
-        )
-        .with_question_answering_node(
-            SimpleQuestionAnswerNode(
+        .with_domain_routing_node(
+            LLMDomainRoutingNode(
                 language_model=language_model,
-                prompt=qa_prompt,
+                prompt=domain_classification_prompt
             )
         )
+        .add_sport_domain_nodes(domain_pipeline_nodes)
+        .add_medicine_domain_nodes(domain_pipeline_nodes)
+        .add_other_domain_nodes(domain_pipeline_nodes)
         .build()
     )
 
