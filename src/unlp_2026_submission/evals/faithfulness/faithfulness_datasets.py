@@ -30,7 +30,10 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
     questions: list[QuestionWithContext] = []
 
     for i, row in df.iterrows():
-        answers_raw = [row[c].strip() for c in answer_cols]
+        answers_raw = [
+            row[c].strip() if pd.notna(row[c]) else ""
+            for c in answer_cols
+        ]
         answers = [a for a in answers_raw if a != ""]
         correct_letter = row["Correct_Answer"].strip().upper()
 
@@ -103,6 +106,24 @@ def get_faithfulness_medical_dataset(
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
         name="medical_qa_with_context",
+        backend="local/csv",
+        root_dir=''
+    )
+
+    return dataset
+
+def get_faithfulness_history_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
+
+    sports_domain_df = df[df["Domain"].str.strip() == "domain_3"]
+
+    formatted_df = _format_dataframe(sports_domain_df)
+
+    dataset = Dataset.from_pandas(
+        dataframe=formatted_df,
+        name="history_qa_with_context",
         backend="local/csv",
         root_dir=''
     )

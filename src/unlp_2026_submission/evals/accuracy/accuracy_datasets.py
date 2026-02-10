@@ -4,7 +4,6 @@ import pandas as pd
 from pandas import DataFrame
 from ragas import Dataset
 
-from unlp_2026_submission.config import Config
 from unlp_2026_submission.entities import Question
 
 
@@ -22,8 +21,12 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
     questions: list[Question] = []
 
     for i, row in df.iterrows():
-        answers_raw = [row[c].strip() for c in answer_cols]
+        answers_raw = [
+            row[c].strip() if pd.notna(row[c]) else ""
+            for c in answer_cols
+        ]
         answers = [a for a in answers_raw if a != ""]
+
         correct_letter = row["Correct_Answer"].strip().upper()
 
         if correct_letter not in answer_cols:
@@ -94,6 +97,24 @@ def get_accuracy_medical_dataset(
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
         name="accuracy_medical_dataset",
+        backend="local/csv",
+        root_dir=''
+    )
+
+    return dataset
+
+def get_accuracy_history_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
+
+    sports_domain_df = df[df["Domain"].str.strip() == "domain_3"]
+
+    formatted_df = _format_dataframe(sports_domain_df)
+
+    dataset = Dataset.from_pandas(
+        dataframe=formatted_df,
+        name="accuracy_history_dataset",
         backend="local/csv",
         root_dir=''
     )
