@@ -48,7 +48,7 @@ def main():
     ]
     workflow = (
         QAWorkflowBuilder.create()
-        .with_domain_routing_node(
+        .add_domain_routing_node(
             LLMDomainRoutingNode(
                 language_model=language_model,
                 prompt=domain_classification_prompt,

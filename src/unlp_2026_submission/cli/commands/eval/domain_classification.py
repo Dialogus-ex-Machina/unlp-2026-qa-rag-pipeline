@@ -19,8 +19,7 @@ from unlp_2026_submission.workflow.nodes import (
     LLMDomainRoutingNode,
     FakeQuestionAnswerNode,
 )
-from unlp_2026_submission.workflow.prompts import PromptsFactory
-from unlp_2026_submission.workflow.prompts.domain_classification_prompt_type import DomainClassificationPromptType
+from unlp_2026_submission.workflow.prompts import PromptsFactory, DomainClassificationPromptType
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
@@ -116,7 +115,7 @@ async def _evaluate(
     ]
     workflow = (
         QAWorkflowBuilder.create()
-        .with_domain_routing_node(
+        .add_domain_routing_node(
             LLMDomainRoutingNode(
                 language_model=language_model,
                 prompt=domain_classification_prompt

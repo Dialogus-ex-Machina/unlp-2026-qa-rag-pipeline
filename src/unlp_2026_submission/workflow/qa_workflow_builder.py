@@ -21,7 +21,7 @@ class QAWorkflowBuilder:
     def create() -> 'QAWorkflowBuilder':
         return QAWorkflowBuilder()
 
-    def with_domain_routing_node(self, domain_routing_node: BaseNode):
+    def add_domain_routing_node(self, domain_routing_node: BaseNode):
         self._domain_routing_node = domain_routing_node
         return self
 
@@ -38,10 +38,11 @@ class QAWorkflowBuilder:
         return self
 
     def build(self):
+        domain_routing_node_name = 'domain_routing'
         self._state_graph = StateGraph(state_schema=QAWorkflowState)
 
-        self._state_graph.add_node('domain_routing', self._domain_routing_node)
-        self._state_graph.set_entry_point('domain_routing')
+        self._state_graph.add_node(domain_routing_node_name, self._domain_routing_node)
+        self._state_graph.set_entry_point(domain_routing_node_name)
 
         medicine_node_names = self._build_domain_nodes(
             'medicine',
@@ -57,7 +58,7 @@ class QAWorkflowBuilder:
         )
 
         self._state_graph.add_conditional_edges(
-            self._domain_routing_node.name,
+            domain_routing_node_name,
             lambda state: state["predicted_domain"],
             {
                 "medicine": medicine_node_names[0],
