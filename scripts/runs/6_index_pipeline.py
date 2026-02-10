@@ -27,7 +27,7 @@ nodes = [
     DoclingPageLoadNode(embeddings, device="cuda"),
     SplitNode(
         RecursiveCharacterTextSplitter(
-            chunk_size=800,
+            chunk_size=1024,
             chunk_overlap=0,
             add_start_index=True,
         )
@@ -42,7 +42,7 @@ filepaths = get_pdf_filepaths("../documents/pdf")
 initial_state: IndexState = {
     # "filepaths": ["../documents/test.pdf"],
     "filepaths": filepaths,
-    "vector_store_path": "../vector_dbs/qdrant_db_5"
+    "vector_store_path": "../vector_dbs/qdrant_db_6"
 }
 
 final_state = index_runner.run(initial_state)
