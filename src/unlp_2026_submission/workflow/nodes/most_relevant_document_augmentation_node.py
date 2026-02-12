@@ -12,21 +12,22 @@ class MostRelevantDocumentAugmentationNode(BaseNode):
 
         is_relevant_context_exist = bool(state.get('relevant_context', None))
 
+        relevant_documents = state['relevant_documents']
+
         if is_relevant_context_exist:
             print('Relevant context already exists. Skipping augmentation.')
             return {}
 
-        relevant_documents = state['relevant_documents']
 
-        most_relevant_document = relevant_documents[0]
-
-        if not most_relevant_document:
+        if not relevant_documents:
             print('Most relevant document not found.')
             return {
                 'relevant_context': '',
                 'relevant_document_id': 'UNKNOWN_ID',
                 'relevant_document_page_num': -1,
             }
+
+        most_relevant_document = relevant_documents[0]
 
         relevant_context = most_relevant_document.text
         relevant_document_id = most_relevant_document.document_id

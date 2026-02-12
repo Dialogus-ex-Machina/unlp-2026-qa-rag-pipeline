@@ -17,7 +17,7 @@ from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
     LLMDomainRoutingNode,
-    FakeQuestionAnswerNode,
+    MockQuestionAnswerNode,
 )
 from unlp_2026_submission.workflow.prompts import PromptsFactory, DomainClassificationPromptType
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
@@ -111,7 +111,7 @@ async def _evaluate(
             vector_store=vector_store,
         ),
         MostRelevantDocumentAugmentationNode(),
-        FakeQuestionAnswerNode()
+        MockQuestionAnswerNode()
     ]
     workflow = (
         QAWorkflowBuilder.create()
