@@ -81,7 +81,7 @@ def get_faithfulness_sports_dataset(
 ):
     df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
 
-    sports_domain_df = df[df["Domain"].str.strip() == "domain_1"]
+    sports_domain_df = df[df["Domain"].str.strip() == "sport"]
 
     formatted_df = _format_dataframe(sports_domain_df)
 
@@ -94,36 +94,36 @@ def get_faithfulness_sports_dataset(
 
     return dataset
 
-def get_faithfulness_medical_dataset(
+def get_faithfulness_medicine_dataset(
         data_root_dir: str
 ):
     df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
 
-    sports_domain_df = df[df["Domain"].str.strip() == "domain_2"]
+    sports_domain_df = df[df["Domain"].str.strip() == "medicine"]
 
     formatted_df = _format_dataframe(sports_domain_df)
 
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
-        name="medical_qa_with_context",
+        name="medicine_qa_with_context",
         backend="local/csv",
         root_dir=''
     )
 
     return dataset
 
-def get_faithfulness_history_dataset(
+def get_faithfulness_other_dataset(
         data_root_dir: str
 ):
     df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
 
-    sports_domain_df = df[df["Domain"].str.strip() == "domain_3"]
+    sports_domain_df = df[df["Domain"].str.strip() == "other"]
 
     formatted_df = _format_dataframe(sports_domain_df)
 
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
-        name="history_qa_with_context",
+        name="other_qa_with_context",
         backend="local/csv",
         root_dir=''
     )

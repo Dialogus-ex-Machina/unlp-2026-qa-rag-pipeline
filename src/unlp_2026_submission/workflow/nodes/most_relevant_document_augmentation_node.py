@@ -3,14 +3,9 @@ from langchain_core.vectorstores import VectorStore
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
 from unlp_2026_submission.workflow.state import QAWorkflowState
 
-MOST_RELEVANT_DOCUMENT_AUGMENTATION_NODE = 'most_relevant_document_augmentation_node'
-
 class MostRelevantDocumentAugmentationNode(BaseNode):
     _vector_store: VectorStore
     _top_k: int
-
-    def __init__(self):
-        super().__init__(MOST_RELEVANT_DOCUMENT_AUGMENTATION_NODE)
 
     def __call__(self, state: QAWorkflowState):
         question = state['question']

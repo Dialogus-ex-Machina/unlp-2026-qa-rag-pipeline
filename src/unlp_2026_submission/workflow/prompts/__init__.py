@@ -1,2 +1,6 @@
 from .qa_prompt_type import QAPromptType
 from .prompts_factory import PromptsFactory
+from .en_domain_classification_prompt import ENDomainClassificationPrompt
+from .ua_domain_classification_prompt import UADomainClassificationPrompt
+from .domain_classification_prompt import DomainClassificationPrompt
+from .domain_classification_prompt_type import DomainClassificationPromptType

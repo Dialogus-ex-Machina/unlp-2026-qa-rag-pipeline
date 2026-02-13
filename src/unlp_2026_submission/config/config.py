@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-from unlp_2026_submission.workflow.prompts.qa_prompt_type import QAPromptType
 from .vector_store_config import VectorStoreConfig
 
 load_dotenv()
@@ -26,7 +25,6 @@ class Config:
     downloaded_models_dir: str
     downloaded_models_cache_dir: str
     data_root_dir: str
-    qa_prompt_type: QAPromptType
 
     vector_store: VectorStoreConfig
 
@@ -46,7 +44,6 @@ class Config:
             embeddings_model_name: str | None = None,
             judge_language_model_name: str | None = None,
             judge_language_model_provider_api_key: str | None = None,
-            qa_prompt_type: QAPromptType | None = None,
     ):
         self.language_model_name = self._resolve_value_with_priority(
             language_model_name,
@@ -107,10 +104,6 @@ class Config:
         self.judge_language_model_provider_api_key = self._resolve_value_with_priority(
             judge_language_model_provider_api_key,
             os.getenv('JUDGE_LANGUAGE_MODEL_PROVIDER_API_KEY')
-        )
-        self.qa_prompt_type = self._resolve_value_with_priority(
-            qa_prompt_type,
-            QAPromptType.SIMPLE
         )
 
         # **/unlp-2026-submission/src/unlp_2026_submission

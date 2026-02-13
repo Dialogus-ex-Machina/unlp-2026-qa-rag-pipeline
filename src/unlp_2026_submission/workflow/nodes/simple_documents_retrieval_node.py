@@ -4,8 +4,6 @@ from unlp_2026_submission.entities import RelevantDocument
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
 from unlp_2026_submission.workflow.state import QAWorkflowState
 
-SIMPLE_DOCUMENTS_RETRIEVAL_NODE_NAME = 'simple_documents_retrieval_node'
-
 class SimpleDocumentsRetrievalNode(BaseNode):
     _vector_store: VectorStore
     _top_k: int
@@ -15,7 +13,7 @@ class SimpleDocumentsRetrievalNode(BaseNode):
             vector_store: VectorStore,
             top_k: int = 10,
     ):
-        super().__init__(SIMPLE_DOCUMENTS_RETRIEVAL_NODE_NAME)
+        super().__init__()
         self._vector_store = vector_store
         self._top_k = top_k
 

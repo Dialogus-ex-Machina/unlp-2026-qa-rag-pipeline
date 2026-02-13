@@ -72,7 +72,7 @@ def get_accuracy_sports_dataset(
 ):
     df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
 
-    sports_domain_df = df[df["Domain"].str.strip() == "domain_1"]
+    sports_domain_df = df[df["Domain"].str.strip() == "sport"]
 
     formatted_df = _format_dataframe(sports_domain_df)
 
@@ -85,36 +85,36 @@ def get_accuracy_sports_dataset(
 
     return dataset
 
-def get_accuracy_medical_dataset(
+def get_accuracy_medicine_dataset(
         data_root_dir: str
 ):
     df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
 
-    sports_domain_df = df[df["Domain"].str.strip() == "domain_2"]
+    sports_domain_df = df[df["Domain"].str.strip() == "medicine"]
 
     formatted_df = _format_dataframe(sports_domain_df)
 
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
-        name="accuracy_medical_dataset",
+        name="accuracy_medicine_dataset",
         backend="local/csv",
         root_dir=''
     )
 
     return dataset
 
-def get_accuracy_history_dataset(
+def get_accuracy_other_dataset(
         data_root_dir: str
 ):
     df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
 
-    sports_domain_df = df[df["Domain"].str.strip() == "domain_3"]
+    sports_domain_df = df[df["Domain"].str.strip() == "other"]
 
     formatted_df = _format_dataframe(sports_domain_df)
 
     dataset = Dataset.from_pandas(
         dataframe=formatted_df,
-        name="accuracy_history_dataset",
+        name="accuracy_other_dataset",
         backend="local/csv",
         root_dir=''
     )

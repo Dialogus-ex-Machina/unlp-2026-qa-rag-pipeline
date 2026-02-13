@@ -4,4 +4,4 @@ class FaithfulnessDatasetName(str, Enum):
     FULL = "full"
     SPORT = "sport"
     MEDICINE = "medicine"
-    HISTORY = "history"
+    OTHER = "other"

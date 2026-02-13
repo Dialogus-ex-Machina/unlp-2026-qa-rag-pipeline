@@ -7,15 +7,13 @@ from unlp_2026_submission.workflow.prompts.base_qa_prompt import BaseQAPrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState
 from unlp_2026_submission.language_models import LanguageModel
 
-SIMPLE_QUESTION_ANSWER_NODE_NAME = 'simple_question_answer_node'
-
 class SimpleQuestionAnswerNode(BaseNode):
     def __init__(
             self,
             language_model: LanguageModel,
             prompt: BaseQAPrompt,
     ):
-        super().__init__(SIMPLE_QUESTION_ANSWER_NODE_NAME)
+        super().__init__()
         self.language_model = language_model
         self.prompt = prompt
 
