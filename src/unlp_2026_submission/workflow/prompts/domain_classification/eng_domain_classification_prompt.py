@@ -14,7 +14,7 @@ Answers:
 {% endfor -%}
 """.strip()
 
-class ENDomainClassificationPrompt(DomainClassificationPrompt):
+class EngDomainClassificationPrompt(DomainClassificationPrompt):
     def __init__(self):
         super().__init__(
             SYSTEM_PROMPT,

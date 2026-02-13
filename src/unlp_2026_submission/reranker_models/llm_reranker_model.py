@@ -4,7 +4,7 @@ from langchain_core.messages import AIMessage
 
 from unlp_2026_submission.entities import RelevantDocument
 from unlp_2026_submission.language_models import LanguageModel
-from unlp_2026_submission.workflow.prompts import RerankerPrompt
+from unlp_2026_submission.workflow.prompts import RerankerPrompt, EngRerankerPrompt
 
 from .reranker_model import RerankerModel
 
@@ -23,7 +23,7 @@ class LLMRerankerModel(RerankerModel):
         top_n: int = 10,
     ) -> None:
         self.language_model = language_model
-        self.reranker_prompt = reranker_prompt or RerankerPrompt()
+        self.reranker_prompt = reranker_prompt or EngRerankerPrompt()
         self.batch_size = batch_size
         self.top_n = top_n
 
@@ -38,7 +38,8 @@ class LLMRerankerModel(RerankerModel):
         if len(documents) == 0:
             return []
 
-        initial_results: List[RelevantDocument] = []
+        reranked_documents: List[RelevantDocument] = []
+        raw_response = None
         for idx in range(0, len(documents), self.batch_size):
             documents_batch = documents[idx : idx + self.batch_size]
 
@@ -60,11 +61,20 @@ class LLMRerankerModel(RerankerModel):
 
             for node, relevance in zip(choice_nodes, relevances):
                 node.relevance_score = relevance
-                initial_results.append(node)
+                reranked_documents.append(node)
 
-        return sorted(initial_results, key=lambda x: x.relevance_score or 0.0, reverse=True)[
+        reranked_documents = sorted(reranked_documents, key=lambda x: x.relevance_score or 0.0, reverse=True)[
             : self.top_n
         ]
+
+        if not reranked_documents:
+            print('No relevant documents after rerank.')
+            print(
+                'Raw rerank response',
+                getattr(raw_response, "content", str(raw_response))
+            )
+
+        return reranked_documents
 
     def _format_doc_batch_fn(self, documents: List[RelevantDocument]) -> str:
         """
