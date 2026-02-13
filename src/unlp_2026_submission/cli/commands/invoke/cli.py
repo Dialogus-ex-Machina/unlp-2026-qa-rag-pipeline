@@ -19,11 +19,11 @@ def run_command(
     qa_prompt_type: Annotated[
         Optional[QAPromptType],
         typer.Option("--qa-prompt")
-    ] = QAPromptType.SIMPLE,
+    ] = QAPromptType.ENG,
     domain_classification_prompt_type: Annotated[
         DomainClassificationPromptType,
         typer.Option("--classify-prompt")
-    ] = DomainClassificationPromptType.SIMPLE_EN,
+    ] = DomainClassificationPromptType.ENG,
     language_model_name: Annotated[
         Optional[str],
         typer.Option("--model", "-m", help="Language model name."),

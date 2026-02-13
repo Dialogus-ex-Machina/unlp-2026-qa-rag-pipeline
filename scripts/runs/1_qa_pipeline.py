@@ -3,17 +3,16 @@ import random
 from langchain_qdrant import QdrantVectorStore
 
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import SentenceTransformerEmbeddingModel
+from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
-from unlp_2026_submission.language_models import LlamaCppLanguageModel
+from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
     SimpleDocumentsRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode,
 )
-from unlp_2026_submission.workflow.prompts import ENDomainClassificationPrompt
-from unlp_2026_submission.workflow.prompts.qa_prompt import QAPrompt
+from unlp_2026_submission.workflow.prompts import UkrQAPrompt, EngDomainClassificationPrompt
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 
 
@@ -23,17 +22,17 @@ def main():
         embeddings_model_name="bflhc/Octen-Embedding-0.6B",
     )
 
-    language_model = LlamaCppLanguageModel.create(
+    language_model = LanguageModelFactory.create(
         config=config,
-    )
-    embeddings_model = SentenceTransformerEmbeddingModel.create(config)
+    ).get_language_model()
+    embeddings_model = EmbeddingsModelFactory.create(config).get_embeddings_model()
 
-    qa_prompt = QAPrompt()
-    domain_classification_prompt = ENDomainClassificationPrompt()
+    qa_prompt = UkrQAPrompt()
+    domain_classification_prompt = EngDomainClassificationPrompt()
 
     vector_store = QdrantVectorStore.from_existing_collection(
         embedding=embeddings_model,
-        **config.vector_store,
+        **config.vector_store
     )
 
     domain_pipeline_nodes = [

@@ -1,0 +1,4 @@
+from .domain_classification_prompt import DomainClassificationPrompt
+from .domain_classification_prompt_type import DomainClassificationPromptType
+from .eng_domain_classification_prompt import EngDomainClassificationPrompt
+from .ukr_domain_classification_prompt import UkrDomainClassificationPrompt

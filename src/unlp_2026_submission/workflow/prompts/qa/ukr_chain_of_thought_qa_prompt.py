@@ -37,7 +37,7 @@ USER_PROMPT = """
 Один із варіантів завжди є правильним.
 """.strip()
 
-class ChainOfThoughtQAPrompt(BaseQAPrompt):
+class UkrChainOfThoughtQAPrompt(BaseQAPrompt):
     _template: ChatPromptTemplate
 
     def __init__(self):
