@@ -2,9 +2,9 @@ from ragas import Dataset
 from .accuracy_datasets import (
     get_accuracy_full_dataset,
     get_accuracy_sports_dataset,
-    get_accuracy_medical_dataset
+    get_accuracy_medicine_dataset,
+    get_accuracy_other_dataset,
 )
-from unlp_2026_submission.config import Config
 from .accuracy_dataset_name import AccuracyDatasetName
 
 
@@ -16,18 +16,20 @@ class AccuracyDatasetFactory:
 
     @staticmethod
     def create(
-            config: Config,
+            data_root_dir: str,
             dataset_name: AccuracyDatasetName
     ):
 
         def get_dataset():
             match dataset_name:
                 case AccuracyDatasetName.FULL:
-                    return get_accuracy_full_dataset(config)
+                    return get_accuracy_full_dataset(data_root_dir)
                 case AccuracyDatasetName.SPORT:
-                    return get_accuracy_sports_dataset(config)
+                    return get_accuracy_sports_dataset(data_root_dir)
                 case AccuracyDatasetName.MEDICINE:
-                    return get_accuracy_medical_dataset(config)
+                    return get_accuracy_medicine_dataset(data_root_dir)
+                case AccuracyDatasetName.OTHER:
+                    return get_accuracy_other_dataset(data_root_dir)
                 case _:
                     raise ValueError("Metric not found.")
 

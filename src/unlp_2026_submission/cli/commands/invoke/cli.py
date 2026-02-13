@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 from rich import print as rprint
 
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetName
-from unlp_2026_submission.workflow.prompts import QAPromptType
+from unlp_2026_submission.workflow.prompts import QAPromptType, DomainClassificationPromptType
 from .service import run_invoke
 
 app = typer.Typer(no_args_is_help=True)
@@ -19,7 +19,11 @@ def run_command(
     qa_prompt_type: Annotated[
         Optional[QAPromptType],
         typer.Option("--qa-prompt")
-    ] = QAPromptType.SIMPLE,
+    ] = QAPromptType.ENG,
+    domain_classification_prompt_type: Annotated[
+        DomainClassificationPromptType,
+        typer.Option("--classify-prompt")
+    ] = DomainClassificationPromptType.ENG,
     language_model_name: Annotated[
         Optional[str],
         typer.Option("--model", "-m", help="Language model name."),
@@ -51,6 +55,7 @@ def run_command(
     result = run_invoke(
         dataset_name=dataset_name,
         qa_prompt_type=qa_prompt_type,
+        domain_classification_prompt_type=domain_classification_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,

@@ -1,29 +1,38 @@
-from .en_qa_prompt import EnQAPrompt
-from .qa_prompt import QAPrompt
-from .chain_of_thought_qa_prompt import ChainOfThoughtQAPrompt
-from .qa_prompt_type import QAPromptType
-
+from .domain_classification import (
+    EngDomainClassificationPrompt,
+    UkrDomainClassificationPrompt,
+    DomainClassificationPromptType
+)
+from .qa import (
+    QAPromptType,
+    UkrQAPrompt,
+    EngQAPrompt,
+    UkrChainOfThoughtQAPrompt,
+)
 
 class PromptsFactory:
-    _qa_prompt_type: QAPromptType
-
-    def __init__(
-            self,
-            qa_prompt_type: QAPromptType
+    @staticmethod
+    def get_qa_prompt(
+            prompt_type: QAPromptType
     ):
-        self._qa_prompt_type = qa_prompt_type
+        match prompt_type:
+            case QAPromptType.UKR:
+                return UkrQAPrompt()
+            case QAPromptType.ENG:
+                return EngQAPrompt()
+            case QAPromptType.UKR_CHAIN_OF_THOUGHT:
+                return UkrChainOfThoughtQAPrompt()
+            case _:
+                raise ValueError("Prompt type not found.")
 
     @staticmethod
-    def create(qa_prompt_type: QAPromptType):
-        return PromptsFactory(qa_prompt_type=qa_prompt_type)
-
-    def get_qa_prompt(self):
-        match self._qa_prompt_type:
-            case QAPromptType.SIMPLE:
-                return QAPrompt()
-            case QAPromptType.SIMPLE_EN:
-                return EnQAPrompt()
-            case QAPromptType.CHAIN_OF_THOUGHT:
-                return ChainOfThoughtQAPrompt()
+    def get_domain_classification_prompt(
+            prompt_type: DomainClassificationPromptType
+    ):
+        match prompt_type:
+            case DomainClassificationPromptType.ENG:
+                return EngDomainClassificationPrompt()
+            case DomainClassificationPromptType.UKR:
+                return UkrDomainClassificationPrompt()
             case _:
                 raise ValueError("Prompt type not found.")

@@ -4,6 +4,8 @@ import typer
 from typing import Annotated
 import logging
 
+from langchain_qdrant import QdrantVectorStore
+
 from unlp_2026_submission.evals.accuracy import (
     AccuracyEvaluationFactory,
     AccuracyMetricName,
@@ -12,11 +14,22 @@ from unlp_2026_submission.evals.accuracy import (
 )
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
-from unlp_2026_submission.knowledge_base import KnowledgeBase
-from unlp_2026_submission.workflow.workflow_builder import WorkflowBuilder
+from unlp_2026_submission.reranker_models import LLMRerankerModel
+from unlp_2026_submission.workflow.nodes import (
+    MostRelevantDocumentAugmentationNode,
+    SimpleQuestionAnswerNode,
+    LLMDomainRoutingNode,
+    RerankerModelNode,
+    HydeDocumentRetrievalNode,
+)
+from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
-from unlp_2026_submission.workflow.prompts import QAPromptType
+from unlp_2026_submission.workflow.prompts import (
+    QAPromptType,
+    PromptsFactory,
+    DomainClassificationPromptType,
+)
 
 app = typer.Typer()
 
@@ -34,7 +47,11 @@ def evaluate_accuracy_command(
         qa_prompt_type: Annotated[
             QAPromptType,
             typer.Option("--qa-prompt")
-        ] = QAPromptType.SIMPLE,
+        ] = QAPromptType.ENG,
+        domain_classification_prompt_type: Annotated[
+            DomainClassificationPromptType,
+            typer.Option("--classify-prompt")
+        ] = DomainClassificationPromptType.ENG,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
         embeddings_model_name: Annotated[str, typer.Option("--embeddings-model", "-em")] = None,
@@ -50,6 +67,7 @@ def evaluate_accuracy_command(
             metric=metric,
             dataset_name=dataset_name,
             qa_prompt_type=qa_prompt_type,
+            domain_classification_prompt_type=domain_classification_prompt_type,
             language_model_name=language_model_name,
             model_provider_api_key=model_provider_api_key,
             embeddings_model_name=embeddings_model_name,
@@ -61,6 +79,7 @@ async def _evaluate(
         metric: AccuracyMetricName,
         dataset_name: AccuracyDatasetName,
         qa_prompt_type: QAPromptType,
+        domain_classification_prompt_type: DomainClassificationPromptType,
         language_model_name: str | None,
         model_provider_api_key: str | None = None,
         embeddings_model_name: str | None = None,
@@ -70,22 +89,22 @@ async def _evaluate(
         metric=metric.value,
         dataset_name=dataset_name.value,
         qa_prompt_type=qa_prompt_type.value,
+        domain_classification_prompt_type=domain_classification_prompt_type.value,
         language_model_name=language_model_name,
         embeddings_model_name=embeddings_model_name,
     )
 
     config = Config(
-        qa_prompt_type=qa_prompt_type,
         language_model_name=language_model_name,
         model_provider_api_key=model_provider_api_key,
         embeddings_model_name=embeddings_model_name,
     )
     dataset = AccuracyDatasetFactory.create(
-        config=config,
+        data_root_dir=config.data_root_dir,
         dataset_name=dataset_name
     ).get_dataset()
 
-    language_model, llama_index_language_model = (
+    language_model = (
         LanguageModelFactory
         .create(config)
         .get_language_model()
@@ -95,18 +114,49 @@ async def _evaluate(
         .create(config)
         .get_embeddings_model()
     )
-
-    knowledge_base = KnowledgeBase.load(
-        llama_index_language_model=llama_index_language_model,
-        embeddings_model=embeddings_model,
-        config=config.knowledge_base,
+    reranker_model = LLMRerankerModel(
+        language_model=language_model,
     )
 
+    qa_prompt = (
+        PromptsFactory
+        .get_qa_prompt(qa_prompt_type)
+    )
+    domain_classification_prompt = (
+        PromptsFactory
+        .get_domain_classification_prompt(
+            domain_classification_prompt_type
+        )
+    )
+
+    vector_store = QdrantVectorStore.from_existing_collection(
+        embedding=embeddings_model,
+        **config.vector_store,
+    )
+
+    domain_pipeline_nodes = [
+        HydeDocumentRetrievalNode(
+            vector_store=vector_store,
+            language_model=language_model,
+        ),
+        RerankerModelNode(reranker_model=reranker_model),
+        MostRelevantDocumentAugmentationNode(),
+        SimpleQuestionAnswerNode(
+            language_model=language_model,
+            prompt=qa_prompt,
+        )
+    ]
     workflow = (
-        WorkflowBuilder
-        .create(config)
-        .with_language_model(language_model)
-        .with_knowledge_base(knowledge_base)
+        QAWorkflowBuilder.create()
+        .add_domain_routing_node(
+            LLMDomainRoutingNode(
+                language_model=language_model,
+                prompt=domain_classification_prompt
+            )
+        )
+        .add_sport_domain_nodes(domain_pipeline_nodes)
+        .add_medicine_domain_nodes(domain_pipeline_nodes)
+        .add_other_domain_nodes(domain_pipeline_nodes)
         .build()
     )
 

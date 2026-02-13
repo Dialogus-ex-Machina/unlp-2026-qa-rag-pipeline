@@ -1,6 +1,5 @@
 from ragas.llms import InstructorBaseRagasLLM as JudgeLanguageModel
-from .language_model import LanguageModel, LlamaIndexLanguageModel
-from .fake_llama_index_language_model import FakeLlamaIndexLanguageModel
+from .language_model import LanguageModel
 from .ollama_language_model import OllamaLanguageModel
 from .gemini_language_model import (
     GeminiLanguageModel,

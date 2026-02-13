@@ -1,2 +1,3 @@
-from unlp_2026_submission.entities.single_answer_question import Question, QuestionWithContext
-from unlp_2026_submission.entities.document_page import DocumentPage
+from .question import Question, QuestionWithContext
+from .relevant_document import RelevantDocument
+from .question_domain import QuestionDomain

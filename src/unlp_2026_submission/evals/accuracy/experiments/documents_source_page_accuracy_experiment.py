@@ -3,7 +3,7 @@ from ragas import experiment
 
 from unlp_2026_submission.entities import Question
 from unlp_2026_submission.evals.accuracy.metrics import document_source_page_accuracy_metric
-from unlp_2026_submission.workflow.state import WorkflowState
+from unlp_2026_submission.workflow.state import QAWorkflowState
 
 
 @experiment()
@@ -11,7 +11,7 @@ async def documents_source_page_accuracy_experiment(
         question: Question,
         workflow: CompiledStateGraph
 ):
-    result: WorkflowState = workflow.invoke(
+    result: QAWorkflowState = workflow.invoke(
         input={ 'question': question }
     )
 
@@ -19,26 +19,17 @@ async def documents_source_page_accuracy_experiment(
         question=question,
         workflow_result=result
     )
-    if score.value is None:
-        score = document_source_page_accuracy_metric(
-            question=question,
-            workflow_result=result
-        )
-
-    reference_page = result.get('reference_document_page')
-    reference_page_text = reference_page.text if reference_page else ""
 
     experiment_view = {
         'question_id': question['question_id'],
         'question_text': question['question_text'],
         'answers': question['answers'],
-        'correct_answer': question.get('correct_answer'),
         'correct_document_id': question['doc_id'],
         'correct_document_page': question['page_num'],
         'raw_answer': result.get('raw_answer'),
-        'reference_document_id': result['reference_document_id'],
-        'reference_document_page_num': result['reference_document_page_num'],
-        'reference_document_page_text': reference_page_text,
+        'relevant_document_id': result['relevant_document_id'],
+        'relevant_document_page_num': result['relevant_document_page_num'],
+        'relevant_context': result['relevant_context'],
         "score": score.value,
     }
 

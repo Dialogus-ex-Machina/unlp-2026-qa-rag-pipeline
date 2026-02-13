@@ -14,7 +14,7 @@ class EmbedStoreNode:
         embeddings: Embeddings,
         collection_name: str = "default",
         distance: Distance = Distance.COSINE,
-        batch_size: int = 64
+        batch_size: int = 64,
     ):
         self.embeddings = embeddings
         self.collection_name = collection_name
@@ -41,8 +41,10 @@ class EmbedStoreNode:
             embedding=self.embeddings,
         )
 
-        for doc in splits:
-            vector_store.add_documents(documents=[doc], batch_size=self.batch_size)
+        vector_store.add_documents(
+            documents=splits,
+            batch_size=self.batch_size,
+        )
 
         return {}
 

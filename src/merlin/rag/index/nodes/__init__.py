@@ -6,6 +6,8 @@ from .pypdf_load_node import PyPDFLoadNode
 from .pymupdf_load_node import PyMuPDFLoadNode
 from .split_node import SplitNode
 from .embed_store_node import EmbedStoreNode
+from .delimited_page_load_node import DelimitedPageLoadNode
+from .proxy_split_node import ProxySplitNode
 
 __all__ = [
     "IndexNode",
@@ -15,5 +17,7 @@ __all__ = [
     "PyPDFLoadNode",
     "PyMuPDFLoadNode",
     "SplitNode",
-    "EmbedStoreNode"
+    "EmbedStoreNode",
+    "DelimitedPageLoadNode",
+    "ProxySplitNode",
 ]
