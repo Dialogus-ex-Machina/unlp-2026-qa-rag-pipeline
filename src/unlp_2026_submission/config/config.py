@@ -135,8 +135,8 @@ class Config:
         )
 
         vector_store_path = os.path.join(
-            project_src_dir,
-            os.getenv('VECTOR_STORE_PATH', 'vector_dbs/qdrant_db')
+            project_root_dir,
+            os.getenv('VECTOR_STORE_PATH', 'scripts/vector_dbs/qdrant_db')
         )
         collection_name = os.getenv('VECTOR_STORE_COLLECTION_NAME', 'default')
 

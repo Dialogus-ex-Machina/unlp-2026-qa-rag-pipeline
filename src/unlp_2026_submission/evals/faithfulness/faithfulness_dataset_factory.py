@@ -3,7 +3,8 @@ from ragas import Dataset
 from .faithfulness_datasets import (
     get_faithfulness_full_dataset,
     get_faithfulness_sports_dataset,
-    get_faithfulness_medical_dataset
+    get_faithfulness_medical_dataset,
+    get_faithfulness_history_dataset
 )
 from .faithfulness_dataset_name import FaithfulnessDatasetName
 
@@ -28,6 +29,8 @@ class FaithfulnessDatasetFactory:
                     return get_faithfulness_sports_dataset(data_root_dir)
                 case FaithfulnessDatasetName.MEDICINE:
                     return get_faithfulness_medical_dataset(data_root_dir)
+                case FaithfulnessDatasetName.HISTORY:
+                    return get_faithfulness_history_dataset(data_root_dir)
                 case _:
                     raise ValueError("Metric not found.")
 

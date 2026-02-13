@@ -2,9 +2,9 @@ from ragas import Dataset
 from .accuracy_datasets import (
     get_accuracy_full_dataset,
     get_accuracy_sports_dataset,
-    get_accuracy_medical_dataset
+    get_accuracy_medical_dataset,
+    get_accuracy_history_dataset,
 )
-from unlp_2026_submission.config import Config
 from .accuracy_dataset_name import AccuracyDatasetName
 
 
@@ -28,6 +28,8 @@ class AccuracyDatasetFactory:
                     return get_accuracy_sports_dataset(data_root_dir)
                 case AccuracyDatasetName.MEDICINE:
                     return get_accuracy_medical_dataset(data_root_dir)
+                case AccuracyDatasetName.HISTORY:
+                    return get_accuracy_history_dataset(data_root_dir)
                 case _:
                     raise ValueError("Metric not found.")
 

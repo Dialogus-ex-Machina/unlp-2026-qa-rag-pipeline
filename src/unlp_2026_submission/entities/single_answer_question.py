@@ -1,7 +1,7 @@
 from typing import TypedDict
 
 class Question(TypedDict):
-    question_id: int
+    question_id: int | str
     question_text: str
     answers: list[str]
 
