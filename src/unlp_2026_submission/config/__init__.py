@@ -1,2 +1,2 @@
 from .config import Config
-from .knowledge_base_config import KnowledgeBaseConfig
+from .vector_store_config import VectorStoreConfig

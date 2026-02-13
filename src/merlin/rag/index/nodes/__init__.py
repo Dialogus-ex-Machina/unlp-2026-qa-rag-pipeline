@@ -4,6 +4,8 @@ from .docling_page_load_node import DoclingPageLoadNode
 from .pypdf_load_node import PyPDFLoadNode
 from .split_node import SplitNode
 from .embed_store_node import EmbedStoreNode
+from .delimited_page_load_node import DelimitedPageLoadNode
+from .proxy_split_node import ProxySplitNode
 
 __all__ = [
     "IndexNode",
@@ -11,5 +13,7 @@ __all__ = [
     "DoclingPageLoadNode",
     "PyPDFLoadNode",
     "SplitNode",
-    "EmbedStoreNode"
+    "EmbedStoreNode",
+    "DelimitedPageLoadNode",
+    "ProxySplitNode",
 ]

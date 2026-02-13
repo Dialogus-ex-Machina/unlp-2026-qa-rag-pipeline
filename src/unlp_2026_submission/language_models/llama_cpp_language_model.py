@@ -1,8 +1,9 @@
-from typing import Any, TypedDict, Unpack, Optional, List, Dict, Union, Literal
+from typing import Any, TypedDict, Unpack, Optional, List, Dict, Union, Tuple
 from pathlib import Path
 import os
 import json
 import fnmatch
+import re
 
 from langchain_community.chat_models import ChatLlamaCpp
 from huggingface_hub import hf_hub_download, HfFileSystem
@@ -80,6 +81,30 @@ class LlamaCppLanguageModelKArgs(TypedDict, total=False):
     """
     verbose: bool
     """Print verbose output to stderr."""
+
+def parse_hf_repo_and_filename(ref: str) -> Tuple[str, Optional[str]]:
+    """
+    Returns (repo_id, filename)
+
+    Examples:
+        - org/repo
+        - org/repo/file.gguf
+        - https://huggingface.co/org/repo/blob/main/file.gguf
+    """
+    ref = ref.strip()
+
+    # remove HF URL if present
+    ref = re.sub(r"^https?://huggingface\.co/", "", ref)
+    ref = ref.replace("/blob/main/", "/").replace("/resolve/main/", "/")
+
+    parts = [p for p in ref.split("/") if p]
+    if len(parts) < 2:
+        raise ValueError(f"Invalid Hugging Face reference: {ref}")
+
+    repo_id = f"{parts[0]}/{parts[1]}"
+    filename = parts[2] if len(parts) > 2 else None
+
+    return repo_id, filename
 
 def _resolve_model_hf_hub(
         config: Config,
@@ -196,22 +221,20 @@ def _resolve_model_hf_hub(
 
 class LlamaCppLanguageModel(ChatLlamaCpp):
     @staticmethod
-    def create_from_hf_hub(
+    def create(
             config: Config,
-            repo_id: str,
-            filename: Optional[str],
-            additional_files: Optional[List] = None,
             **kwargs: Unpack[LlamaCppLanguageModelKArgs],
     ):
         if config.model_provider_api_key:
             if os.environ.get("HF_TOKEN") is None:
                 os.environ["HF_TOKEN"] = config.model_provider_api_key
 
+        repo_id, filename = parse_hf_repo_and_filename(config.language_model_name)
+
         model_path = _resolve_model_hf_hub(
             config=config,
             repo_id=repo_id,
             filename=filename,
-            additional_files=additional_files
         )
         # loading the first file of a sharded GGUF loads all remaining shard files in the subfolder
         return ChatLlamaCpp(
@@ -236,3 +259,4 @@ class LlamaCppLanguageModel(ChatLlamaCpp):
         if language_model_name and language_model_name.lower().endswith(".gguf"):
             return True
         return False
+

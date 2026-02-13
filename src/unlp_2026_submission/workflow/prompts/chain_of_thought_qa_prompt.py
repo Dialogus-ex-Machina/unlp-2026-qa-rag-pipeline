@@ -1,7 +1,6 @@
-from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
 
-from unlp_2026_submission.entities import Question, DocumentPage
+from .base_qa_prompt import BaseQAPrompt
 
 SYSTEM_PROMPT = """
 Ти — асистент для розв'язання завдань з вибором однієї правильної відповіді.
@@ -38,30 +37,11 @@ USER_PROMPT = """
 Один із варіантів завжди є правильним.
 """.strip()
 
-class ChainOfThoughtQAPrompt:
+class ChainOfThoughtQAPrompt(BaseQAPrompt):
     _template: ChatPromptTemplate
 
     def __init__(self):
-        self._template = ChatPromptTemplate.from_messages(
-            messages=[
-                ("system", SYSTEM_PROMPT),
-                ("human", USER_PROMPT),
-            ],
-            template_format="jinja2"
-        )
-
-    def format_messages(
-            self,
-            question: Question,
-            document_page: DocumentPage | None = None
-    ) -> list[BaseMessage]:
-        question_text = question.get('question_text')
-        answers = question.get('answers')
-
-        context = document_page.text if document_page else ''
-
-        return self._template.format_messages(
-            question=question_text,
-            answers=answers,
-            context=context
+        super().__init__(
+            system_prompt=SYSTEM_PROMPT,
+            user_prompt=USER_PROMPT
         )

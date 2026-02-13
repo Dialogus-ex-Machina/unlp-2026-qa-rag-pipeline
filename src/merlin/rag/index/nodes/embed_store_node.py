@@ -13,11 +13,13 @@ class EmbedStoreNode:
         self,
         embeddings: Embeddings,
         collection_name: str = "default",
-        distance: Distance = Distance.COSINE
+        distance: Distance = Distance.COSINE,
+        batch_size: int = 64,
     ):
         self.embeddings = embeddings
         self.collection_name = collection_name
         self.distance = distance
+        self.batch_size = batch_size
 
     def __call__(self, state: IndexState) -> IndexState:
         splits: List = state.get("splits", [])
@@ -39,7 +41,10 @@ class EmbedStoreNode:
             embedding=self.embeddings,
         )
 
-        vector_store.add_documents(documents=splits)
+        vector_store.add_documents(
+            documents=splits,
+            batch_size=self.batch_size,
+        )
 
         return {}
 

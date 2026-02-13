@@ -1,9 +1,9 @@
 from langgraph.graph.state import CompiledStateGraph
 from ragas import experiment
 
-from unlp_2026_submission.entities import QuestionWithContext, DocumentPage
+from unlp_2026_submission.entities import QuestionWithContext
 from .answer_faithfulness_metric import answer_faithfulness_metric
-from unlp_2026_submission.workflow.state import WorkflowState
+from unlp_2026_submission.workflow.state import QAWorkflowState
 
 
 @experiment()
@@ -13,20 +13,16 @@ async def answers_faithfulness_experiment(
 ):
     correct_answer = question['correct_answer']
 
-    reference_document_id = question['doc_id']
-    reference_document_page_num = question['page_num']
-    reference_document_page = DocumentPage(
-        document_id=reference_document_id,
-        page_number=reference_document_page_num,
-        text=question['doc_text'],
-    )
+    relevant_document_id = question['doc_id']
+    relevant_document_page_num = question['page_num']
+    relevant_context = question['doc_text']
 
-    result: WorkflowState = workflow.invoke(
+    result: QAWorkflowState = workflow.invoke(
         input={
             'question': question,
-            'reference_document_page': reference_document_page,
-            'reference_document_id': reference_document_id,
-            'reference_document_page_num': reference_document_page_num,
+            'relevant_context': relevant_context,
+            'relevant_document_id': relevant_document_id,
+            'relevant_document_page_num': relevant_document_page_num,
         }
     )
 

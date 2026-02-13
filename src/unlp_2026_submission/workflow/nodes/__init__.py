@@ -1,3 +1,4 @@
-from unlp_2026_submission.workflow.nodes.base_node import *
-from unlp_2026_submission.workflow.nodes.question_answer_node import *
-from unlp_2026_submission.workflow.nodes.context_retrieval_node import *
+from .base_node import BaseNode
+from .simple_question_answer_node import SimpleQuestionAnswerNode
+from .simple_documents_retrieval_node import SimpleDocumentsRetrievalNode
+from .most_relevant_document_augmentation_node import MostRelevantDocumentAugmentationNode

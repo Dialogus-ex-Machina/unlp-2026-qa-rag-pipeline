@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 from unlp_2026_submission.workflow.prompts.qa_prompt_type import QAPromptType
-from .knowledge_base_config import KnowledgeBaseConfig
+from .vector_store_config import VectorStoreConfig
 
 load_dotenv()
 
@@ -28,7 +28,7 @@ class Config:
     data_root_dir: str
     qa_prompt_type: QAPromptType
 
-    knowledge_base: KnowledgeBaseConfig
+    vector_store: VectorStoreConfig
 
     def __init__(
             self,
@@ -134,26 +134,16 @@ class Config:
             os.path.join(hf_home_dir, "models/.cache")
         )
 
-        kb_store_root_dir = os.path.join(
-            project_src_dir,
-            os.getenv('KB_DATA_ROOT_DIR', 'kb_data')
-        )
         vector_store_path = os.path.join(
-            kb_store_root_dir,
-            os.getenv('KB_VECTOR_STORE_PATH', 'db')
+            project_src_dir,
+            os.getenv('VECTOR_STORE_PATH', 'vector_dbs/qdrant_db')
         )
-        context_path = os.path.join(
-            kb_store_root_dir,
-            os.getenv('KB_CONTEXT_PATH', 'context')
-        )
-        collection_name = os.getenv('KB_COLLECTION_NAME', 'default_collection')
+        collection_name = os.getenv('VECTOR_STORE_COLLECTION_NAME', 'default')
 
-        self.knowledge_base = KnowledgeBaseConfig(
-            kb_store_root_dir=kb_store_root_dir,
-            vector_store_path=vector_store_path,
-            context_path=context_path,
-            collection_name=collection_name
-        )
+        self.vector_store = {
+            'path': vector_store_path,
+            'collection_name': collection_name
+        }
 
     def _resolve_value_with_priority(self, *values):
         for v in values:

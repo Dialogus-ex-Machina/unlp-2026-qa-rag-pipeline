@@ -1,5 +1,4 @@
 from ragas import Dataset
-from unlp_2026_submission.config import Config
 
 from .faithfulness_datasets import (
     get_faithfulness_full_dataset,
@@ -17,18 +16,18 @@ class FaithfulnessDatasetFactory:
 
     @staticmethod
     def create(
-            config: Config,
+            data_root_dir: str,
             dataset_name: FaithfulnessDatasetName
     ):
 
         def get_dataset():
             match dataset_name:
                 case FaithfulnessDatasetName.FULL:
-                    return get_faithfulness_full_dataset(config)
+                    return get_faithfulness_full_dataset(data_root_dir)
                 case FaithfulnessDatasetName.SPORT:
-                    return get_faithfulness_sports_dataset(config)
+                    return get_faithfulness_sports_dataset(data_root_dir)
                 case FaithfulnessDatasetName.MEDICINE:
-                    return get_faithfulness_medical_dataset(config)
+                    return get_faithfulness_medical_dataset(data_root_dir)
                 case _:
                     raise ValueError("Metric not found.")
 

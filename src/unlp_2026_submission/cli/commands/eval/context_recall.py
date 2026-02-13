@@ -4,6 +4,8 @@ import typer
 from typing import Annotated
 import logging
 
+from langchain_qdrant import QdrantVectorStore
+
 from unlp_2026_submission.evals.accuracy import (
     AccuracyMetricName,
     AccuracyDatasetFactory,
@@ -12,11 +14,15 @@ from unlp_2026_submission.evals.accuracy import (
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.context_recall import evaluate_context_recall
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
-from unlp_2026_submission.knowledge_base import KnowledgeBase
-from unlp_2026_submission.workflow.workflow_builder import WorkflowBuilder
+from unlp_2026_submission.workflow.nodes import (
+    MostRelevantDocumentAugmentationNode,
+    SimpleDocumentsRetrievalNode,
+    SimpleQuestionAnswerNode
+)
+from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory, JudgeLanguageModelFactory
-from unlp_2026_submission.workflow.prompts import QAPromptType
+from unlp_2026_submission.workflow.prompts import QAPromptType, PromptsFactory
 
 app = typer.Typer()
 
@@ -95,11 +101,11 @@ async def _evaluate(
         qa_prompt_type=qa_prompt_type,
     )
     dataset = AccuracyDatasetFactory.create(
-        config=config,
+        data_root_dir=config.data_root_dir,
         dataset_name=dataset_name
     ).get_dataset()
 
-    language_model, llama_index_language_model = (
+    language_model = (
         LanguageModelFactory
         .create(config)
         .get_language_model()
@@ -115,17 +121,33 @@ async def _evaluate(
         .get_language_model()
     )
 
-    knowledge_base = KnowledgeBase.load(
-        llama_index_language_model=llama_index_language_model,
-        embeddings_model=embeddings_model,
-        config=config.knowledge_base,
+    qa_prompt = (
+        PromptsFactory
+        .create(config.qa_prompt_type)
+        .get_qa_prompt()
+    )
+
+    vector_store = QdrantVectorStore.from_existing_collection(
+        embedding=embeddings_model,
+        **config.vector_store,
     )
 
     workflow = (
-        WorkflowBuilder
-        .create(config)
-        .with_language_model(language_model)
-        .with_knowledge_base(knowledge_base)
+        QAWorkflowBuilder.create()
+        .with_documents_retrieval_node(
+            SimpleDocumentsRetrievalNode(
+                vector_store=vector_store,
+            ),
+        )
+        .with_augmentation_node(
+            MostRelevantDocumentAugmentationNode()
+        )
+        .with_question_answering_node(
+            SimpleQuestionAnswerNode(
+                language_model=language_model,
+                prompt=qa_prompt,
+            )
+        )
         .build()
     )
 
