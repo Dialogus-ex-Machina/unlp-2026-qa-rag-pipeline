@@ -1,7 +1,12 @@
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
 from unlp_2026_submission.workflow.state import QAWorkflowState
 
-class MostRelevantDocumentAugmentationNode(BaseNode):
+class TopKRelevantDocumentAugmentation(BaseNode):
+    _top_k: int
+
+    def __init__(self, top_k: int = 3):
+        self._top_k = top_k
+
     def __call__(self, state: QAWorkflowState):
         question = state['question']
 
@@ -22,11 +27,16 @@ class MostRelevantDocumentAugmentationNode(BaseNode):
                 'relevant_document_page_num': -1,
             }
 
-        most_relevant_document = relevant_documents[0]
+        top_k_relevant = relevant_documents[0:self._top_k]
 
-        relevant_context = most_relevant_document.text
-        relevant_document_id = most_relevant_document.document_id
-        relevant_document_page_num = most_relevant_document.page_number
+        # separator = "\n---------------------\n"
+        separator = "\n\n"
+        relevant_context = separator.join(
+            page.text for page in top_k_relevant
+        )
+
+        relevant_document_id = top_k_relevant[0].document_id
+        relevant_document_page_num = top_k_relevant[0].page_number
 
         print('Retrieved doc_id:', relevant_document_id)
         print('Retrieved page_num:', relevant_document_page_num)
