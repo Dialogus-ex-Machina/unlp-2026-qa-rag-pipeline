@@ -6,9 +6,15 @@ from unlp_2026_submission.workflow.state import QAWorkflowState
 
 class TopKRelevantDocumentAugmentation(BaseNode):
     _top_k: int
+    _should_reorder: bool
 
-    def __init__(self, top_k: Literal[1, 3, 5] = 3):
+    def __init__(
+            self,
+            top_k: Literal[1, 3, 5] = 3,
+            should_reorder: bool = False,
+    ):
         self._top_k = top_k
+        self._should_reorder = should_reorder
 
     def __call__(self, state: QAWorkflowState):
         question = state['question']
@@ -50,7 +56,10 @@ class TopKRelevantDocumentAugmentation(BaseNode):
         k = min(self._top_k, len(relevant_documents))
         docs = relevant_documents[:k]
 
-        top_k_relevant = self._reorder_docs(docs)
+        if self._should_reorder:
+            top_k_relevant = self._reorder_docs(docs)
+        else:
+            top_k_relevant = docs
 
         separator = "\n\n"
         relevant_context = separator.join(doc.text for doc in top_k_relevant)
