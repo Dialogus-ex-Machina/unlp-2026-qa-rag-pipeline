@@ -25,6 +25,9 @@ class RerankerModelNode(BaseNode):
             documents=relevant_documents,
         )
 
+        if not reranked_relevant_documents:
+            return {}
+
         print('Reranked relevant documents:', reranked_relevant_documents)
 
         return {
