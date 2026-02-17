@@ -47,11 +47,11 @@ def evaluate_accuracy_command(
         qa_prompt_type: Annotated[
             QAPromptType,
             typer.Option("--qa-prompt")
-        ] = QAPromptType.ENG,
+        ] = QAPromptType.UKR,
         domain_classification_prompt_type: Annotated[
             DomainClassificationPromptType,
             typer.Option("--classify-prompt")
-        ] = DomainClassificationPromptType.ENG,
+        ] = DomainClassificationPromptType.UKR,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
         embeddings_model_name: Annotated[str, typer.Option("--embeddings-model", "-em")] = None,

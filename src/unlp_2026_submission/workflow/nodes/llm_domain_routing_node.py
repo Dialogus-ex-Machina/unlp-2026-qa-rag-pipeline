@@ -3,7 +3,7 @@ import re
 from langchain_core.messages import AIMessage
 
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
-from unlp_2026_submission.workflow.prompts import EngDomainClassificationPrompt, DomainClassificationPrompt
+from unlp_2026_submission.workflow.prompts import DomainClassificationPrompt, UkrDomainClassificationPrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState
 from unlp_2026_submission.language_models import LanguageModel
 from unlp_2026_submission.entities import QuestionDomain
@@ -15,7 +15,7 @@ class LLMDomainRoutingNode(BaseNode):
     def __init__(
             self,
             language_model: LanguageModel,
-            prompt: DomainClassificationPrompt,
+            prompt: DomainClassificationPrompt = UkrDomainClassificationPrompt(),
     ):
         super().__init__()
         self.language_model = language_model

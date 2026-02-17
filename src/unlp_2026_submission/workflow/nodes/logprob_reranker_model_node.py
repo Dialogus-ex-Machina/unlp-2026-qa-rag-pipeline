@@ -16,8 +16,8 @@ class LogprobRerankerModelNode(BaseNode):
             self,
             language_model: LlamaCppLanguageModel,
             prompt: LogprobRerankerPrompt = UkrLogprobRerankerPrompt(),
-            yes_token = 'Yes',
-            no_token = 'No',
+            yes_token = 'Так',
+            no_token = 'Ні',
     ):
         self.language_model = language_model
         self.prompt = prompt

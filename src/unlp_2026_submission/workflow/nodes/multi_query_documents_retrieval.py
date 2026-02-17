@@ -5,7 +5,7 @@ from langchain_core.vectorstores import VectorStore
 
 from unlp_2026_submission.entities import RelevantDocument
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
-from unlp_2026_submission.workflow.prompts import MultiQueryPrompt, EngMultiQueryPrompt
+from unlp_2026_submission.workflow.prompts import MultiQueryPrompt, UkrMultiQueryPrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState
 from unlp_2026_submission.language_models import LanguageModel
 
@@ -20,7 +20,7 @@ class MultiQueryDocumentsRetrievalNode(BaseNode):
             self,
             vector_store: VectorStore,
             language_model: LanguageModel,
-            prompt: MultiQueryPrompt = EngMultiQueryPrompt(),
+            prompt: MultiQueryPrompt = UkrMultiQueryPrompt(),
             top_k: int = 10,
     ):
         super().__init__()

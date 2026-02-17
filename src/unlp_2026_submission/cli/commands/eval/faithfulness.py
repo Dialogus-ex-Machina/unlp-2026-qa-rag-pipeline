@@ -40,11 +40,11 @@ def evaluate_faithfulness_command(
         qa_prompt_type: Annotated[
             QAPromptType,
             typer.Option("--qa-prompt")
-        ] = QAPromptType.ENG,
+        ] = QAPromptType.UKR,
         domain_classification_prompt_type: Annotated[
             DomainClassificationPromptType,
             typer.Option("--classify-prompt")
-        ] = DomainClassificationPromptType.ENG,
+        ] = DomainClassificationPromptType.UKR,
         language_model_name: Annotated[
             str,
             typer.Option("--model", "-m")
