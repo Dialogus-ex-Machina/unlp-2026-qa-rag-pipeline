@@ -57,7 +57,7 @@ class LogprobRerankerModelNode(BaseNode):
             document: RelevantDocument
     ) -> float:
         prompt = self.prompt.format(
-            query=question['question_text'],
+            question=question,
             context=document.text,
             yes_token=self.yes_token,
             no_token=self.no_token,

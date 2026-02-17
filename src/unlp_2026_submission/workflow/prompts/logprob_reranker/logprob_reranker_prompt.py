@@ -1,5 +1,8 @@
 from langchain_core.prompts import PromptTemplate
 
+from unlp_2026_submission.entities import Question
+
+
 class LogprobRerankerPrompt:
     _template: PromptTemplate
 
@@ -12,20 +15,27 @@ class LogprobRerankerPrompt:
             input_variables=[
                 "context",
                 "query",
+                "answers",
                 "yes_token",
                 "no_token"
-            ]
+            ],
+            template_format="jinja2"
         )
 
     def format(
-            self, query: str,
+            self,
+            question: Question,
             context: str,
             yes_token: str,
             no_token: str,
     ) -> str:
+        question_text = question.get('question_text')
+        answers = question.get('answers')
+
         return self._template.format(
-            query=query,
+            query=question_text,
             context=context,
+            answers=answers,
             yes_token=yes_token,
             no_token=no_token
         )

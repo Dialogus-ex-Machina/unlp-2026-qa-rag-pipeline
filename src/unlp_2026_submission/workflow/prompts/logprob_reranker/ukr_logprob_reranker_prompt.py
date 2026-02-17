@@ -3,15 +3,21 @@ from langchain_core.prompts import PromptTemplate
 from .logprob_reranker_prompt import LogprobRerankerPrompt
 
 RERANKER_PROMPT = """
-Нижче наведено документ і запитання користувача.
+Нижче наведено документ і запитання користувача з варіантами відповідей.
 Визнач, чи відповідає документ на це запитання.
-У відповідь напиши тільки {yes_token} або {no_token}.
+У відповідь напиши лише {{ yes_token | trim }} або {{ no_token | trim }}.
 Документ:
-{context}
+{{ context | trim }}
 Запитання користувача:
-{query}
+{{ query | trim }}
+Варіанти:
+{% set letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" -%}
+{% for ans in answers -%}
+{{ letters[loop.index0] }}. {{ ans }}
+{% endfor -%}
+
 Відповідь:
-"""
+""".strip()
 
 class UkrLogprobRerankerPrompt(LogprobRerankerPrompt):
     _template: PromptTemplate
