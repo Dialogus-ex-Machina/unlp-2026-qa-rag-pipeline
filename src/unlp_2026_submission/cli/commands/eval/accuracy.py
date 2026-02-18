@@ -14,14 +14,13 @@ from unlp_2026_submission.evals.accuracy import (
 )
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
-from unlp_2026_submission.reranker_models import LLMRerankerModel
 from unlp_2026_submission.workflow.nodes import (
-    MostRelevantDocumentAugmentationNode,
     SimpleQuestionAnswerNode,
-    LLMDomainRoutingNode,
-    RerankerModelNode,
-    HydeDocumentRetrievalNode,
+    SimpleDocumentsRetrievalNode,
+    TopKRelevantDocumentAugmentation,
+    MockDomainRoutingNode,
 )
+from unlp_2026_submission.workflow.nodes.logprob_reranker_model_node import LogprobRerankerModelNode
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
@@ -114,19 +113,10 @@ async def _evaluate(
         .create(config)
         .get_embeddings_model()
     )
-    reranker_model = LLMRerankerModel(
-        language_model=language_model,
-    )
 
     qa_prompt = (
         PromptsFactory
         .get_qa_prompt(qa_prompt_type)
-    )
-    domain_classification_prompt = (
-        PromptsFactory
-        .get_domain_classification_prompt(
-            domain_classification_prompt_type
-        )
     )
 
     vector_store = QdrantVectorStore.from_existing_collection(
@@ -135,12 +125,15 @@ async def _evaluate(
     )
 
     domain_pipeline_nodes = [
-        HydeDocumentRetrievalNode(
+        SimpleDocumentsRetrievalNode(
             vector_store=vector_store,
+        ),
+        LogprobRerankerModelNode(
             language_model=language_model,
         ),
-        RerankerModelNode(reranker_model=reranker_model),
-        MostRelevantDocumentAugmentationNode(),
+        TopKRelevantDocumentAugmentation(
+            top_k=4,
+        ),
         SimpleQuestionAnswerNode(
             language_model=language_model,
             prompt=qa_prompt,
@@ -149,10 +142,7 @@ async def _evaluate(
     workflow = (
         QAWorkflowBuilder.create()
         .add_domain_routing_node(
-            LLMDomainRoutingNode(
-                language_model=language_model,
-                prompt=domain_classification_prompt
-            )
+            MockDomainRoutingNode()
         )
         .add_sport_domain_nodes(domain_pipeline_nodes)
         .add_medicine_domain_nodes(domain_pipeline_nodes)

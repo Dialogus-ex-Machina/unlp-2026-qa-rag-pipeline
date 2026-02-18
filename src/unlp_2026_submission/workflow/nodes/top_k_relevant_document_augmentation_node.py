@@ -10,7 +10,7 @@ class TopKRelevantDocumentAugmentation(BaseNode):
 
     def __init__(
             self,
-            top_k: Literal[1, 3, 5] = 3,
+            top_k: Literal[1, 2, 3, 4, 5] = 3,
             should_reorder: bool = False,
     ):
         self._top_k = top_k

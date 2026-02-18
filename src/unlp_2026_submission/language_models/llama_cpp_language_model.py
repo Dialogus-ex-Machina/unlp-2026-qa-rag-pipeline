@@ -251,6 +251,7 @@ class LlamaCppLanguageModel(ChatLlamaCpp):
             top_p=config.language_model_top_p,
             top_k=config.language_model_top_k,
             model_kwargs={ "penalize_nl": False },
+            logits_all=True,
             **kwargs,
         )
 
