@@ -6,6 +6,7 @@ from .split_node import SplitNode
 from .embed_store_node import EmbedStoreNode
 from .delimited_page_load_node import DelimitedPageLoadNode
 from .proxy_split_node import ProxySplitNode
+from .contextual_augmentation_node import ContextualAugmentationNode
 
 __all__ = [
     "IndexNode",
@@ -16,4 +17,5 @@ __all__ = [
     "EmbedStoreNode",
     "DelimitedPageLoadNode",
     "ProxySplitNode",
+    "ContextualAugmentationNode",
 ]
