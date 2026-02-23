@@ -34,15 +34,23 @@ def document_source_composite_accuracy_metric(
         correct_document_page = question['page_num']
         n_pages = question['n_pages']
 
-        if predicted_document_page is None or correct_document_page is None or not n_pages or n_pages <= 0:
+        try:
+            predicted_document_page = int(predicted_document_page)
+            correct_document_page = int(correct_document_page)
+            n_pages = int(n_pages)
+        except (TypeError, ValueError):
             p_i = 0.0
         else:
-            p_i = 1.0 - (abs(predicted_document_page - correct_document_page) / float(n_pages))
-            p_i = max(0.0, min(1.0, p_i))
+            if n_pages <= 0:
+                p_i = 0.0
+            else:
+                p_i = 1.0 - (abs(predicted_document_page - correct_document_page) / float(n_pages))
+                p_i = max(0.0, min(1.0, float(p_i)))
 
-    score = 0.5 * d_i + 0.5 * p_i
+    score = 0.5 * float(d_i) + 0.5 * float(p_i)
+    score = max(0.0, min(1.0, score))
 
-    return MetricResult(max(0.0, min(1.0, score)))
+    return MetricResult(value=score)
 
 def calculate_total_documents_source_composite_accuracy(
         experiment_results: Experiment

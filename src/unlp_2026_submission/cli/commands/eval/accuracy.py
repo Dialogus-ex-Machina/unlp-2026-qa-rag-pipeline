@@ -14,11 +14,13 @@ from unlp_2026_submission.evals.accuracy import (
 )
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
+from unlp_2026_submission.reranker_models import LLMRerankerModel
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
-    SimpleDocumentsRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode,
+    RerankerModelNode,
+    HydeDocumentRetrievalNode,
 )
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
@@ -45,11 +47,11 @@ def evaluate_accuracy_command(
         qa_prompt_type: Annotated[
             QAPromptType,
             typer.Option("--qa-prompt")
-        ] = QAPromptType.SIMPLE,
+        ] = QAPromptType.ENG,
         domain_classification_prompt_type: Annotated[
             DomainClassificationPromptType,
             typer.Option("--classify-prompt")
-        ] = DomainClassificationPromptType.SIMPLE_EN,
+        ] = DomainClassificationPromptType.ENG,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
         embeddings_model_name: Annotated[str, typer.Option("--embeddings-model", "-em")] = None,
@@ -112,6 +114,9 @@ async def _evaluate(
         .create(config)
         .get_embeddings_model()
     )
+    reranker_model = LLMRerankerModel(
+        language_model=language_model,
+    )
 
     qa_prompt = (
         PromptsFactory
@@ -130,9 +135,11 @@ async def _evaluate(
     )
 
     domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+        HydeDocumentRetrievalNode(
             vector_store=vector_store,
+            language_model=language_model,
         ),
+        RerankerModelNode(reranker_model=reranker_model),
         MostRelevantDocumentAugmentationNode(),
         SimpleQuestionAnswerNode(
             language_model=language_model,

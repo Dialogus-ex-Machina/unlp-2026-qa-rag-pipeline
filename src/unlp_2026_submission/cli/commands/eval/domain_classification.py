@@ -36,7 +36,7 @@ def evaluate_domain_classification_command(
         domain_classification_prompt_type: Annotated[
             DomainClassificationPromptType,
             typer.Option("--classify-prompt")
-        ] = DomainClassificationPromptType.SIMPLE_EN,
+        ] = DomainClassificationPromptType.ENG,
         language_model_name: Annotated[str, typer.Option("--model", "-m")] = None,
         model_provider_api_key: Annotated[str, typer.Option("--api-key", "-key")] = None,
         embeddings_model_name: Annotated[str, typer.Option("--embeddings-model", "-em")] = None,

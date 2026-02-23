@@ -14,7 +14,7 @@ USER_PROMPT = """
 {% endfor -%}
 """.strip()
 
-class UADomainClassificationPrompt(DomainClassificationPrompt):
+class UkrDomainClassificationPrompt(DomainClassificationPrompt):
     def __init__(self):
         super().__init__(
             SYSTEM_PROMPT,

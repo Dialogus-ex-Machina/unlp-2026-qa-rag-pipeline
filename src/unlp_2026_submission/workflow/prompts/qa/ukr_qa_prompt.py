@@ -23,7 +23,7 @@ USER_PROMPT = """
 Відповідай лише літерою варіанту.
 """.strip()
 
-class QAPrompt(BaseQAPrompt):
+class UkrQAPrompt(BaseQAPrompt):
     _template: ChatPromptTemplate
 
     def __init__(self):

@@ -23,7 +23,7 @@ Options:
 Respond with only the option letter.
 """.strip()
 
-class EnQAPrompt(BaseQAPrompt):
+class EngQAPrompt(BaseQAPrompt):
     _template: ChatPromptTemplate
 
     def __init__(self):
