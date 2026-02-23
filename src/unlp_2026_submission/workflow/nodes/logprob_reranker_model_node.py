@@ -66,6 +66,7 @@ class LogprobRerankerModelNode(BaseNode):
         result = self.language_model.invoke(
             prompt,
             logprobs=True,
+            # TODO update for proper value
             top_logprobs=25,
         )
 
