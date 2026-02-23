@@ -39,13 +39,16 @@ class MultiQueryDocumentsRetrievalNode(BaseNode):
             return {}
 
         generate_queries = (
-                self._prompt.template
-                | self._language_model
+                self._language_model
                 | StrOutputParser()
                 | self._clean_queries
         )
 
-        queries = generate_queries.invoke({ 'question': question['question_text'] })
+        prompt = self._prompt.format(
+            question=question,
+        )
+
+        queries = generate_queries.invoke(prompt)
         print('Multiple queries:', queries)
 
         relevant_documents = []

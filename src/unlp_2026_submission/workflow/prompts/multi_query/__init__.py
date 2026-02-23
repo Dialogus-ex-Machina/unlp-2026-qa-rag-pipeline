@@ -1,3 +1,4 @@
 from .multi_query_prompt import MultiQueryPrompt
 from .eng_multi_query_prompt import EngMultiQueryPrompt
 from .ukr_multi_query_prompt import UkrMultiQueryPrompt
+from .ukr_multi_query_with_answers_prompt import UkrMultiQueryWithAnswersPrompt
