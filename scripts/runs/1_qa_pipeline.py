@@ -32,7 +32,7 @@ def main():
 
     vector_store = QdrantVectorStore.from_existing_collection(
         embedding=embeddings_model,
-        **config.vector_store,
+        **config.vector_store
     )
 
     domain_pipeline_nodes = [

@@ -37,14 +37,14 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
 
         questions.append(
             Question(
-                question_id=row["Question_ID"],
-                question_text=row["Question"].strip(),
+                question_id=int(row["Question_ID"]),
+                question_text=str(row["Question"]).strip(),
                 answers=answers,
                 correct_answer=correct_letter,
-                domain=row["Domain"].strip(),
-                n_pages=row["N_Pages"],
-                doc_id=row["Doc_ID"],
-                page_num=row["Page_Num"]
+                domain=str(row["Domain"]).strip(),
+                n_pages=int(row["N_Pages"]),
+                doc_id=str(row["Doc_ID"]).strip(),
+                page_num=int(row["Page_Num"]),
             )
         )
 

@@ -14,6 +14,7 @@ from unlp_2026_submission.evals.accuracy import (
 )
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
+from unlp_2026_submission.reranker_models import LLMRerankerModel
 from unlp_2026_submission.workflow.nodes import (
     SimpleQuestionAnswerNode,
     SimpleDocumentsRetrievalNode,
@@ -112,6 +113,9 @@ async def _evaluate(
         EmbeddingsModelFactory
         .create(config)
         .get_embeddings_model()
+    )
+    reranker_model = LLMRerankerModel(
+        language_model=language_model,
     )
 
     qa_prompt = (
