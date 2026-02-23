@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from pathlib import Path
+import re
 from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Tuple
 
 from docling.datamodel.accelerator_options import AcceleratorOptions
@@ -208,13 +209,74 @@ class DoclingConverterNode:
         out: List[str] = []
         for (src, page), items in sorted(pages.items(), key=lambda x: (x[0][0], x[0][1])):
             items.sort(key=self._sort_key)
-            text_parts = [(it.page_content or "").strip() for it in items if (it.page_content or "").strip()]
-            if not text_parts:
+            page_text = self._build_page_text_without_heading_repeats(items)
+            if not page_text:
                 continue
-            out.append(self.join_sep.join(text_parts).strip())
+            out.append(page_text)
             out.append(self.page_end_template.format(page=page))
 
         return "\n".join(out).strip()
+
+    def _build_page_text_without_heading_repeats(self, items: List[Document]) -> str:
+        text_parts: List[str] = []
+        current_heading: Optional[str] = None
+
+        for it in items:
+            chunk = (it.page_content or "").strip()
+            if not chunk:
+                continue
+
+            chunk, current_heading = self._drop_repeated_heading_prefix(chunk, current_heading)
+            if chunk:
+                text_parts.append(chunk)
+
+        return self.join_sep.join(text_parts).strip()
+
+    def _drop_repeated_heading_prefix(
+        self,
+        text: str,
+        current_heading: Optional[str],
+    ) -> Tuple[str, Optional[str]]:
+        lines = text.splitlines()
+        first_idx: Optional[int] = None
+        for i, ln in enumerate(lines):
+            if ln.strip():
+                first_idx = i
+                break
+
+        if first_idx is None:
+            return "", current_heading
+
+        first_line = lines[first_idx].strip()
+        has_tail = any(ln.strip() for ln in lines[first_idx + 1 :])
+
+        # Docling chunks can repeat the same section heading in each chunk.
+        if current_heading is not None and has_tail and first_line == current_heading:
+            lines[first_idx] = ""
+            while lines and not lines[0].strip():
+                lines.pop(0)
+            return "\n".join(lines).strip(), current_heading
+
+        if self._is_heading_line(first_line):
+            current_heading = first_line
+
+        return text, current_heading
+
+    @staticmethod
+    def _is_heading_line(line: str) -> bool:
+        raw = line.strip()
+        if not raw:
+            return False
+        if raw.startswith("#"):
+            return True
+
+        # Numeric and roman section-style headings, including Ukrainian "І.".
+        if re.match(r"^\d+(?:\.\d+)*[.)]\s+\S", raw):
+            return True
+        if re.match(r"^[IVXLCDMІVXLCDM]+[.)]\s+\S", raw, flags=re.IGNORECASE):
+            return True
+
+        return False
 
     def _load_doc_chunks(self, filepath: str, converter: DocumentConverter) -> List[Document]:
         loader = DoclingLoader(
