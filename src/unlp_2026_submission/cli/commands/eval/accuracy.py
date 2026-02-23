@@ -114,9 +114,6 @@ async def _evaluate(
         .create(config)
         .get_embeddings_model()
     )
-    reranker_model = LLMRerankerModel(
-        language_model=language_model,
-    )
 
     qa_prompt = (
         PromptsFactory
