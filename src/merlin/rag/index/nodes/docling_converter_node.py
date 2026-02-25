@@ -132,19 +132,18 @@ class DoclingConverterNode:
             md_path = pdf_path.with_suffix(self.output_suffix)
 
             if self.selective_ocr:
-                text_chunks = self._load_doc_chunks(fp, converter=self._converter_text)
-                text_norm = [self._normalize_chunk(d) for d in text_chunks]
-                bad_pages = self._detect_bad_pages(text_norm)
+                text_md = self._export_markdown_best_effort(fp, converter=self._converter_text)
+                text_pages = self._split_markdown_pages(text_md)
+                bad_pages = self._detect_bad_pages_from_page_map(text_pages)
 
                 if bad_pages:
-                    ocr_chunks = self._load_doc_chunks(fp, converter=self._converter_ocr)
-                    ocr_norm = [self._normalize_chunk(d) for d in ocr_chunks]
-                    merged = self._merge_pages(text_norm, ocr_norm, bad_pages)
+                    ocr_md = self._export_markdown_best_effort(fp, converter=self._converter_ocr)
+                    ocr_pages = self._split_markdown_pages(ocr_md)
+                    merged_pages = self._merge_page_maps(text_pages, ocr_pages, bad_pages)
                 else:
-                    merged = text_norm
+                    merged_pages = text_pages
 
-                merged.sort(key=self._sort_key)
-                md = self._chunks_to_markdown(merged)
+                md = self._build_markdown_from_pages(merged_pages)
                 md_path.write_text(md, encoding="utf-8")
 
                 out_docs.append(
@@ -198,6 +197,71 @@ class DoclingConverterNode:
             out.append(self.page_end_template.format(page=page))
         return "\n".join(out).strip()
 
+    def _split_markdown_pages(self, markdown_text: str) -> Dict[int, str]:
+        marker_re = re.compile(r"<!--\s*page_end:(-?\d+)\s*-->")
+        pages: Dict[int, str] = {}
+
+        pos = 0
+        last_page: Optional[int] = None
+
+        for m in marker_re.finditer(markdown_text):
+            page_text = markdown_text[pos:m.start()].strip()
+            page_no = int(m.group(1))
+            pages[page_no] = page_text
+            pos = m.end()
+            last_page = page_no
+
+        tail = markdown_text[pos:].strip()
+        if tail:
+            fallback_page = (last_page + 1) if last_page is not None else (0 if self.zero_based_pages else 1)
+            pages[fallback_page] = tail
+
+        return pages
+
+    def _build_markdown_from_pages(self, pages: Dict[int, str]) -> str:
+        out: List[str] = []
+        for page_no in sorted(pages.keys()):
+            page_text = (pages[page_no] or "").strip()
+            if not page_text:
+                continue
+            out.append(page_text)
+            out.append(self.page_end_template.format(page=page_no))
+        return "\n".join(out).strip()
+
+    def _merge_page_maps(
+        self,
+        text_pages: Dict[int, str],
+        ocr_pages: Dict[int, str],
+        bad_pages: set[int],
+    ) -> Dict[int, str]:
+        merged: Dict[int, str] = {}
+        all_pages = sorted(set(text_pages.keys()) | set(ocr_pages.keys()))
+
+        for page_no in all_pages:
+            if page_no in bad_pages and page_no in ocr_pages:
+                merged[page_no] = ocr_pages[page_no]
+            else:
+                merged[page_no] = text_pages.get(page_no, ocr_pages.get(page_no, ""))
+
+        return merged
+
+    def _detect_bad_pages_from_page_map(self, pages: Dict[int, str]) -> set[int]:
+        bad: set[int] = set()
+
+        for page_no, text in pages.items():
+            txt = (text or "").strip()
+            if not txt:
+                continue
+
+            n = len(txt)
+            alnum = sum(1 for ch in txt if ch.isalnum())
+            ratio = (alnum / n) if n else 0.0
+
+            if n < self.selective_min_page_chars or ratio < self.selective_min_alnum_ratio:
+                bad.add(page_no)
+
+        return bad
+
     def _chunks_to_markdown(self, chunks: List[Document]) -> str:
         pages: DefaultDict[Tuple[str, int], List[Document]] = defaultdict(list)
         for d in chunks:
@@ -219,6 +283,8 @@ class DoclingConverterNode:
 
     def _build_page_text_without_heading_repeats(self, items: List[Document]) -> str:
         text_parts: List[str] = []
+        page_norm_text = ""
+        seen_chunks: set[str] = set()
         current_heading: Optional[str] = None
 
         for it in items:
@@ -227,8 +293,27 @@ class DoclingConverterNode:
                 continue
 
             chunk, current_heading = self._drop_repeated_heading_prefix(chunk, current_heading)
-            if chunk:
-                text_parts.append(chunk)
+            if not chunk:
+                continue
+
+            if text_parts:
+                chunk = self._trim_overlap_with_previous_text(text_parts[-1], chunk)
+                if not chunk:
+                    continue
+
+            chunk_norm = self._normalize_for_dedup(chunk)
+            if not chunk_norm:
+                continue
+
+            # Skip exact and large in-page duplicates caused by doc chunk overlap.
+            if chunk_norm in seen_chunks:
+                continue
+            if len(chunk_norm) >= 80 and chunk_norm in page_norm_text:
+                continue
+
+            text_parts.append(chunk)
+            seen_chunks.add(chunk_norm)
+            page_norm_text = f"{page_norm_text} {chunk_norm}".strip()
 
         return self.join_sep.join(text_parts).strip()
 
@@ -275,8 +360,55 @@ class DoclingConverterNode:
             return True
         if re.match(r"^[IVXLCDMІVXLCDM]+[.)]\s+\S", raw, flags=re.IGNORECASE):
             return True
+        if DoclingConverterNode._is_uppercase_heading_like(raw):
+            return True
 
         return False
+
+    @staticmethod
+    def _is_uppercase_heading_like(raw: str) -> bool:
+        letters = [ch for ch in raw if ch.isalpha()]
+        if len(letters) < 8:
+            return False
+
+        upper_ratio = sum(1 for ch in letters if ch.isupper()) / len(letters)
+        # High-level headings from OCR/chunks are often fully upper-cased.
+        return upper_ratio >= 0.85 and len(raw) <= 220
+
+    @staticmethod
+    def _normalize_for_dedup(text: str) -> str:
+        return " ".join(text.lower().split())
+
+    def _trim_overlap_with_previous_text(self, prev_text: str, curr_text: str) -> str:
+        prev_tokens = re.findall(r"\S+", prev_text.lower())
+        curr_tokens = re.findall(r"\S+", curr_text.lower())
+        if not prev_tokens or not curr_tokens:
+            return curr_text.strip()
+
+        max_overlap = min(len(prev_tokens), len(curr_tokens), 200)
+        min_overlap = 12
+
+        overlap = 0
+        for k in range(max_overlap, min_overlap - 1, -1):
+            if prev_tokens[-k:] == curr_tokens[:k]:
+                overlap = k
+                break
+
+        if overlap == 0:
+            return curr_text.strip()
+
+        return self._drop_leading_tokens(curr_text, overlap)
+
+    @staticmethod
+    def _drop_leading_tokens(text: str, tokens_to_drop: int) -> str:
+        if tokens_to_drop <= 0:
+            return text.strip()
+
+        for i, match in enumerate(re.finditer(r"\S+", text)):
+            if i == tokens_to_drop:
+                return text[match.start() :].lstrip()
+
+        return ""
 
     def _load_doc_chunks(self, filepath: str, converter: DocumentConverter) -> List[Document]:
         loader = DoclingLoader(
