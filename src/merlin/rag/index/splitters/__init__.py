@@ -1,1 +1,2 @@
 from .cluster_semantic_splitter import ClusterSemanticSplitter
+from .sentence_splitter import SentenceSplitter
