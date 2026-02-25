@@ -41,10 +41,13 @@ class ContextualAugmentationNode:
                 split = splits[global_idx]
                 window_docs = self._get_window(group_docs, local_i)
                 context = self._get_context_for_split(window_docs, split)
+                split.metadata["context"] = context
 
-                print('Added context:', context)
+                print('Added context:', split.metadata.get('context'))
 
-                split.page_content = f"{split.page_content}\n\n{context}"
+        for split in splits:
+            split.page_content = f"{split.page_content}\n\n{split.metadata.get('context')}"
+            split.metadata.pop("context", None)
 
         if self.on_success:
             self.on_success()
