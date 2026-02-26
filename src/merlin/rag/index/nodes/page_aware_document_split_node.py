@@ -61,13 +61,22 @@ class PageAwareDocumentSplitNode:
 
         for s in splits:
             start = s.metadata.get("start_index")
-            end = s.metadata.get("end_index")
+
+            if (
+                    start is None
+                    or not isinstance(start, int)
+                    or start < 0
+            ):
+                s.metadata["page_label"] = last_page_num
+                continue
+
+            end = s.metadata.get("end_index") or s.metadata.get("start_index") + len(s.page_content)
 
             # Fallback if missing/invalid
             if (
-                    start is None or end is None
-                    or not isinstance(start, int) or not isinstance(end, int)
-                    or start < 0 or end < 0
+                    end is None
+                    or not isinstance(end, int)
+                    or end < 0
                     or start >= end
             ):
                 s.metadata["page_label"] = last_page_num

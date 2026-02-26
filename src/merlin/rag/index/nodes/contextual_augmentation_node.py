@@ -17,7 +17,7 @@ class ContextualAugmentationNode:
     def __init__(
             self,
             language_model: LanguageModel,
-            sliding_window: int = 5,
+            sliding_window: int = 3,
             on_success: Optional[Callable[[], None]] = None,
             prompt: str = UKR_CONTEXTUAL_AUGMENTATION_PROMPT
     ):
