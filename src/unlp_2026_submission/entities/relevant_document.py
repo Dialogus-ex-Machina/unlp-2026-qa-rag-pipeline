@@ -31,11 +31,13 @@ class RelevantDocument:
     def from_node_with_score(cls, doc_with_score: tuple[Document, float]):
         document = doc_with_score[0]
         relevance_score = doc_with_score[1]
+        metadata = document.metadata or {}
+        page_label = metadata.get("page_label", metadata.get("page", -1))
 
         return RelevantDocument(
-            source=document.metadata['source'],
+            source=metadata.get("source", "UNKNOWN_SOURCE"),
             text=document.page_content,
-            page_label=document.metadata['page_label'],
+            page_label=str(page_label),
             relevance_score=relevance_score,
         )
 
