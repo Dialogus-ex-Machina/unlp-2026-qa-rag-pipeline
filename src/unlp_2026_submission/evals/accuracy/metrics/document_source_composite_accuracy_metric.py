@@ -174,4 +174,5 @@ def calculate_total_documents_source_composite_accuracy(
         "recall_at_3": _recall_at_k(experiment_results, 3),
         "recall_at_5": _recall_at_k(experiment_results, 5),
         "recall_at_10": _recall_at_k(experiment_results, 10),
+        "recall_at_20": _recall_at_k(experiment_results, 20),
     }

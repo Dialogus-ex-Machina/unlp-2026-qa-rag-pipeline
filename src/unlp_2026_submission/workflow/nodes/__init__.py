@@ -8,3 +8,4 @@ from .llm_domain_routing_node import LLMDomainRoutingNode
 from .mock_domain_routing_node import MockDomainRoutingNode
 from .reranker_model_node import RerankerModelNode
 from .hyde_document_retrieval_node import HydeDocumentRetrievalNode
+from .hybrid_multi_query_documents_retrieval import HybridMultiQueryDocumentsRetrievalNode

@@ -27,7 +27,7 @@ async def evaluate_documents_source_composite_accuracy(
     print(f"Document source accuracy: {results['document_source_accuracy']['total']['accuracy']:.5%} (correct: {results['document_source_accuracy']['total']['correct']})")
     print(f"Document page source accuracy: {results['document_page_source_accuracy']['total']['accuracy']:.5%} (total_score: {results['document_page_source_accuracy']['total']['total_score']:.2f})")
 
-    print(f"Recall@1: {results['recall_at_1']:.5%}, Recall@3: {results['recall_at_3']:.5%}, Recall@5: {results['recall_at_5']:.5%}, Recall@10: {results['recall_at_10']:.5%}")
+    print(f"Recall@1: {results['recall_at_1']:.5%}, Recall@3: {results['recall_at_3']:.5%}, Recall@5: {results['recall_at_5']:.5%}, Recall@10: {results['recall_at_10']:.5%}, Recall@20: {results['recall_at_20']:.5%}")
 
     for domain, metrics in results["document_source_accuracy"]["by_domain"].items():
         print(f"    [{domain}] doc_source: {metrics['accuracy']:.5%}, doc_page: {results['document_page_source_accuracy']['by_domain'][domain]['accuracy']:.5%}")
