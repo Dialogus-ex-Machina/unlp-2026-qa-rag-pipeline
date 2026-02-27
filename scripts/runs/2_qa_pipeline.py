@@ -50,7 +50,7 @@ def main():
         sparse_vector_name="sparse",
     )
 
-    domain_pipeline_nodes = [
+    nodes = [
         SimpleRetrievalNode(
             vector_store=vector_store,
         ),
@@ -67,12 +67,7 @@ def main():
     ]
     workflow = (
         QAWorkflowBuilder.create()
-        .add_domain_routing_node(
-            MockDomainRoutingNode()
-        )
-        .add_sport_domain_nodes(domain_pipeline_nodes)
-        .add_medicine_domain_nodes(domain_pipeline_nodes)
-        .add_other_domain_nodes(domain_pipeline_nodes)
+        .add_nodes(nodes)
         .build()
     )
 

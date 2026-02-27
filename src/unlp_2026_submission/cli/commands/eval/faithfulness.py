@@ -124,7 +124,11 @@ async def _evaluate(
         **config.vector_store,
     )
 
-    domain_pipeline_nodes = [
+    nodes = [
+        LLMDomainRoutingNode(
+            language_model=language_model,
+            prompt=domain_classification_prompt
+        ),
         SimpleRetrievalNode(
             vector_store=vector_store,
         ),
@@ -136,15 +140,7 @@ async def _evaluate(
     ]
     workflow = (
         QAWorkflowBuilder.create()
-        .add_domain_routing_node(
-            LLMDomainRoutingNode(
-                language_model=language_model,
-                prompt=domain_classification_prompt
-            )
-        )
-        .add_sport_domain_nodes(domain_pipeline_nodes)
-        .add_medicine_domain_nodes(domain_pipeline_nodes)
-        .add_other_domain_nodes(domain_pipeline_nodes)
+        .add_nodes(nodes)
         .build()
     )
 
