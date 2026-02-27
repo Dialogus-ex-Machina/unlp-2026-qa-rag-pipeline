@@ -8,7 +8,7 @@ from .split_node import SplitNode
 from .embed_store_node import EmbedStoreNode
 from .delimited_page_load_node import DelimitedPageLoadNode
 from .proxy_split_node import ProxySplitNode
-from .contextual_augmentation_node import ContextualAugmentationNode
+from .splits_augmentation_node import ContextualSplitsAugmentationNode
 from .txt_load_node import TxtLoadNode
 from .docling_converter_node import DoclingConverterNode
 from .docling_markdown_page_split_node import DoclingMarkdownPageSplitNode
@@ -28,5 +28,5 @@ __all__ = [
     "HybridEmbedStoreNode",
     "DelimitedPageLoadNode",
     "ProxySplitNode",
-    "ContextualAugmentationNode",
+    "ContextualSplitsAugmentationNode",
 ]

@@ -4,22 +4,22 @@ from typing import Optional, Callable
 from langchain_core.documents import Document
 
 from merlin.rag.index.index_state import IndexState
-from merlin.rag.index.prompts import UKR_CONTEXTUAL_AUGMENTATION_PROMPT
 from unlp_2026_submission.language_models import LanguageModel
+from unlp_2026_submission.workflow.prompts import UkrContextualSplitsAugmentationPrompt, SplitsAugmentationPrompt
 
 
-class ContextualAugmentationNode:
+class ContextualSplitsAugmentationNode:
     language_model: LanguageModel
     sliding_window: int
     on_success: Optional[Callable[[], None]] = None,
-    prompt: str
+    prompt: SplitsAugmentationPrompt
 
     def __init__(
             self,
             language_model: LanguageModel,
             sliding_window: int = 3,
             on_success: Optional[Callable[[], None]] = None,
-            prompt: str = UKR_CONTEXTUAL_AUGMENTATION_PROMPT
+            prompt: SplitsAugmentationPrompt = UkrContextualSplitsAugmentationPrompt()
     ):
         self.language_model = language_model
         self.sliding_window = max(1, int(sliding_window))
