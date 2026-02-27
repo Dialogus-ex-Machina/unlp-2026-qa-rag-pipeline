@@ -37,7 +37,7 @@ def _format_dataframe(df: DataFrame) -> DataFrame:
 
         questions.append(
             Question(
-                question_id=int(row["Question_ID"]),
+                question_id=row["Question_ID"],
                 question_text=str(row["Question"]).strip(),
                 answers=answers,
                 correct_answer=correct_letter,

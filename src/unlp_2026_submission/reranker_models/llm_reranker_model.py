@@ -4,7 +4,7 @@ from langchain_core.messages import AIMessage
 
 from unlp_2026_submission.entities import RelevantDocument
 from unlp_2026_submission.language_models import LanguageModel
-from unlp_2026_submission.workflow.prompts import RerankerPrompt, EngRerankerPrompt
+from unlp_2026_submission.workflow.prompts import RerankerPrompt, UkrRerankerPrompt
 
 from .reranker_model import RerankerModel
 
@@ -23,7 +23,7 @@ class LLMRerankerModel(RerankerModel):
         top_n: int = 10,
     ) -> None:
         self.language_model = language_model
-        self.reranker_prompt = reranker_prompt or EngRerankerPrompt()
+        self.reranker_prompt = reranker_prompt or UkrRerankerPrompt()
         self.batch_size = batch_size
         self.top_n = top_n
 

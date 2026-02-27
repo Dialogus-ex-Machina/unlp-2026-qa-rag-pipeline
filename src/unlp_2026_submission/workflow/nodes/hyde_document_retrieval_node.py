@@ -3,7 +3,7 @@ from langchain_core.vectorstores import VectorStore
 from unlp_2026_submission.entities import RelevantDocument
 from unlp_2026_submission.language_models import LanguageModel
 from unlp_2026_submission.workflow.nodes import BaseNode
-from unlp_2026_submission.workflow.prompts import HydePrompt, EngHydePrompt
+from unlp_2026_submission.workflow.prompts import HydePrompt, UkrHydePrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState
 
 class HydeDocumentRetrievalNode(BaseNode):
@@ -17,7 +17,7 @@ class HydeDocumentRetrievalNode(BaseNode):
             language_model: LanguageModel,
             vector_store: VectorStore,
             top_k: int = 10,
-            prompt: HydePrompt = EngHydePrompt(),
+            prompt: HydePrompt = UkrHydePrompt(),
     ):
         self.language_model = language_model
         self._vector_store = vector_store

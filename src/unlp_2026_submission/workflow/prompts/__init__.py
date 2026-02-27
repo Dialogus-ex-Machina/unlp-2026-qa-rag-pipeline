@@ -13,4 +13,9 @@ from .domain_classification import (
     UkrDomainClassificationPrompt,
 )
 from .reranker import RerankerPrompt, EngRerankerPrompt, UkrRerankerPrompt
-from .hyde import EngHydePrompt, HydePrompt
+from .hyde import EngHydePrompt, HydePrompt, UkrHydePrompt
+from .multi_query import (
+    EngMultiQueryPrompt,
+    MultiQueryPrompt,
+    UkrMultiQueryPrompt
+)

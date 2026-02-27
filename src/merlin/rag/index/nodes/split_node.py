@@ -1,10 +1,10 @@
-from langchain_text_splitters.base import TextSplitter
+from langchain_core.documents import BaseDocumentTransformer
 
 from merlin.rag.index.index_state import IndexState
 
 
 class SplitNode:
-    def __init__(self, splitter: TextSplitter = None):
+    def __init__(self, splitter: BaseDocumentTransformer = None):
         self.splitter = splitter
 
     def __call__(self, state: IndexState) -> IndexState:
@@ -13,6 +13,6 @@ class SplitNode:
         documents = state["documents"]
 
         if self.splitter != None:
-            return {"splits": self.splitter.split_documents(documents)}
+            return {"splits": self.splitter.transform_documents(documents)}
         else:
             return {"splits": documents}

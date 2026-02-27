@@ -44,7 +44,7 @@ docker-compose.override.yaml
 # Project-specific
 /hf_cache
 /scripts/vector_dbs
+/experiments
 
 # Jupyter-specific
 .ipynb_checkpoints/
-/experiments
