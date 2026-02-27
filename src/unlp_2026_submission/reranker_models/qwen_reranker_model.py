@@ -12,17 +12,25 @@ class QwenRerankerModel(RerankerModel):
             self,
             cache_dir: str,
             model_name: str = "Qwen/Qwen3-Reranker-0.6B",
-            **model_kwargs: Dict[str, Any]
+            device: str = "cuda",
+            batch_size: int = 4,
+            max_length: int = 4096,
+        **model_kwargs: Dict[str, Any],
     ):
+        self._batch_size = batch_size
+        self._max_length = max_length
+
         self._tokenizer = AutoTokenizer.from_pretrained(
             model_name,
             cache_dir=cache_dir,
             padding_side='left',
+            device_map=device,
             **model_kwargs,
         )
         self._model = AutoModelForCausalLM.from_pretrained(
             model_name,
             cache_dir=cache_dir,
+            device_map=device,
             **model_kwargs,
         ).eval()
 
@@ -42,11 +50,11 @@ class QwenRerankerModel(RerankerModel):
         def process_inputs(pairs):
             inputs = self._tokenizer(
                 pairs, padding=False, truncation='longest_first',
-                return_attention_mask=False, max_length=max_length - len(prefix_tokens) - len(suffix_tokens)
+                return_attention_mask=False, max_length=self._max_length - len(prefix_tokens) - len(suffix_tokens)
             )
             for i, ele in enumerate(inputs['input_ids']):
                 inputs['input_ids'][i] = prefix_tokens + ele + suffix_tokens
-            inputs = self._tokenizer.pad(inputs, padding=True, return_tensors="pt", max_length=max_length)
+            inputs = self._tokenizer.pad(inputs, padding=True, return_tensors="pt", max_length=self._max_length)
             for key in inputs:
                 inputs[key] = inputs[key].to(self._model.device)
             return inputs
@@ -65,7 +73,6 @@ class QwenRerankerModel(RerankerModel):
         # model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen3-Reranker-0.6B", torch_dtype=torch.float16, attn_implementation="flash_attention_2").cuda().eval()
         token_false_id = self._tokenizer.convert_tokens_to_ids("no")
         token_true_id = self._tokenizer.convert_tokens_to_ids("yes")
-        max_length = 8192
 
         prefix = "<|im_start|>system\nJudge whether the Document meets the requirements based on the Query and the Instruct provided. Note that the answer can only be \"yes\" or \"no\".<|im_end|>\n<|im_start|>user\n"
         suffix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
@@ -78,12 +85,16 @@ class QwenRerankerModel(RerankerModel):
 
         pairs = [format_instruction(task, query, doc) for query, doc in query_doc_pairs]
 
-        # Tokenize the input texts
-        inputs = process_inputs(pairs)
-        scores = compute_logits(inputs)
+        all_scores: List[float] = []
+        for start in range(0, len(pairs), self._batch_size):
+            batch_pairs = pairs[start:start + self._batch_size]
+            inputs = process_inputs(batch_pairs)
+            batch_scores = compute_logits(inputs)
+
+            all_scores.extend(batch_scores)
 
         results: List[RelevantDocument] = []
-        for i, score in enumerate(scores):
+        for i, score in enumerate(all_scores):
             document = documents[i]
             document.relevance_score = score
             results.append(document)

@@ -12,7 +12,7 @@ from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
-    SimpleDocumentsRetrievalNode,
+    SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode
 )
@@ -74,7 +74,7 @@ def build_workflow(
     )
 
     domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
         MostRelevantDocumentAugmentationNode(),

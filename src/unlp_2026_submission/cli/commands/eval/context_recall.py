@@ -16,7 +16,7 @@ from unlp_2026_submission.evals.context_recall import evaluate_context_recall
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
-    SimpleDocumentsRetrievalNode,
+    SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode
 )
@@ -150,7 +150,7 @@ async def _evaluate(
     )
 
     domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
         MostRelevantDocumentAugmentationNode(),

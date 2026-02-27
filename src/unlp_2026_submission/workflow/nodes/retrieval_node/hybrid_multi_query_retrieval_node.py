@@ -19,7 +19,7 @@ def _doc_key(doc: RelevantDocument) -> tuple[str, str]:
     return (doc.source or "", doc.page_label or "")
 
 
-class HybridMultiQueryDocumentsRetrievalNode(BaseNode):
+class HybridMultiQueryRetrievalNode(BaseNode):
     _dense_vector_store: VectorStore
     _sparse_vector_store: VectorStore
     _language_model: LanguageModel

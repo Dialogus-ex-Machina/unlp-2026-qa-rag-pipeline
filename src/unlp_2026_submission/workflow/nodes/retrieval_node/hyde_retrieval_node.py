@@ -6,7 +6,7 @@ from unlp_2026_submission.workflow.nodes import BaseNode
 from unlp_2026_submission.workflow.prompts import HydePrompt, UkrHydePrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState
 
-class HydeDocumentRetrievalNode(BaseNode):
+class HydeRetrievalNode(BaseNode):
     _language_model: LanguageModel
     _vector_store: VectorStore
     _top_k: int = 10

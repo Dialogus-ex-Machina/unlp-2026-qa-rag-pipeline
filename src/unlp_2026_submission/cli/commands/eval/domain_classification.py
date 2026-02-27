@@ -15,7 +15,7 @@ from unlp_2026_submission.evals.create_experiment_name import create_experiment_
 from unlp_2026_submission.evals.domain_classification import evaluate_domain_classification
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
-    SimpleDocumentsRetrievalNode,
+    SimpleRetrievalNode,
     LLMDomainRoutingNode,
     MockQuestionAnswerNode,
 )
@@ -107,7 +107,7 @@ async def _evaluate(
     )
 
     domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
         MostRelevantDocumentAugmentationNode(),

@@ -10,7 +10,7 @@ from unlp_2026_submission.workflow.state import QAWorkflowState
 from unlp_2026_submission.language_models import LanguageModel
 
 
-class MultiQueryDocumentsRetrievalNode(BaseNode):
+class MultiQueryRetrievalNode(BaseNode):
     _vector_store: VectorStore
     _language_model: LanguageModel
     _prompt: MultiQueryPrompt

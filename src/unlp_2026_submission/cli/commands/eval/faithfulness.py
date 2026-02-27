@@ -15,7 +15,7 @@ from unlp_2026_submission.evals.faithfulness import (
 )
 from unlp_2026_submission.workflow.nodes import (
     MostRelevantDocumentAugmentationNode,
-    SimpleDocumentsRetrievalNode,
+    SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode,
 )
@@ -125,7 +125,7 @@ async def _evaluate(
     )
 
     domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
         MostRelevantDocumentAugmentationNode(),

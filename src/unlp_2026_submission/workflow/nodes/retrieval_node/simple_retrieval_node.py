@@ -4,7 +4,7 @@ from unlp_2026_submission.entities import RelevantDocument
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
 from unlp_2026_submission.workflow.state import QAWorkflowState
 
-class SimpleDocumentsRetrievalNode(BaseNode):
+class SimpleRetrievalNode(BaseNode):
     _vector_store: VectorStore
     _top_k: int
 
