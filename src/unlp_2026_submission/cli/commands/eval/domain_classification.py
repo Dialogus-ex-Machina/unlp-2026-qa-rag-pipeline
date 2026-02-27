@@ -14,7 +14,7 @@ from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.evals.domain_classification import evaluate_domain_classification
 from unlp_2026_submission.workflow.nodes import (
-    MostRelevantDocumentAugmentationNode,
+    MostRelevantDocsContextCreationNode,
     SimpleRetrievalNode,
     LLMDomainRoutingNode,
     MockQuestionAnswerNode,
@@ -110,7 +110,7 @@ async def _evaluate(
         SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        MostRelevantDocumentAugmentationNode(),
+        MostRelevantDocsContextCreationNode(),
         MockQuestionAnswerNode()
     ]
     workflow = (

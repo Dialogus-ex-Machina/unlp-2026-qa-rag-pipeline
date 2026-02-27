@@ -14,14 +14,13 @@ from unlp_2026_submission.evals.accuracy import (
 )
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
-from unlp_2026_submission.reranker_models import LLMRerankerModel
 from unlp_2026_submission.workflow.nodes import (
     SimpleQuestionAnswerNode,
-    SimpleDocumentsRetrievalNode,
-    TopKRelevantDocumentAugmentation,
+    SimpleRetrievalNode,
+    TopKDocsContextCreationNode,
     MockDomainRoutingNode,
+    LogprobRerankerNode,
 )
-from unlp_2026_submission.workflow.nodes.logprob_reranker_model_node import LogprobRerankerModelNode
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
@@ -126,13 +125,13 @@ async def _evaluate(
     )
 
     domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        LogprobRerankerModelNode(
+        LogprobRerankerNode(
             language_model=language_model,
         ),
-        TopKRelevantDocumentAugmentation(
+        TopKDocsContextCreationNode(
             top_k=4,
         ),
         SimpleQuestionAnswerNode(

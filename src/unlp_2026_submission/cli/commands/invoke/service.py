@@ -11,7 +11,7 @@ from unlp_2026_submission.config import Config
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow.nodes import (
-    MostRelevantDocumentAugmentationNode,
+    MostRelevantDocsContextCreationNode,
     SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode
@@ -77,7 +77,7 @@ def build_workflow(
         SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        MostRelevantDocumentAugmentationNode(),
+        MostRelevantDocsContextCreationNode(),
         SimpleQuestionAnswerNode(
             language_model=language_model,
             prompt=qa_prompt,

@@ -6,7 +6,7 @@ from unlp_2026_submission.workflow.nodes import BaseNode
 from unlp_2026_submission.workflow.prompts.logprob_reranker import LogprobRerankerPrompt, UkrLogprobRerankerPrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState
 
-class LogprobRerankerModelNode(BaseNode):
+class LogprobRerankerNode(BaseNode):
     language_model: LlamaCppLanguageModel
     prompt: LogprobRerankerPrompt
     yes_token: str

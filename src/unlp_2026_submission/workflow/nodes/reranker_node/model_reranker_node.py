@@ -2,7 +2,7 @@ from unlp_2026_submission.reranker_models import RerankerModel
 from unlp_2026_submission.workflow.nodes import BaseNode
 from unlp_2026_submission.workflow.state import QAWorkflowState
 
-class RerankerModelNode(BaseNode):
+class ModelRerankerNode(BaseNode):
     reranker_model: RerankerModel
 
     def __init__(

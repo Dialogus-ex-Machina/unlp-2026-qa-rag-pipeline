@@ -14,7 +14,7 @@ from unlp_2026_submission.evals.faithfulness import (
     FaithfulnessDatasetName
 )
 from unlp_2026_submission.workflow.nodes import (
-    MostRelevantDocumentAugmentationNode,
+    MostRelevantDocsContextCreationNode,
     SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode,
@@ -128,7 +128,7 @@ async def _evaluate(
         SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        MostRelevantDocumentAugmentationNode(),
+        MostRelevantDocsContextCreationNode(),
         SimpleQuestionAnswerNode(
             language_model=language_model,
             prompt=qa_prompt,

@@ -15,7 +15,7 @@ from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.context_recall import evaluate_context_recall
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.workflow.nodes import (
-    MostRelevantDocumentAugmentationNode,
+    MostRelevantDocsContextCreationNode,
     SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode
@@ -153,7 +153,7 @@ async def _evaluate(
         SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        MostRelevantDocumentAugmentationNode(),
+        MostRelevantDocsContextCreationNode(),
         SimpleQuestionAnswerNode(
             language_model=language_model,
             prompt=qa_prompt,
