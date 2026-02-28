@@ -4,3 +4,4 @@ from .voyage_ai_reranker_model import VoyageAIRerankerModel
 from .llm_reranker_model import LLMRerankerModel
 from .cross_encoder_reranker_model import CrossEncoderRerankerModel
 from .jina_v3_reranker_model import JinaV3RerankerModel
+from .contextual_ai_v2_reranker_model import ContextualAIV2RerankerModel

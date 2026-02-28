@@ -95,7 +95,7 @@ class Config:
 
         self.embeddings_model_name = self._resolve_value_with_priority(
             embeddings_model_name,
-            os.getenv('EMBEDDINGS_MODEL_NAME', 'bflhc/Octen-Embedding-0.6B'),
+            os.getenv('EMBEDDINGS_MODEL_NAME', 'Snowflake/snowflake-arctic-embed-l-v2.0'),
         )
         self.judge_language_model_name = self._resolve_value_with_priority(
             judge_language_model_name,
