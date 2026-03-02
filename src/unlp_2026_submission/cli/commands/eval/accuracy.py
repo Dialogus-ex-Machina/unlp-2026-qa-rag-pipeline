@@ -21,6 +21,7 @@ from unlp_2026_submission.workflow.nodes import (
     MockDomainRoutingNode,
     LogprobRerankerNode,
 )
+from unlp_2026_submission.workflow.nodes.logprob_reranker_model_node import LogprobRerankerModelNode
 from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.language_models import LanguageModelFactory
