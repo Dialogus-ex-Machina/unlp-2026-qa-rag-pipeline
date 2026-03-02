@@ -13,6 +13,7 @@ from .txt_load_node import TxtLoadNode
 from .docling_converter_node import DoclingConverterNode
 from .docling_markdown_page_split_node import DoclingMarkdownPageSplitNode
 from .hybrid_embed_store_node import HybridEmbedStoreNode
+from .contextual_augmentation_node import ContextualAugmentationNode
 
 __all__ = [
     "IndexNode",
