@@ -54,7 +54,7 @@ class Config:
         )
         self.language_model_context_window = self._resolve_value_with_priority(
             language_model_context_window,
-            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '4096')),
+            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '6144')),
         )
         self.model_provider_api_key = self._resolve_value_with_priority(
             model_provider_api_key,

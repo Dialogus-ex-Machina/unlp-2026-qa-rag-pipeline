@@ -13,8 +13,8 @@ class BGEV2RerankerModel(RerankerModel):
             cache_dir: str,
             model_name: str = "BAAI/bge-reranker-v2-m3",
             device: str = "cuda",
-            batch_size: int = 4,
-            max_length: int = 4096,
+            batch_size: int = 2,
+            max_length: int = 2048,
             **model_kwargs: Dict[str, Any],
     ):
         self._batch_size = batch_size
