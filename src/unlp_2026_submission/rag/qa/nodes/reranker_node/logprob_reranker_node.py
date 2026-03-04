@@ -4,7 +4,7 @@ from unlp_2026_submission.entities import RelevantDocument, Question
 from unlp_2026_submission.models.language_models import LlamaCppLanguageModel
 from unlp_2026_submission.rag.qa.nodes import BaseNode
 from unlp_2026_submission.rag.qa.prompts import LogprobRerankerPrompt, UkrLogprobRerankerPrompt
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 class LogprobRerankerNode(BaseNode):
     language_model: LlamaCppLanguageModel
@@ -24,7 +24,7 @@ class LogprobRerankerNode(BaseNode):
         self.yes_token = yes_token
         self.no_token = no_token
 
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         question = state['question']
 
         relevant_documents = state.get('relevant_documents', [])

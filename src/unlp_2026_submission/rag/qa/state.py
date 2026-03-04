@@ -2,7 +2,7 @@ from typing import TypedDict, NotRequired
 from unlp_2026_submission.entities import Question, RelevantDocument, QuestionDomain
 
 
-class QAWorkflowState(TypedDict):
+class QAState(TypedDict):
     question: Question
     relevant_documents: list[RelevantDocument]
 

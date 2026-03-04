@@ -4,7 +4,7 @@ from langchain_core.messages import AIMessage
 
 from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
 from unlp_2026_submission.rag.qa.prompts import DomainClassificationPrompt, UkrDomainClassificationPrompt
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 from unlp_2026_submission.models.language_models import LanguageModel
 from unlp_2026_submission.entities import QuestionDomain
 
@@ -21,7 +21,7 @@ class LLMDomainRoutingNode(BaseNode):
         self.language_model = language_model
         self.prompt = prompt
 
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         question = state['question']
 
         prompt = self.prompt.format_messages(question=question)

@@ -1,1 +1,1 @@
-from .qa_workflow_state import QAWorkflowState
+from .qa_workflow_state import QAState

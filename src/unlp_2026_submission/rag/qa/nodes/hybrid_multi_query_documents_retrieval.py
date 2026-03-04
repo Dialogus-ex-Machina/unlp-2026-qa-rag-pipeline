@@ -6,7 +6,7 @@ from langchain_core.vectorstores import VectorStore
 from unlp_2026_submission.entities import RelevantDocument, Question
 from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
 from unlp_2026_submission.rag.qa.prompts import MultiQueryPrompt, UkrMultiQueryPrompt, UkrMultiSparseQueryWithAnswersPrompt
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 from unlp_2026_submission.models.language_models import LanguageModel
 
 # Default RRF constant (k). Higher k reduces impact of top ranks; 60 is standard.
@@ -46,7 +46,7 @@ class HybridMultiQueryDocumentsRetrievalNode(BaseNode):
         self._dense_prompt = dense_prompt
         self._sparse_prompt = sparse_prompt
 
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         question = state["question"]
 
         if state.get("relevant_context"):

@@ -3,7 +3,7 @@ from ragas import experiment
 
 from unlp_2026_submission.entities import Question
 from unlp_2026_submission.evals.accuracy.metrics import answer_accuracy_metric
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 
 @experiment()
@@ -13,7 +13,7 @@ async def answers_accuracy_experiment(
 ):
     correct_answer = question['correct_answer']
 
-    result: QAWorkflowState = workflow.invoke(
+    result: QAState = workflow.invoke(
         input={ 'question': question }
     )
 

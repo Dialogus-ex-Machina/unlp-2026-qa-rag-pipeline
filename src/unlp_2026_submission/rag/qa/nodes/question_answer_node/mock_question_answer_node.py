@@ -1,5 +1,5 @@
 from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 class MockQuestionAnswerNode(BaseNode):
     answer: str
@@ -8,7 +8,7 @@ class MockQuestionAnswerNode(BaseNode):
         super().__init__()
         self.answer = answer
 
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         print('Mock question answer')
 
         return {

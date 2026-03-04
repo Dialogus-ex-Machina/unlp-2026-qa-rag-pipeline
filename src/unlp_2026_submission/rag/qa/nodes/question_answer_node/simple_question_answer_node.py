@@ -4,7 +4,7 @@ from langchain_core.messages import AIMessage
 
 from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
 from unlp_2026_submission.rag.qa.prompts.qa import BaseQAPrompt
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 from unlp_2026_submission.models.language_models import LanguageModel
 
 class SimpleQuestionAnswerNode(BaseNode):
@@ -17,7 +17,7 @@ class SimpleQuestionAnswerNode(BaseNode):
         self.language_model = language_model
         self.prompt = prompt
 
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         question = state['question']
         relevant_context = state['relevant_context']
 

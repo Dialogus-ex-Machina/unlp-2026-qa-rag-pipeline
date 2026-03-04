@@ -2,7 +2,7 @@ from langchain_core.vectorstores import VectorStore
 
 from unlp_2026_submission.entities import RelevantDocument
 from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 class SimpleRetrievalNode(BaseNode):
     _vector_store: VectorStore
@@ -17,7 +17,7 @@ class SimpleRetrievalNode(BaseNode):
         self._vector_store = vector_store
         self._top_k = top_k
 
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         question = state['question']
 
         is_relevant_context_exist = bool(state.get('relevant_context', None))

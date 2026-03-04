@@ -4,7 +4,7 @@ from langgraph.constants import END
 from langgraph.graph import StateGraph
 
 from .nodes import BaseNode
-from .state.qa_workflow_state import QAWorkflowState
+from .state.qa_workflow_state import QAState
 
 
 class QAWorkflowBuilder:
@@ -20,7 +20,7 @@ class QAWorkflowBuilder:
         return self
 
     def build(self):
-        self._state_graph = StateGraph(state_schema=QAWorkflowState)
+        self._state_graph = StateGraph(state_schema=QAState)
 
         node_names = self._build_nodes()
         self._state_graph.set_entry_point(node_names[0])

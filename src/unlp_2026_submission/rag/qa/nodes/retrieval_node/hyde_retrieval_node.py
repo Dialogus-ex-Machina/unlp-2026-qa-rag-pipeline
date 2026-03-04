@@ -4,7 +4,7 @@ from unlp_2026_submission.entities import RelevantDocument
 from unlp_2026_submission.models.language_models import LanguageModel
 from unlp_2026_submission.rag.qa.nodes import BaseNode
 from unlp_2026_submission.rag.qa.prompts import HydePrompt, UkrHydePrompt
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 class HydeRetrievalNode(BaseNode):
     _language_model: LanguageModel
@@ -24,7 +24,7 @@ class HydeRetrievalNode(BaseNode):
         self._top_k = top_k
         self._prompt = prompt
 
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         question = state['question']
 
         is_relevant_context_exist = bool(state.get('relevant_context', None))

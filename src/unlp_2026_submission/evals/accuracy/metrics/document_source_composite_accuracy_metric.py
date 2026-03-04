@@ -5,7 +5,7 @@ from ragas.metrics import numeric_metric
 from ragas.metrics.result import MetricResult
 
 from unlp_2026_submission.entities import Question
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 from .accuracy_metric_name import AccuracyMetricName
 
@@ -16,7 +16,7 @@ from .accuracy_metric_name import AccuracyMetricName
 )
 def document_source_composite_accuracy_metric(
     question: Question,
-    workflow_result: QAWorkflowState,
+    workflow_result: QAState,
 ) -> MetricResult:
     """
         composite score = 0.5*d_i + 0.5*p_i

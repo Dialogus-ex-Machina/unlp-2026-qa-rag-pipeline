@@ -1,8 +1,8 @@
 from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 class MostRelevantDocsContextCreationNode(BaseNode):
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         question = state['question']
 
         is_relevant_context_exist = bool(state.get('relevant_context', None))

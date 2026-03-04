@@ -1,6 +1,6 @@
 from unlp_2026_submission.models.reranker_models import RerankerModel
 from unlp_2026_submission.rag.qa.nodes import BaseNode
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 class ModelRerankerNode(BaseNode):
     reranker_model: RerankerModel
@@ -11,7 +11,7 @@ class ModelRerankerNode(BaseNode):
     ):
         self.reranker_model = reranker_model
 
-    def __call__(self, state: QAWorkflowState):
+    def __call__(self, state: QAState):
         question = state['question']
 
         relevant_documents = state.get('relevant_documents', [])

@@ -2,7 +2,7 @@ from langgraph.graph.state import CompiledStateGraph
 from ragas import experiment
 
 from unlp_2026_submission.entities import Question
-from unlp_2026_submission.rag.qa.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 from .domain_classification_metric import domain_classification_metric
 
 @experiment()
@@ -12,7 +12,7 @@ async def domain_classification_experiment(
 ):
     correct_domain = question['domain']
 
-    result: QAWorkflowState = workflow.invoke(
+    result: QAState = workflow.invoke(
         input={ 'question': question }
     )
     predicted_domain = result['predicted_domain']
