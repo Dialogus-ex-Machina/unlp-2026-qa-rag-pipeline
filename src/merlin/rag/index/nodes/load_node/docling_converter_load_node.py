@@ -14,7 +14,7 @@ from langchain_docling.loader import ExportType
 from merlin.rag.index.index_state import IndexState
 
 
-class DoclingConverterNode:
+class DoclingConverterLoadNode:
     def __init__(
         self,
         output_suffix: str = ".md",
@@ -360,7 +360,7 @@ class DoclingConverterNode:
             return True
         if re.match(r"^[IVXLCDMІVXLCDM]+[.)]\s+\S", raw, flags=re.IGNORECASE):
             return True
-        if DoclingConverterNode._is_uppercase_heading_like(raw):
+        if DoclingConverterLoadNode._is_uppercase_heading_like(raw):
             return True
 
         return False

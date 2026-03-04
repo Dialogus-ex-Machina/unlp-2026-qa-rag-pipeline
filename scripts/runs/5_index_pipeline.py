@@ -3,7 +3,7 @@ from pathlib import Path
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from merlin.rag.index import IndexState, IndexRunner
-from merlin.rag.index.nodes import EmbedStoreNode, SplitNode, DoclingPageLoadNode
+from merlin.rag.index.nodes import EmbedStoreNode, SimpleSplitNode, DoclingPageLoadNode
 from merlin.models.embeddings import EmbeddingsFactory, EmbeddingsSpec
 
 def get_pdf_filepaths(documents_dir: str = "../documents") -> list[str]:
@@ -25,7 +25,7 @@ embeddings = EmbeddingsFactory.create_all_embeddings_factory().create(spec)
 """
 nodes = [
     DoclingPageLoadNode(embeddings, device="cuda"),
-    SplitNode(
+    SimpleSplitNode(
         RecursiveCharacterTextSplitter(
             chunk_size=800,
             chunk_overlap=0,

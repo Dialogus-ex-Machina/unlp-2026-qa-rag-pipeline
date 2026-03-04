@@ -3,7 +3,7 @@ from langchain_core.documents import BaseDocumentTransformer
 from merlin.rag.index.index_state import IndexState
 
 
-class SplitNode:
+class SimpleSplitNode:
     def __init__(self, splitter: BaseDocumentTransformer = None):
         self.splitter = splitter
 

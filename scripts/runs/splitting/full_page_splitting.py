@@ -1,11 +1,7 @@
 from pathlib import Path
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
 from merlin.rag.index import IndexState, IndexRunner
-from merlin.rag.index.nodes import TxtLoadNode, DelimitedPageLoadNode, ProxySplitNode
-from merlin.rag.index.nodes.hybrid_embed_store_node import HybridEmbedStoreNode
-from merlin.rag.index.nodes.page_aware_document_split_node import PageAwareDocumentSplitNode
+from merlin.rag.index.nodes import DelimitedPageLoadNode, ProxySplitNode, HybridEmbedStoreNode
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 
