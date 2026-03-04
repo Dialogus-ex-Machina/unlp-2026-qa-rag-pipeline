@@ -3,7 +3,7 @@ from ragas import experiment
 
 from unlp_2026_submission.entities import QuestionWithContext
 from .answer_faithfulness_metric import answer_faithfulness_metric
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 
 
 @experiment()

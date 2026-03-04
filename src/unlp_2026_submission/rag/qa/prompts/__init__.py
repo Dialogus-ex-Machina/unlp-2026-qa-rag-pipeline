@@ -15,7 +15,11 @@ from .domain_classification import (
 from .reranker import (
     RerankerPrompt,
     EngRerankerPrompt,
-    UkrRerankerPrompt
+    UkrRerankerPrompt,
+)
+from .logprob_reranker import (
+    LogprobRerankerPrompt,
+    UkrLogprobRerankerPrompt,
 )
 from .hyde import (
     EngHydePrompt,
@@ -25,9 +29,11 @@ from .hyde import (
 from .multi_query import (
     EngMultiQueryPrompt,
     MultiQueryPrompt,
-    UkrMultiQueryPrompt
+    UkrMultiQueryPrompt,
+    UkrMultiQueryWithAnswersPrompt,
+    UkrMultiSparseQueryWithAnswersPrompt,
 )
 from .splits_augmentation_node import (
     UkrContextualSplitsAugmentationPrompt,
-    SplitsAugmentationPrompt
+    SplitsAugmentationPrompt,
 )

@@ -1,6 +1,6 @@
 from unlp_2026_submission.models.reranker_models import RerankerModel
-from unlp_2026_submission.workflow.nodes import BaseNode
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.nodes import BaseNode
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 
 class ModelRerankerNode(BaseNode):
     reranker_model: RerankerModel

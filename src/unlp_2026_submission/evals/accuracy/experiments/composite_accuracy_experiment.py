@@ -3,7 +3,7 @@ from ragas import experiment
 
 from unlp_2026_submission.entities import Question
 from unlp_2026_submission.evals.accuracy.metrics import composite_accuracy_metric
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 
 
 @experiment()

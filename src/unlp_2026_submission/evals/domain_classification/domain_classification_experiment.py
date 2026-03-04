@@ -2,7 +2,7 @@ from langgraph.graph.state import CompiledStateGraph
 from ragas import experiment
 
 from unlp_2026_submission.entities import Question
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 from .domain_classification_metric import domain_classification_metric
 
 @experiment()

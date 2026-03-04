@@ -2,9 +2,9 @@ import re
 
 from langchain_core.messages import AIMessage
 
-from unlp_2026_submission.workflow.nodes.base_node import BaseNode
-from unlp_2026_submission.workflow.prompts import DomainClassificationPrompt, UkrDomainClassificationPrompt
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
+from unlp_2026_submission.rag.qa.prompts import DomainClassificationPrompt, UkrDomainClassificationPrompt
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 from unlp_2026_submission.models.language_models import LanguageModel
 from unlp_2026_submission.entities import QuestionDomain
 

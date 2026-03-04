@@ -1,10 +1,10 @@
 from typing import Literal
 
 from unlp_2026_submission.entities import RelevantDocument
-from unlp_2026_submission.workflow.nodes.base_node import BaseNode
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 
-class TopKDocsContextCreationNode(BaseNode):
+class TopKRelevantDocumentAugmentation(BaseNode):
     _top_k: int
     _should_reorder: bool
 

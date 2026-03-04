@@ -4,10 +4,9 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.vectorstores import VectorStore
 
 from unlp_2026_submission.entities import RelevantDocument, Question
-from unlp_2026_submission.workflow.nodes.base_node import BaseNode
-from unlp_2026_submission.workflow.prompts import MultiQueryPrompt, UkrMultiQueryPrompt
-from unlp_2026_submission.workflow.prompts.multi_query import UkrMultiSparseQueryWithAnswersPrompt
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.nodes.base_node import BaseNode
+from unlp_2026_submission.rag.qa.prompts import MultiQueryPrompt, UkrMultiQueryPrompt, UkrMultiSparseQueryWithAnswersPrompt
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 from unlp_2026_submission.models.language_models import LanguageModel
 
 # Default RRF constant (k). Higher k reduces impact of top ranks; 60 is standard.
@@ -19,7 +18,7 @@ def _doc_key(doc: RelevantDocument) -> tuple[str, str]:
     return (doc.source or "", doc.page_label or "")
 
 
-class HybridMultiQueryDocumentsRetrievalNode(BaseNode):
+class HybridMultiQueryRetrievalNode(BaseNode):
     _dense_vector_store: VectorStore
     _sparse_vector_store: VectorStore
     _language_model: LanguageModel

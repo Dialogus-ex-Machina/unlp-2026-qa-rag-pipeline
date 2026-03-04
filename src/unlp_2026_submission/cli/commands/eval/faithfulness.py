@@ -13,16 +13,16 @@ from unlp_2026_submission.evals.faithfulness import (
     FaithfulnessDatasetFactory,
     FaithfulnessDatasetName
 )
-from unlp_2026_submission.workflow.nodes import (
+from unlp_2026_submission.rag.qa.nodes import (
     MostRelevantDocsContextCreationNode,
     SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode,
 )
-from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
+from unlp_2026_submission.rag.qa.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.models.language_models import LanguageModelFactory
-from unlp_2026_submission.workflow.prompts import (
+from unlp_2026_submission.rag.qa.prompts import (
     QAPromptType,
     PromptsFactory,
     DomainClassificationPromptType,

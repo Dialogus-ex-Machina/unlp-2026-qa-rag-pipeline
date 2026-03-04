@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 
 class BaseNode(ABC):
     @abstractmethod

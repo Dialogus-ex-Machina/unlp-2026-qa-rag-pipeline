@@ -2,9 +2,9 @@ import math
 
 from unlp_2026_submission.entities import RelevantDocument, Question
 from unlp_2026_submission.models.language_models import LlamaCppLanguageModel
-from unlp_2026_submission.workflow.nodes import BaseNode
-from unlp_2026_submission.workflow.prompts.logprob_reranker import LogprobRerankerPrompt, UkrLogprobRerankerPrompt
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.nodes import BaseNode
+from unlp_2026_submission.rag.qa.prompts.logprob_reranker import LogprobRerankerPrompt, UkrLogprobRerankerPrompt
+from unlp_2026_submission.rag.qa.state import QAWorkflowState
 
 class LogprobRerankerModelNode(BaseNode):
     language_model: LlamaCppLanguageModel
