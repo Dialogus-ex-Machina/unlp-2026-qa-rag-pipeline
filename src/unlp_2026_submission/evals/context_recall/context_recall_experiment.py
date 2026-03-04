@@ -3,7 +3,7 @@ from ragas import experiment
 from typing import Optional
 
 from unlp_2026_submission.entities import QuestionWithContext
-from unlp_2026_submission.language_models import JudgeLanguageModel
+from unlp_2026_submission.models.language_models import JudgeLanguageModel
 from unlp_2026_submission.workflow.state import QAWorkflowState
 from .context_recall_metric import ContextRecall
 

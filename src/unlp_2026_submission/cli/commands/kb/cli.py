@@ -3,8 +3,8 @@ import typer
 from typing import Annotated, Optional
 
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import EmbeddingsModelFactory
-from unlp_2026_submission.language_models import LanguageModelFactory
+from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
+from unlp_2026_submission.models.language_models import LanguageModelFactory
 
 app = typer.Typer(no_args_is_help=True)
 

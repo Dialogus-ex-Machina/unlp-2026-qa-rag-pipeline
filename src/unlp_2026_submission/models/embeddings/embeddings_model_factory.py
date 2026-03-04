@@ -1,5 +1,5 @@
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import (
+from unlp_2026_submission.models.embeddings import (
     OpenAIEmbeddingsModel,
     EmbeddingsModel,
     GoogleEmbeddingsModel,

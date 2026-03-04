@@ -5,7 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from merlin.rag.index import IndexState, IndexRunner
 from merlin.rag.index.nodes import TxtLoadNode, HybridEmbedStoreNode, PageAwareDocumentSplitNode
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import EmbeddingsModelFactory
+from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
 
 def get_txt_filepaths(documents_dir: str = "../documents") -> list[str]:
     p = Path(documents_dir)

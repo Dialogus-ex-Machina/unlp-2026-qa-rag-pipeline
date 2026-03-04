@@ -1,7 +1,7 @@
 import math
 
 from unlp_2026_submission.entities import RelevantDocument, Question
-from unlp_2026_submission.language_models import LlamaCppLanguageModel
+from unlp_2026_submission.models.language_models import LlamaCppLanguageModel
 from unlp_2026_submission.workflow.nodes import BaseNode
 from unlp_2026_submission.workflow.prompts.logprob_reranker import LogprobRerankerPrompt, UkrLogprobRerankerPrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState

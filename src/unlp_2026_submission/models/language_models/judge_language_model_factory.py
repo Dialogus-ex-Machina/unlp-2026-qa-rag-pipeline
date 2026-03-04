@@ -1,9 +1,10 @@
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.language_models import (
+from unlp_2026_submission.models.language_models import (
     OpenAILanguageModel,
     GeminiLanguageModel,
     OpenAIJudgeLanguageModel,
-    JudgeLanguageModel, GeminiJudgeLanguageModel,
+    JudgeLanguageModel,
+    GeminiJudgeLanguageModel,
 )
 
 class JudgeLanguageModelFactory:

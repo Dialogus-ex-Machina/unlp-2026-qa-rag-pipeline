@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 from langchain_core.messages import AIMessage
 
 from unlp_2026_submission.entities import RelevantDocument
-from unlp_2026_submission.language_models import LanguageModel
+from unlp_2026_submission.models.language_models import LanguageModel
 from unlp_2026_submission.workflow.prompts import RerankerPrompt, UkrRerankerPrompt
 
 from .reranker_model import RerankerModel

@@ -6,8 +6,8 @@ from merlin.rag.index.nodes import (
     ContextualSplitsAugmentationNode
 )
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import EmbeddingsModelFactory
-from unlp_2026_submission.language_models import LlamaCppLanguageModel
+from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
+from unlp_2026_submission.models.language_models import LlamaCppLanguageModel
 
 config = Config(
     embeddings_model_name="bflhc/Octen-Embedding-0.6B",

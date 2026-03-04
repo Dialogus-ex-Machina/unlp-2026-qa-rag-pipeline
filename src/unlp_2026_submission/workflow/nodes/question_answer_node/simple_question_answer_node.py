@@ -5,7 +5,7 @@ from langchain_core.messages import AIMessage
 from unlp_2026_submission.workflow.nodes.base_node import BaseNode
 from unlp_2026_submission.workflow.prompts.qa import BaseQAPrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState
-from unlp_2026_submission.language_models import LanguageModel
+from unlp_2026_submission.models.language_models import LanguageModel
 
 class SimpleQuestionAnswerNode(BaseNode):
     def __init__(

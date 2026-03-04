@@ -7,7 +7,7 @@ import tiktoken
 from langchain_core.documents import BaseDocumentTransformer, Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from llama_index.core.node_parser import SentenceSplitter
-from unlp_2026_submission.embeddings import EmbeddingsModel
+from unlp_2026_submission.models.embeddings import EmbeddingsModel
 
 # - "1. " (арабські)
 # - "IV. " (латинські римські)

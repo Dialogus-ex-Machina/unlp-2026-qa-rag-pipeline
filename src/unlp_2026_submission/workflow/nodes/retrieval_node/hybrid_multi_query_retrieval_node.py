@@ -8,7 +8,7 @@ from unlp_2026_submission.workflow.nodes.base_node import BaseNode
 from unlp_2026_submission.workflow.prompts import MultiQueryPrompt, UkrMultiQueryPrompt
 from unlp_2026_submission.workflow.prompts.multi_query import UkrMultiSparseQueryWithAnswersPrompt
 from unlp_2026_submission.workflow.state import QAWorkflowState
-from unlp_2026_submission.language_models import LanguageModel
+from unlp_2026_submission.models.language_models import LanguageModel
 
 # Default RRF constant (k). Higher k reduces impact of top ranks; 60 is standard.
 RRF_K = 60

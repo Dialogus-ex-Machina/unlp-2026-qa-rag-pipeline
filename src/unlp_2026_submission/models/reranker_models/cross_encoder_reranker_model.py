@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from sentence_transformers import CrossEncoder
 
-from unlp_2026_submission.reranker_models import RerankerModel
+from .reranker_model import RerankerModel
 from unlp_2026_submission.entities import RelevantDocument
 
 
