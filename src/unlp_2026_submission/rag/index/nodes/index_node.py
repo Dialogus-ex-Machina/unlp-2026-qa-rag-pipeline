@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from merlin.rag.index import IndexState
+from unlp_2026_submission.rag.index import IndexState
 
 
 class IndexNode(Protocol):

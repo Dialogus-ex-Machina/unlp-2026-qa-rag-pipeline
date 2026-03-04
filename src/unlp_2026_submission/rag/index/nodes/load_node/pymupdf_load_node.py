@@ -3,7 +3,7 @@ from typing import List
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_core.documents import Document
 
-from merlin.rag.index.index_state import IndexState
+from unlp_2026_submission.rag.index.index_state import IndexState
 
 
 class PyMuPDFLoadNode:

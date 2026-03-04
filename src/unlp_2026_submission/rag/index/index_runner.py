@@ -2,8 +2,8 @@ from itertools import pairwise
 
 from langgraph.graph import StateGraph
 
-from merlin.rag.index import IndexState
-from merlin.rag.index.nodes import IndexNode
+from unlp_2026_submission.rag.index import IndexState
+from unlp_2026_submission.rag.index.nodes import IndexNode
 
 
 class IndexRunner:

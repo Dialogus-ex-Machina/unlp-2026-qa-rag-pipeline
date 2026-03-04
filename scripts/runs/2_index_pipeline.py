@@ -2,8 +2,8 @@ from pathlib import Path
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from merlin.rag.index import IndexState, IndexRunner
-from merlin.rag.index.nodes import EmbedStoreNode, PyPDFLoadNode, SimpleSplitNode
+from unlp_2026_submission.rag.index import IndexState, IndexRunner
+from unlp_2026_submission.rag.index.nodes import EmbedStoreNode, PyPDFLoadNode, SimpleSplitNode
 from merlin.models.embeddings import EmbeddingsFactory, EmbeddingsSpec
 
 def get_pdf_filepaths(documents_dir: str = "../documents") -> list[str]:

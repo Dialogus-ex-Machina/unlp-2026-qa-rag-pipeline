@@ -1,5 +1,5 @@
-from merlin.rag.index import IndexState, IndexRunner
-from merlin.rag.index.nodes import (
+from unlp_2026_submission.rag.index import IndexState, IndexRunner
+from unlp_2026_submission.rag.index.nodes import (
     EmbedStoreNode,
     DelimitedPageLoadNode,
     ProxySplitNode,

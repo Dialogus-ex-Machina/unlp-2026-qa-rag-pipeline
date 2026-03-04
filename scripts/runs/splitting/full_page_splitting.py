@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from merlin.rag.index import IndexState, IndexRunner
-from merlin.rag.index.nodes import DelimitedPageLoadNode, ProxySplitNode, HybridEmbedStoreNode
+from unlp_2026_submission.rag.index import IndexState, IndexRunner
+from unlp_2026_submission.rag.index.nodes import DelimitedPageLoadNode, ProxySplitNode, HybridEmbedStoreNode
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
 

@@ -12,7 +12,7 @@ from langchain_docling import DoclingLoader
 from langchain_docling.loader import ExportType
 from transformers import AutoTokenizer
 
-from merlin.rag.index.index_state import IndexState
+from unlp_2026_submission.rag.index.index_state import IndexState
 
 
 class DoclingLoadSplitNode:

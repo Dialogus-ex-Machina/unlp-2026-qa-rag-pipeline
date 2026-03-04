@@ -1,4 +1,4 @@
-from merlin.rag.index.index_state import IndexState
+from unlp_2026_submission.rag.index.index_state import IndexState
 
 
 class ProxySplitNode:

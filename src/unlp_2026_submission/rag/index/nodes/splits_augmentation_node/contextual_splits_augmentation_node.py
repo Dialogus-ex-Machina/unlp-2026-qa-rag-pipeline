@@ -3,7 +3,7 @@ from typing import Optional, Callable
 
 from langchain_core.documents import Document
 
-from merlin.rag.index.index_state import IndexState
+from unlp_2026_submission.rag.index.index_state import IndexState
 from unlp_2026_submission.models.language_models import LanguageModel
 from unlp_2026_submission.rag.qa.prompts import UkrContextualSplitsAugmentationPrompt, SplitsAugmentationPrompt
 

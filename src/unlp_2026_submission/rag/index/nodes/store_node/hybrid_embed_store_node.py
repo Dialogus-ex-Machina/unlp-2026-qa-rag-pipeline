@@ -5,7 +5,7 @@ from langchain_qdrant import QdrantVectorStore, RetrievalMode, FastEmbedSparse
 from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Distance, SparseVectorParams, VectorParams
 
-from merlin.rag.index.index_state import IndexState
+from unlp_2026_submission.rag.index.index_state import IndexState
 
 
 class HybridEmbedStoreNode:

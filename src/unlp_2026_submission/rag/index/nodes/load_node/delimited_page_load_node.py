@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Union
 
 from langchain_core.documents import Document
 
-from merlin.rag.index import IndexState
+from unlp_2026_submission.rag.index import IndexState
 
 PAGE_DELIMITER_PATTERN = re.compile(r"^===== Page (\d+) =====$")
 

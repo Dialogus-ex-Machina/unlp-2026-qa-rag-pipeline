@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 from langchain_core.documents import Document
 
-from merlin.rag.index.index_state import IndexState
+from unlp_2026_submission.rag.index.index_state import IndexState
 
 
 class DoclingMarkdownPageSplitNode:

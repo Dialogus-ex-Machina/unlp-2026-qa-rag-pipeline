@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from merlin.rag.index import IndexState, IndexRunner
-from merlin.rag.index.nodes import DoclingLoadSplitNode, EmbedStoreNode
+from unlp_2026_submission.rag.index import IndexState, IndexRunner
+from unlp_2026_submission.rag.index.nodes import DoclingLoadSplitNode, EmbedStoreNode
 from merlin.models.embeddings import EmbeddingsFactory, EmbeddingsSpec
 
 def get_pdf_filepaths(documents_dir: str = "../documents") -> list[str]:
