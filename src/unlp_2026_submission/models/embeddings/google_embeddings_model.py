@@ -1,18 +1,21 @@
 import os
+from typing import Optional
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from unlp_2026_submission.config import Config
 
 class GoogleEmbeddingsModel(GoogleGenerativeAIEmbeddings):
     @staticmethod
-    def create(config: Config):
-        if not config.model_provider_api_key:
+    def create(
+            model_name: str,
+            api_key: Optional[str],
+    ):
+        if not api_key and os.environ.get("GOOGLE_API_KEY") is None:
             raise ValueError("Model provider API key not found")
 
         if os.environ.get("GOOGLE_API_KEY") is None:
-            os.environ["GOOGLE_API_KEY"] = config.model_provider_api_key
+            os.environ["GOOGLE_API_KEY"] = api_key
 
         return GoogleEmbeddingsModel(
-            model=config.embeddings_model_name,
+            model=model_name,
         )
 
     @staticmethod

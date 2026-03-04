@@ -4,8 +4,6 @@ from langchain_core.embeddings import Embeddings
 from pydantic import BaseModel, ConfigDict, Field
 from sentence_transformers import SentenceTransformer
 
-from unlp_2026_submission.config import Config
-
 class SentenceTransformerEmbeddingModel(BaseModel, Embeddings):
     """HuggingFace sentence_transformers embedding models."""
 
@@ -50,10 +48,13 @@ class SentenceTransformerEmbeddingModel(BaseModel, Embeddings):
         )
 
     @staticmethod
-    def create(config: Config):
+    def create(
+            model_name: str,
+            cache_dir: str | None = None,
+    ):
         return SentenceTransformerEmbeddingModel(
-            model_name=config.embeddings_model_name,
-            cache_folder=config.downloaded_models_cache_dir,
+            model_name=model_name,
+            cache_folder=cache_dir,
         )
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
