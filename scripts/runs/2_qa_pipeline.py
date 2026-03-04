@@ -9,7 +9,6 @@ from unlp_2026_submission.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
 from unlp_2026_submission.language_models import LanguageModelFactory
 from unlp_2026_submission.workflow.nodes import (
-    MockDomainRoutingNode,
     SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     TopKDocsContextCreationNode,
@@ -23,7 +22,7 @@ from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
 
 def main():
     repo_root = Path(__file__).resolve().parents[2]
-    data_root_dir = repo_root / "src" / "data"
+    data_root_dir = repo_root / "data"
     vector_store_path = repo_root / "scripts" / "vector_dbs" / "qdrant_db_9_minilm_384"
 
     config = Config(

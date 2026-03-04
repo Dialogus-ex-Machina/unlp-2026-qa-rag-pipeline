@@ -112,7 +112,7 @@ class Config:
         project_src_dir = package_root_dir.parent
         project_root_dir = project_src_dir.parent
 
-        self.data_root_dir = os.getenv('INPUT_DATA_DIR', project_src_dir / "data")
+        self.data_root_dir = os.getenv('INPUT_DATA_DIR', project_root_dir / "data")
 
         hf_home_dir = os.getenv('HF_HOME', os.path.join(project_root_dir, "hf_cache"))
         if os.environ.get("HF_HOME") is None:
