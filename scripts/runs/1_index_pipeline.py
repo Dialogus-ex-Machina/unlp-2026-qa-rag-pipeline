@@ -1,19 +1,23 @@
 from pathlib import Path
 
+from unlp_2026_submission.config import Config
+from unlp_2026_submission.models.embeddings import SentenceTransformerEmbeddingModel
 from unlp_2026_submission.rag.index import IndexState, IndexRunner
 from unlp_2026_submission.rag.index.nodes import DoclingLoadSplitNode, EmbedStoreNode
-from merlin.models.embeddings import EmbeddingsFactory, EmbeddingsSpec
 
 def get_pdf_filepaths(documents_dir: str = "../documents") -> list[str]:
     p = Path(documents_dir)
     # recursive; use p.glob("*.pdf") if you only want top-level
     return sorted(str(fp) for fp in p.rglob("*.pdf") if fp.is_file())
 
-spec = EmbeddingsSpec(
-    provider="huggingface",
-    model_name="bflhc/Octen-Embedding-0.6B",
+config = Config(
+    embeddings_model_name="bflhc/Octen-Embedding-0.6B",
 )
-embeddings = EmbeddingsFactory.create_all_embeddings_factory().create(spec)
+
+embeddings = SentenceTransformerEmbeddingModel(
+    model_name=config.embeddings_model_name,
+    cache_folder=config.downloaded_models_cache_dir,
+)
 
 """Index pipeline configuration:
 1) Load+Split: DoclingLoadSplit(Octen-Embedding-0.6B)
