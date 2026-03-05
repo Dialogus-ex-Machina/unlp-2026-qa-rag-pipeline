@@ -32,7 +32,10 @@ class SimpleQuestionAnswerNode(BaseNode):
 
         print('raw_answer:', formatted_response['raw_answer'])
         print('answer:', formatted_response['answer'])
-        print('correct_answer:', question['correct_answer'])
+
+        correct_answer = question.get('correct_answer')
+        if correct_answer is not None:
+            print('correct_answer:', correct_answer)
 
         return {
             **formatted_response,

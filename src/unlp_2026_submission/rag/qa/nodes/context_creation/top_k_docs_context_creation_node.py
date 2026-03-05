@@ -43,8 +43,14 @@ class TopKDocsContextCreationNode(BaseNode):
 
         print('Retrieved doc_id:', relevant_document_id)
         print('Retrieved page_num:', relevant_document_page_num)
-        print('Correct doc_id:', question['doc_id'])
-        print('Correct page_num:', question['page_num'])
+
+        correct_doc_id = question.get('doc_id')
+        if correct_doc_id is not None:
+            print('Correct doc_id:', correct_doc_id)
+
+        correct_page_num = question.get('page_num')
+        if correct_page_num is not None:
+            print('Correct page_num:', correct_page_num)
 
         return {
             'relevant_context': relevant_context,

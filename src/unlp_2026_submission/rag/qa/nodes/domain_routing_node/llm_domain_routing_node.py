@@ -31,7 +31,10 @@ class LLMDomainRoutingNode(BaseNode):
 
         print('Raw predicted domain:', raw_response)
         print('Predicted domain:', predicted_domain)
-        print('Correct domain:', question['domain'])
+
+        correct_domain = question.get('domain')
+        if correct_domain is not None:
+            print('Correct domain:', correct_domain)
 
         return {
             'predicted_domain': predicted_domain,
