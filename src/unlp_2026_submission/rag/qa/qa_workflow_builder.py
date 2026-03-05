@@ -4,7 +4,7 @@ from langgraph.constants import END
 from langgraph.graph import StateGraph
 
 from .nodes import BaseNode
-from .state.qa_workflow_state import QAState
+from .state import QAState
 
 
 class QAWorkflowBuilder:

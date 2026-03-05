@@ -33,7 +33,7 @@ class EmbeddingsModelFactory:
             return embeddings_model
 
         embeddings_model = SentenceTransformerEmbeddingModel.create(
-            model_name=self._config.embeddings_model_name,
+            model_name_or_path=self._config.embeddings_model_name,
             cache_dir=self._config.downloaded_models_cache_dir,
         )
         return embeddings_model

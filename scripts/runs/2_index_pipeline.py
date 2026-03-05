@@ -17,7 +17,7 @@ config = Config(
 )
 
 embeddings = SentenceTransformerEmbeddingModel(
-    model_name=config.embeddings_model_name,
+    model_name_or_path=config.embeddings_model_name,
     cache_folder=config.downloaded_models_cache_dir,
 )
 

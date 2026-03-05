@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 class SentenceTransformerEmbeddingModel(BaseModel, Embeddings):
     """HuggingFace sentence_transformers embedding models."""
 
-    model_name: str = Field(
+    model_name_or_path: str = Field(
         default="sentence-transformers/all-mpnet-base-v2", alias="model"
     )
     """Model name to use."""
@@ -44,17 +44,35 @@ class SentenceTransformerEmbeddingModel(BaseModel, Embeddings):
         super().__init__(**kwargs)
 
         self._transformer = SentenceTransformer(
-            self.model_name, cache_folder=self.cache_folder, **self.model_kwargs
+            model_name_or_path=self.model_name_or_path,
+            cache_folder=self.cache_folder,
+            **self.model_kwargs
         )
 
     @staticmethod
     def create(
-            model_name: str,
+            model_name_or_path: str,
             cache_dir: str | None = None,
     ):
         return SentenceTransformerEmbeddingModel(
-            model_name=model_name,
+            model_name_or_path=model_name_or_path,
             cache_folder=cache_dir,
+        )
+
+    def save(
+            self,
+            path: str,
+            model_name: str | None = None,
+            create_model_card: bool = True,
+            train_datasets: list[str] | None = None,
+            safe_serialization: bool = True,
+    ):
+        self._transformer.save(
+            path=path,
+            model_name=model_name,
+            create_model_card=create_model_card,
+            train_datasets=train_datasets,
+            safe_serialization=safe_serialization,
         )
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
