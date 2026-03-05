@@ -237,7 +237,7 @@ class LlamaCppLanguageModel(ChatLlamaCpp):
             filename=filename,
         )
         # loading the first file of a sharded GGUF loads all remaining shard files in the subfolder
-        return ChatLlamaCpp(
+        return LlamaCppLanguageModel(
             model_path=model_path,
             max_tokens=config.language_model_max_tokens,
             n_batch=config.language_model_n_batch,

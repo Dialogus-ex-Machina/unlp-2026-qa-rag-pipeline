@@ -15,6 +15,7 @@ class PyPDFLoadNode:
         for filepath in filepaths:
             loader = PyPDFLoader(filepath)
             document_pages = loader.load()
+            print(f"document {filepath} loaded")
             documents.extend(document_pages)
 
         return {"documents": documents}
