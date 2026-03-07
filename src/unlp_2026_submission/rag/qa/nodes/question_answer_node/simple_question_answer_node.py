@@ -26,20 +26,30 @@ class SimpleQuestionAnswerNode(BaseNode):
             relevant_context=relevant_context
         )
 
-        response = self.language_model.invoke(prompt)
+        try:
+            response = self.language_model.invoke(prompt)
 
-        formatted_response = self.format_single_answer_response(response)
+            formatted_response = self.format_single_answer_response(response)
 
-        print('raw_answer:', formatted_response['raw_answer'])
-        print('answer:', formatted_response['answer'])
+            print('raw_answer:', formatted_response['raw_answer'])
+            print('answer:', formatted_response['answer'])
 
-        correct_answer = question.get('correct_answer')
-        if correct_answer is not None:
-            print('correct_answer:', correct_answer)
+            correct_answer = question.get('correct_answer')
+            if correct_answer is not None:
+                print('correct_answer:', correct_answer)
 
-        return {
-            **formatted_response,
-        }
+            return {
+                **formatted_response,
+            }
+        except Exception as e:
+            # TODO try to cut some part of relevant context for processing
+            print('Error in SimpleQuestionAnswerNode:', e)
+            print('Random value assigned to answer')
+
+            return {
+                'raw_answer': 'A',
+                'answer': 'A',
+            }
 
     def format_single_answer_response(self, response: AIMessage):
         raw_answer = getattr(response, "content", str(response))
