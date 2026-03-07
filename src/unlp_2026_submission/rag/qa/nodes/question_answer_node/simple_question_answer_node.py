@@ -31,20 +31,21 @@ class SimpleQuestionAnswerNode(BaseNode):
 
             formatted_response = self.format_single_answer_response(response)
 
-            print('raw_answer:', formatted_response['raw_answer'])
-            print('answer:', formatted_response['answer'])
+            # print('raw_answer:', formatted_response['raw_answer'])
+            # print('answer:', formatted_response['answer'])
 
-            correct_answer = question.get('correct_answer')
-            if correct_answer is not None:
-                print('correct_answer:', correct_answer)
+            # correct_answer = question.get('correct_answer')
+            # if correct_answer is not None:
+            #     print('correct_answer:', correct_answer)
 
             return {
                 **formatted_response,
             }
-        except Exception as e:
+        # except Exception as e:
+        except Exception:
             # TODO try to cut some part of relevant context for processing
-            print('Error in SimpleQuestionAnswerNode:', e)
-            print('Random value assigned to answer')
+            # print('Error in SimpleQuestionAnswerNode:', e)
+            # print('Random value assigned to answer')
 
             return {
                 'raw_answer': 'A',

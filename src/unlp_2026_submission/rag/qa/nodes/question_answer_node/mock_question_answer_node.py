@@ -9,7 +9,7 @@ class MockQuestionAnswerNode(BaseNode):
         self.answer = answer
 
     def __call__(self, state: QAState):
-        print('Mock question answer')
+        # print('Mock question answer')
 
         return {
             'raw_answer': self.answer,

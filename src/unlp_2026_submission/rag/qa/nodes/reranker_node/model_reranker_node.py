@@ -17,7 +17,7 @@ class ModelRerankerNode(BaseNode):
         relevant_documents = state.get('relevant_documents', [])
 
         if not relevant_documents:
-            print('Relevant context not found. Skipping reranking.')
+            # print('Relevant context not found. Skipping reranking.')
             return {}
 
         reranked_relevant_documents = self.reranker_model.rerank(
@@ -28,7 +28,7 @@ class ModelRerankerNode(BaseNode):
         if not reranked_relevant_documents:
             return {}
 
-        print('Reranked relevant documents:', reranked_relevant_documents)
+        # print('Reranked relevant documents:', reranked_relevant_documents)
 
         return {
             'relevant_documents': reranked_relevant_documents,

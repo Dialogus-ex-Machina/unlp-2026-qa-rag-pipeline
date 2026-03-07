@@ -29,12 +29,12 @@ class LLMDomainRoutingNode(BaseNode):
         response = self.language_model.invoke(prompt)
         predicted_domain, raw_response = self.format_domain_response(response)
 
-        print('Raw predicted domain:', raw_response)
-        print('Predicted domain:', predicted_domain)
+        # print('Raw predicted domain:', raw_response)
+        # print('Predicted domain:', predicted_domain)
 
-        correct_domain = question.get('domain')
-        if correct_domain is not None:
-            print('Correct domain:', correct_domain)
+        # correct_domain = question.get('domain')
+        # if correct_domain is not None:
+        #     print('Correct domain:', correct_domain)
 
         return {
             'predicted_domain': predicted_domain,

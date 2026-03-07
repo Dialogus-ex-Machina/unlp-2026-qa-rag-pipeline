@@ -35,7 +35,7 @@ class MultiQueryRetrievalNode(BaseNode):
         is_relevant_context_exist = bool(state.get('relevant_context', None))
 
         if is_relevant_context_exist:
-            print('Relevant context already exists. Skipping context retrieval.')
+            # print('Relevant context already exists. Skipping context retrieval.')
             return {}
 
         generate_queries = (
@@ -49,7 +49,7 @@ class MultiQueryRetrievalNode(BaseNode):
         )
 
         queries = generate_queries.invoke(prompt)
-        print('Multiple queries:', queries)
+        # print('Multiple queries:', queries)
 
         relevant_documents = []
         for query in queries:

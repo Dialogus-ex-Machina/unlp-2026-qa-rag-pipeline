@@ -30,15 +30,15 @@ class HydeRetrievalNode(BaseNode):
         is_relevant_context_exist = bool(state.get('relevant_context', None))
 
         if is_relevant_context_exist:
-            print('Relevant context already exists. Skipping context retrieval.')
+            # print('Relevant context already exists. Skipping context retrieval.')
             return {}
 
         chain = self._prompt.template | self.language_model | StrOutputParser()
 
         hyde_query = chain.invoke({ 'query': question['question_text'] })
 
-        print('Raw query', question['question_text'])
-        print('Rephrase query', hyde_query)
+        # print('Raw query', question['question_text'])
+        # print('Rephrase query', hyde_query)
 
         docs_with_score = self._vector_store.similarity_search_with_score(
             hyde_query,

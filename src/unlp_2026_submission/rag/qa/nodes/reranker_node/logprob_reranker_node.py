@@ -30,7 +30,7 @@ class LogprobRerankerNode(BaseNode):
         relevant_documents = state.get('relevant_documents', [])
 
         if not relevant_documents:
-            print('Relevant context not found. Skipping reranking.')
+            # print('Relevant context not found. Skipping reranking.')
             return {}
 
         for document in relevant_documents:
@@ -45,7 +45,7 @@ class LogprobRerankerNode(BaseNode):
         if not reranked_relevant_documents:
             return {}
 
-        print('Reranked relevant documents:', reranked_relevant_documents)
+        # print('Reranked relevant documents:', reranked_relevant_documents)
 
         return {
             'relevant_documents': reranked_relevant_documents,

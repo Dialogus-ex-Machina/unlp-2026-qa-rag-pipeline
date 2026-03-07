@@ -42,7 +42,7 @@ class ContextualSplitsAugmentationNode:
                 window_docs = self._get_window(group_docs, local_i)
                 context = self._get_context_for_split(window_docs, split)
 
-                print('Added context:', context)
+                # print('Added context:', context)
 
                 split.page_content = f"{split.page_content}\n\n{context}"
 

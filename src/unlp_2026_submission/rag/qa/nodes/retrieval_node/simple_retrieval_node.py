@@ -23,7 +23,7 @@ class SimpleRetrievalNode(BaseNode):
         is_relevant_context_exist = bool(state.get('relevant_context', None))
 
         if is_relevant_context_exist:
-            print('Relevant context already exists. Skipping context retrieval.')
+            # print('Relevant context already exists. Skipping context retrieval.')
             return {}
 
         docs_with_score = self._vector_store.similarity_search_with_score(

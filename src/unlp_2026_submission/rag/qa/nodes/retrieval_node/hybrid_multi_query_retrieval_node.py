@@ -50,7 +50,7 @@ class HybridMultiQueryRetrievalNode(BaseNode):
         question = state["question"]
 
         if state.get("relevant_context"):
-            print("Relevant context already exists. Skipping context retrieval.")
+            # print("Relevant context already exists. Skipping context retrieval.")
             return {}
 
         dense_docs = self._query_dense_rank_lists(question)
@@ -72,7 +72,7 @@ class HybridMultiQueryRetrievalNode(BaseNode):
     def _query_dense_rank_lists(self, question: Question) -> list[RelevantDocument]:
         """Generate dense queries via LLM, retrieve per query, return single list with duplicates filtered."""
         queries = self._generate_queries(question, self._dense_prompt)
-        print("Dense queries:", queries)
+        # print("Dense queries:", queries)
 
         relevant_documents: list[RelevantDocument] = []
         for query in queries:
@@ -85,7 +85,7 @@ class HybridMultiQueryRetrievalNode(BaseNode):
     def _query_sparse_rank_lists(self, question: Question) -> list[RelevantDocument]:
         """Generate sparse queries via LLM, retrieve per query, return single list with duplicates filtered."""
         queries = self._generate_queries(question, self._sparse_prompt)
-        print("Sparse queries:", queries)
+        # print("Sparse queries:", queries)
 
         relevant_documents: list[RelevantDocument] = []
         for query in queries:
