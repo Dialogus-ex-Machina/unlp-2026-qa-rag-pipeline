@@ -1,5 +1,3 @@
 from langchain_core.embeddings import Embeddings as EmbeddingsModel
-from .google_embeddings_model import GoogleEmbeddingsModel
-from .open_ai_embeddings_model import OpenAIEmbeddingsModel
 from .sentence_transformer_embeddings_model import SentenceTransformerEmbeddingModel
 from .embeddings_model_factory import EmbeddingsModelFactory
