@@ -1,3 +1,3 @@
-from langchain_core.embeddings import Embeddings as EmbeddingsModel
+from .embeddings_model import EmbeddingsModel
 from .sentence_transformer_embeddings_model import SentenceTransformerEmbeddingModel
 from .embeddings_model_factory import EmbeddingsModelFactory

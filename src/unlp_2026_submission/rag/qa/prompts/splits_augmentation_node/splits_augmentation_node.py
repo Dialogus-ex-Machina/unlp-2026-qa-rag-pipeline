@@ -1,4 +1,5 @@
 from langchain_core.prompts import PromptTemplate
+from langchain_core.documents import Document
 
 class SplitsAugmentationPrompt:
     _template: PromptTemplate
@@ -9,15 +10,19 @@ class SplitsAugmentationPrompt:
     ):
         self._template = PromptTemplate(
             template=prompt_template,
-            input_variables=["chunk_content", "doc_content"]
+            input_variables=["fragments", "target_fragment_id"],
+            template_format="jinja2"
         )
 
     def format(
             self,
-            chunk_content: str,
-            doc_content: str
+            document_splits: list[Document],
+            target_split: Document
     ) -> str:
+        document_splits_content = [doc_split.page_content for doc_split in document_splits]
+
+        target_split = target_split.page_content
         return self._template.format(
-            chunk_content=chunk_content,
-            doc_content=doc_content
+            document_splits=document_splits_content,
+            target_split=target_split
         )

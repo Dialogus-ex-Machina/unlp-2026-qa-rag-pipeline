@@ -41,10 +41,15 @@ class ContextualSplitsAugmentationNode:
                 split = splits[global_idx]
                 window_docs = self._get_window(group_docs, local_i)
                 context = self._get_context_for_split(window_docs, split)
-
+                split.metadata["context"] = context
                 # print('Added context:', context)
 
+        for split in splits:
+            context = split.metadata.get("context", None)
+
+            if context is not None:
                 split.page_content = f"{split.page_content}\n\n{context}"
+                del split.metadata["context"]
 
         if self.on_success:
             self.on_success()
@@ -61,39 +66,41 @@ class ContextualSplitsAugmentationNode:
             i: int,
     ) -> list[Document]:
         """
-        Returns a list of docs of length `window` when possible.
-        Tries to place index `i` near the middle of the window.
+        Returns documents in the static window containing index i.
+        Documents are cut into non-overlapping windows of size window_size.
+        Window for index i starts at (i // window_size) * window_size.
+        If the last window would have only 1 split, it is expanded backward
+        to include at least 2 splits.
         """
         n = len(splits)
         if n == 0:
             return []
 
-        window = min(self.sliding_window, n)
-        half = window // 2
+        window_size = min(self.sliding_window, n)
+        window_start = (i // window_size) * window_size
+        window_end = min(window_start + window_size, n)
 
-        start = i - half
-        end = start + window
+        # Avoid last window with only 1 split: expand backward
+        if window_end - window_start < min(window_size, 2) and window_start > 0:
+            window_start = max(0, window_end - min(window_size, 2))
 
-        # Clamp to [0, n] while preserving window length when possible
-        if start < 0:
-            start = 0
-            end = window
-        if end > n:
-            end = n
-            start = n - window
+        return splits[window_start:window_end]
 
-        return splits[start:end]
-
-    def _get_context_for_split(self, document_contents: list[Document], split: Document):
-        separator = "\n\n"
-        neighbour_content = separator.join(doc.page_content for doc in document_contents)
-
+    def _get_context_for_split(
+            self,
+            document_splits: list[Document],
+            target_split: Document
+    ):
         prompt = self.prompt.format(
-            doc_content=neighbour_content,
-            chunk_content=split.page_content,
+            document_splits=document_splits,
+            target_split=target_split,
         )
 
-        result = self.language_model.invoke(prompt)
-        context = getattr(result, "content", str(result))
+        try:
+            result = self.language_model.invoke(prompt)
+            context = getattr(result, "content", str(result))
 
-        return context
+            return context
+        except Exception as e:
+            print(f"Error in ContextualSplitsAugmentationNode: {e}")
+            return ""
