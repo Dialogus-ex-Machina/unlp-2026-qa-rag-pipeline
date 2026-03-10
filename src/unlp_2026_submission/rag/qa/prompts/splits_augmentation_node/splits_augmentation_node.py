@@ -10,19 +10,16 @@ class SplitsAugmentationPrompt:
     ):
         self._template = PromptTemplate(
             template=prompt_template,
-            input_variables=["fragments", "target_fragment_id"],
+            input_variables=["document_splits"],
             template_format="jinja2"
         )
 
     def format(
             self,
             document_splits: list[Document],
-            target_split: Document
     ) -> str:
         document_splits_content = [doc_split.page_content for doc_split in document_splits]
 
-        target_split = target_split.page_content
         return self._template.format(
             document_splits=document_splits_content,
-            target_split=target_split
         )
