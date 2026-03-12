@@ -1,3 +1,5 @@
+from qdrant_client import QdrantClient
+
 from unlp_2026_submission.rag.index import IndexState, IndexRunner
 from unlp_2026_submission.rag.index.nodes import (
     EmbedStoreNode,
@@ -28,6 +30,10 @@ def on_success():
     """
     language_model.client.close()
 
+vector_store_client = QdrantClient(
+    path=config.vector_store['path']
+)
+
 nodes = [
     DelimitedPageLoadNode(),
     ProxySplitNode(),
@@ -36,6 +42,7 @@ nodes = [
         on_success=on_success,
     ),
     EmbedStoreNode(
+        vector_store_client=vector_store_client,
         embeddings=embeddings_model,
         batch_size=10,
     )

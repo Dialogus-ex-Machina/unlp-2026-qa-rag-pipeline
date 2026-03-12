@@ -1,17 +1,21 @@
-from typing import TypedDict
+from typing import TypedDict, NotRequired
 
 class Question(TypedDict):
     question_id: int | str
     question_text: str
     answers: list[str]
 
-    domain: str | None
-    n_pages: int | None
-    correct_answer: str | None
-    doc_id: str | None
-    page_num: int | None
+    domain: NotRequired[str]
+    n_pages: NotRequired[int]
+    correct_answer: NotRequired[str]
+    doc_id: NotRequired[str]
+    page_num: NotRequired[int]
 
-class QuestionWithContext(Question):
+class QuestionWithContext(TypedDict):
+    question_id: int | str
+    question_text: str
+    answers: list[str]
+
     domain: str
     n_pages: int
     correct_answer: str

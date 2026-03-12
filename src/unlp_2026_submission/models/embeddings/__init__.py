@@ -1,3 +1,4 @@
 from .embeddings_model import EmbeddingsModel
 from .sentence_transformer_embeddings_model import SentenceTransformerEmbeddingModel
 from .embeddings_model_factory import EmbeddingsModelFactory
+from .stored_queries_embeddings_model import StoredQueriesEmbeddingsModel

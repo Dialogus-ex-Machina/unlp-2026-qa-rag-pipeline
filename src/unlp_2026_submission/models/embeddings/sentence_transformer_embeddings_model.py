@@ -106,7 +106,7 @@ class SentenceTransformerEmbeddingModel(BaseModel, Embeddings):
 
         return embeddings.tolist()
 
-    def embed_query(self, text: str) -> list[float]:
+    def embed_query(self, text: str | list[str]) -> list[float] | list[list[float]]:
         """Compute query embeddings using a HuggingFace transformer model.
 
         Args:
@@ -122,7 +122,10 @@ class SentenceTransformerEmbeddingModel(BaseModel, Embeddings):
             else self.encode_kwargs
         )
 
-        preprocessed_texts = self._preprocess_text([text])
+        if isinstance(text, str):
+            preprocessed_texts = self._preprocess_text([text])
+        else:
+            preprocessed_texts = self._preprocess_text(text)
 
         if self.multi_process:
             pool = self._transformer.start_multi_process_pool()
@@ -140,8 +143,12 @@ class SentenceTransformerEmbeddingModel(BaseModel, Embeddings):
             )
 
         self._validate_embeddings(embeddings)
+        embeddings = embeddings.tolist()
 
-        return embeddings.tolist()[0]
+        if isinstance(text, str):
+            return embeddings[0]
+        else:
+            return embeddings
 
     def _preprocess_text(self, texts: list[str]) -> list[str]:
         return [x.replace("\n", " ") for x in texts]

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from qdrant_client import QdrantClient
 
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.models.embeddings import SentenceTransformerEmbeddingModel
@@ -22,6 +23,10 @@ embeddings = SentenceTransformerEmbeddingModel(
     model_kwargs={"device":"cuda"},
 )
 
+vector_store_client = QdrantClient(
+    path=config.vector_store['path']
+)
+
 """Index pipeline configuration:
 1) Load: DoclingPageLoad(Octen-Embedding-0.6B)
 2) Split: Skipped
@@ -36,7 +41,10 @@ nodes = [
             add_start_index=True,
         )
     ),
-    EmbedStoreNode(embeddings)
+    EmbedStoreNode(
+        vector_store_client=vector_store_client,
+        embeddings=embeddings,
+    )
 ]
 
 index_runner = IndexRunner(nodes)

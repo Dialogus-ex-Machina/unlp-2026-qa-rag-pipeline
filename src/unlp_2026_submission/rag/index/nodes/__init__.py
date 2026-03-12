@@ -22,6 +22,7 @@ from .store_node import (
     EmbedStoreNode,
     HybridEmbedStoreNode
 )
+from .embed_questions_node import SimpleEmbedQuestionsNode
 
 __all__ = [
     "IndexNode",

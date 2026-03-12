@@ -9,13 +9,17 @@ from unlp_2026_submission.rag.index.index_state import IndexState
 
 
 class EmbedStoreNode:
+    vector_store_client: QdrantClient
+
     def __init__(
         self,
+        vector_store_client: QdrantClient,
         embeddings: Embeddings,
         collection_name: str = "default",
         distance: Distance = Distance.COSINE,
         batch_size: int = 64,
     ):
+        self.vector_store_client = vector_store_client
         self.embeddings = embeddings
         self.collection_name = collection_name
         self.distance = distance
@@ -26,17 +30,15 @@ class EmbedStoreNode:
         if not splits:
             return {}
 
-        qdrant_client = QdrantClient(path=state["vector_store_path"])
-
-        if not qdrant_client.collection_exists(self.collection_name):
+        if not self.vector_store_client.collection_exists(self.collection_name):
             dim = self._embedding_dim()
-            qdrant_client.create_collection(
+            self.vector_store_client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(size=dim, distance=self.distance),
             )
 
         vector_store = QdrantVectorStore(
-            client=qdrant_client,
+            client=self.vector_store_client,
             collection_name=self.collection_name,
             embedding=self.embeddings,
         )

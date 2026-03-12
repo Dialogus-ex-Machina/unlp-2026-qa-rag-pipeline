@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from qdrant_client import QdrantClient
 
 from unlp_2026_submission.config import Config
 from unlp_2026_submission.models.embeddings import SentenceTransformerEmbeddingModel
@@ -21,6 +22,10 @@ embeddings = SentenceTransformerEmbeddingModel(
     cache_folder=config.downloaded_models_cache_dir,
 )
 
+vector_store_client = QdrantClient(
+    path=config.vector_store['path']
+)
+
 """Index pipeline configuration:
 1) Load: PyPDFLoader
 2) Split: RecursiveCharacterTextSplitter(size=400, overlap=0, start_index=true)
@@ -35,7 +40,10 @@ nodes = [
             add_start_index=True,
         )
     ),
-    EmbedStoreNode(embeddings)
+    EmbedStoreNode(
+        vector_store_client=vector_store_client,
+        embeddings=embeddings,
+    )
 ]
 
 index_runner = IndexRunner(nodes)
