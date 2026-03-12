@@ -1,0 +1,18 @@
+from langchain_core.documents import BaseDocumentTransformer
+
+from unlp_2026_submission.rag.index.index_state import IndexState
+
+
+class SimpleSplitNode:
+    def __init__(self, splitter: BaseDocumentTransformer = None):
+        self.splitter = splitter
+
+    def __call__(self, state: IndexState) -> IndexState:
+        print("Splitting...")
+        
+        documents = state["documents"]
+
+        if self.splitter != None:
+            return {"splits": self.splitter.transform_documents(documents)}
+        else:
+            return {"splits": documents}

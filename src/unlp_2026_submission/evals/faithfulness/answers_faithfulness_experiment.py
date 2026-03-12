@@ -3,7 +3,7 @@ from ragas import experiment
 
 from unlp_2026_submission.entities import QuestionWithContext
 from .answer_faithfulness_metric import answer_faithfulness_metric
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 
 @experiment()
@@ -17,7 +17,7 @@ async def answers_faithfulness_experiment(
     relevant_document_page_num = question['page_num']
     relevant_context = question['doc_text']
 
-    result: QAWorkflowState = workflow.invoke(
+    result: QAState = workflow.invoke(
         input={
             'question': question,
             'relevant_context': relevant_context,

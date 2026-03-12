@@ -1,6 +1,6 @@
 from langgraph.graph.state import CompiledStateGraph
 
-from unlp_2026_submission.language_models import JudgeLanguageModel
+from unlp_2026_submission.models.language_models import JudgeLanguageModel
 from .context_recall_experiment import context_recall_experiment
 from .context_recall_metric import calculate_total_context_recall
 

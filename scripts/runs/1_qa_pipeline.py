@@ -3,18 +3,17 @@ import random
 from langchain_qdrant import QdrantVectorStore
 
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import EmbeddingsModelFactory
+from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
-from unlp_2026_submission.language_models import LanguageModelFactory
-from unlp_2026_submission.workflow.nodes import (
-    SimpleDocumentsRetrievalNode,
+from unlp_2026_submission.models.language_models import LanguageModelFactory
+from unlp_2026_submission.rag.qa.nodes import (
+    SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
-    TopKRelevantDocumentAugmentation,
-    MockDomainRoutingNode,
+    TopKDocsContextCreationNode,
+    LogprobRerankerNode,
 )
-from unlp_2026_submission.workflow.nodes.logprob_reranker_model_node import LogprobRerankerModelNode
-from unlp_2026_submission.workflow.prompts import UkrQAPrompt
-from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
+from unlp_2026_submission.rag.qa.prompts import UkrQAPrompt
+from unlp_2026_submission.rag.qa.qa_workflow_builder import QAWorkflowBuilder
 
 
 def main():
@@ -35,14 +34,14 @@ def main():
         **config.vector_store
     )
 
-    domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+    nodes = [
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        LogprobRerankerModelNode(
+        LogprobRerankerNode(
             language_model=language_model,
         ),
-        TopKRelevantDocumentAugmentation(
+        TopKDocsContextCreationNode(
             top_k=4,
         ),
         SimpleQuestionAnswerNode(
@@ -52,12 +51,7 @@ def main():
     ]
     workflow = (
         QAWorkflowBuilder.create()
-        .add_domain_routing_node(
-            MockDomainRoutingNode()
-        )
-        .add_sport_domain_nodes(domain_pipeline_nodes)
-        .add_medicine_domain_nodes(domain_pipeline_nodes)
-        .add_other_domain_nodes(domain_pipeline_nodes)
+        .add_nodes(nodes)
         .build()
     )
 

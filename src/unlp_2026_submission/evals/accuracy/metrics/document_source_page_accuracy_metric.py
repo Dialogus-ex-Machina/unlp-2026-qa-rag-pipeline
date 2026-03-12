@@ -4,7 +4,7 @@ from ragas.metrics.result import MetricResult
 from pathlib import Path
 
 from unlp_2026_submission.entities import Question
-from unlp_2026_submission.workflow.state import QAWorkflowState
+from unlp_2026_submission.rag.qa.state import QAState
 
 from .accuracy_metric_name import AccuracyMetricName
 
@@ -15,7 +15,7 @@ from .accuracy_metric_name import AccuracyMetricName
 )
 def document_source_page_accuracy_metric(
         question: Question,
-        workflow_result: QAWorkflowState,
+        workflow_result: QAState,
 ) -> MetricResult:
     """Calculate accuracy of the prediction."""
     predicted_document_id_stem = Path(workflow_result['relevant_document_id']).stem

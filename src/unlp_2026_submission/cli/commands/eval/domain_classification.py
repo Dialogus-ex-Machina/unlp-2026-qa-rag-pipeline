@@ -10,19 +10,19 @@ from unlp_2026_submission.evals.accuracy import (
     AccuracyDatasetFactory,
     AccuracyDatasetName,
 )
-from unlp_2026_submission.embeddings import EmbeddingsModelFactory
+from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
 from unlp_2026_submission.evals.domain_classification import evaluate_domain_classification
-from unlp_2026_submission.workflow.nodes import (
-    MostRelevantDocumentAugmentationNode,
-    SimpleDocumentsRetrievalNode,
+from unlp_2026_submission.rag.qa.nodes import (
+    MostRelevantDocsContextCreationNode,
+    SimpleRetrievalNode,
     LLMDomainRoutingNode,
     MockQuestionAnswerNode,
 )
-from unlp_2026_submission.workflow.prompts import PromptsFactory, DomainClassificationPromptType
-from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
+from unlp_2026_submission.rag.qa.prompts import PromptsFactory, DomainClassificationPromptType
+from unlp_2026_submission.rag.qa.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.language_models import LanguageModelFactory
+from unlp_2026_submission.models.language_models import LanguageModelFactory
 
 app = typer.Typer()
 
@@ -106,24 +106,20 @@ async def _evaluate(
         )
     )
 
-    domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+    nodes = [
+        LLMDomainRoutingNode(
+            language_model=language_model,
+            prompt=domain_classification_prompt
+        ),
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        MostRelevantDocumentAugmentationNode(),
+        MostRelevantDocsContextCreationNode(),
         MockQuestionAnswerNode()
     ]
     workflow = (
         QAWorkflowBuilder.create()
-        .add_domain_routing_node(
-            LLMDomainRoutingNode(
-                language_model=language_model,
-                prompt=domain_classification_prompt
-            )
-        )
-        .add_sport_domain_nodes(domain_pipeline_nodes)
-        .add_medicine_domain_nodes(domain_pipeline_nodes)
-        .add_other_domain_nodes(domain_pipeline_nodes)
+        .add_nodes(nodes)
         .build()
     )
 

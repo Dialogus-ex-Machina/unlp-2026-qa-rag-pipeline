@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 from rich import print as rprint
 
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetName
-from unlp_2026_submission.workflow.prompts import QAPromptType, DomainClassificationPromptType
+from unlp_2026_submission.rag.qa.prompts import QAPromptType, DomainClassificationPromptType
 from .service import run_invoke
 
 app = typer.Typer(no_args_is_help=True)

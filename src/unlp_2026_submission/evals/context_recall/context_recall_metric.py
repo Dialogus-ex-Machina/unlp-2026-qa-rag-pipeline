@@ -6,7 +6,7 @@ from ragas import Experiment
 from ragas.metrics.collections.base import BaseMetric
 from ragas.metrics.result import MetricResult
 
-from unlp_2026_submission.language_models import JudgeLanguageModel
+from unlp_2026_submission.models.language_models import JudgeLanguageModel
 from .context_recall_prompt import (
     ContextRecallInput,
     ContextRecallOutput,

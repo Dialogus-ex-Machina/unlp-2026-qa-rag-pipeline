@@ -54,7 +54,7 @@ class Config:
         )
         self.language_model_context_window = self._resolve_value_with_priority(
             language_model_context_window,
-            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '4096')),
+            int(os.getenv('LANGUAGE_MODEL_CONTEXT_WINDOW', '6144')),
         )
         self.model_provider_api_key = self._resolve_value_with_priority(
             model_provider_api_key,
@@ -95,7 +95,7 @@ class Config:
 
         self.embeddings_model_name = self._resolve_value_with_priority(
             embeddings_model_name,
-            os.getenv('EMBEDDINGS_MODEL_NAME', 'bflhc/Octen-Embedding-0.6B'),
+            os.getenv('EMBEDDINGS_MODEL_NAME', 'Snowflake/snowflake-arctic-embed-l-v2.0'),
         )
         self.judge_language_model_name = self._resolve_value_with_priority(
             judge_language_model_name,
@@ -112,7 +112,7 @@ class Config:
         project_src_dir = package_root_dir.parent
         project_root_dir = project_src_dir.parent
 
-        self.data_root_dir = os.getenv('INPUT_DATA_DIR', project_src_dir / "data")
+        self.data_root_dir = os.getenv('INPUT_DATA_DIR', project_root_dir / "data")
 
         hf_home_dir = os.getenv('HF_HOME', os.path.join(project_root_dir, "hf_cache"))
         if os.environ.get("HF_HOME") is None:

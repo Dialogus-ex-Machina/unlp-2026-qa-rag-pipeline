@@ -11,19 +11,19 @@ from unlp_2026_submission.evals.accuracy import (
     AccuracyDatasetFactory,
     AccuracyDatasetName,
 )
-from unlp_2026_submission.embeddings import EmbeddingsModelFactory
+from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
 from unlp_2026_submission.evals.context_recall import evaluate_context_recall
 from unlp_2026_submission.evals.create_experiment_name import create_experiment_name
-from unlp_2026_submission.workflow.nodes import (
-    MostRelevantDocumentAugmentationNode,
-    SimpleDocumentsRetrievalNode,
+from unlp_2026_submission.rag.qa.nodes import (
+    MostRelevantDocsContextCreationNode,
+    SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode
 )
-from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
+from unlp_2026_submission.rag.qa.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.language_models import LanguageModelFactory, JudgeLanguageModelFactory
-from unlp_2026_submission.workflow.prompts import (
+from unlp_2026_submission.models.language_models import LanguageModelFactory, JudgeLanguageModelFactory
+from unlp_2026_submission.rag.qa.prompts import (
     QAPromptType,
     PromptsFactory,
     DomainClassificationPromptType,
@@ -149,11 +149,15 @@ async def _evaluate(
         **config.vector_store,
     )
 
-    domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+    nodes = [
+        LLMDomainRoutingNode(
+            language_model=language_model,
+            prompt=domain_classification_prompt
+        ),
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        MostRelevantDocumentAugmentationNode(),
+        MostRelevantDocsContextCreationNode(),
         SimpleQuestionAnswerNode(
             language_model=language_model,
             prompt=qa_prompt,
@@ -161,15 +165,7 @@ async def _evaluate(
     ]
     workflow = (
         QAWorkflowBuilder.create()
-        .add_domain_routing_node(
-            LLMDomainRoutingNode(
-                language_model=language_model,
-                prompt=domain_classification_prompt
-            )
-        )
-        .add_sport_domain_nodes(domain_pipeline_nodes)
-        .add_medicine_domain_nodes(domain_pipeline_nodes)
-        .add_other_domain_nodes(domain_pipeline_nodes)
+        .add_nodes(nodes)
         .build()
     )
 

@@ -8,17 +8,17 @@ from typing import Optional
 from langchain_qdrant import QdrantVectorStore
 
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import EmbeddingsModelFactory
-from unlp_2026_submission.language_models import LanguageModelFactory
-from unlp_2026_submission.workflow.nodes import (
-    MostRelevantDocumentAugmentationNode,
-    SimpleDocumentsRetrievalNode,
+from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
+from unlp_2026_submission.models.language_models import LanguageModelFactory
+from unlp_2026_submission.rag.qa.nodes import (
+    MostRelevantDocsContextCreationNode,
+    SimpleRetrievalNode,
     SimpleQuestionAnswerNode,
     LLMDomainRoutingNode
 )
-from unlp_2026_submission.workflow.qa_workflow_builder import QAWorkflowBuilder
+from unlp_2026_submission.rag.qa.qa_workflow_builder import QAWorkflowBuilder
 from unlp_2026_submission.evals.accuracy import AccuracyDatasetFactory, AccuracyDatasetName
-from unlp_2026_submission.workflow.prompts import (
+from unlp_2026_submission.rag.qa.prompts import (
     QAPromptType,
     PromptsFactory,
     DomainClassificationPromptType,
@@ -73,11 +73,15 @@ def build_workflow(
         **config.vector_store,
     )
 
-    domain_pipeline_nodes = [
-        SimpleDocumentsRetrievalNode(
+    nodes = [
+        LLMDomainRoutingNode(
+            language_model=language_model,
+            prompt=domain_classification_prompt
+        ),
+        SimpleRetrievalNode(
             vector_store=vector_store,
         ),
-        MostRelevantDocumentAugmentationNode(),
+        MostRelevantDocsContextCreationNode(),
         SimpleQuestionAnswerNode(
             language_model=language_model,
             prompt=qa_prompt,
@@ -85,15 +89,7 @@ def build_workflow(
     ]
     workflow = (
         QAWorkflowBuilder.create()
-        .add_domain_routing_node(
-            LLMDomainRoutingNode(
-                language_model=language_model,
-                prompt=domain_classification_prompt
-            )
-        )
-        .add_sport_domain_nodes(domain_pipeline_nodes)
-        .add_medicine_domain_nodes(domain_pipeline_nodes)
-        .add_other_domain_nodes(domain_pipeline_nodes)
+        .add_nodes(nodes)
         .build()
     )
     return workflow

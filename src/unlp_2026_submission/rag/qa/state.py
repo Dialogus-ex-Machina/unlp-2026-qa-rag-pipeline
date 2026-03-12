@@ -1,0 +1,15 @@
+from typing import TypedDict, NotRequired
+from unlp_2026_submission.entities import Question, RelevantDocument, QuestionDomain
+
+
+class QAState(TypedDict):
+    question: Question
+    relevant_documents: list[RelevantDocument]
+
+    predicted_domain: NotRequired[QuestionDomain]
+    relevant_context: str
+    relevant_document_id: str
+    relevant_document_page_num: int
+
+    answer: str
+    raw_answer: str

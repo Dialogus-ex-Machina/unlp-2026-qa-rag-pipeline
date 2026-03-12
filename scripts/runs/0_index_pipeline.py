@@ -1,13 +1,13 @@
-from merlin.rag.index import IndexState, IndexRunner
-from merlin.rag.index.nodes import (
+from unlp_2026_submission.rag.index import IndexState, IndexRunner
+from unlp_2026_submission.rag.index.nodes import (
     EmbedStoreNode,
     DelimitedPageLoadNode,
     ProxySplitNode,
-    ContextualAugmentationNode
+    ContextualSplitsAugmentationNode
 )
 from unlp_2026_submission.config import Config
-from unlp_2026_submission.embeddings import EmbeddingsModelFactory
-from unlp_2026_submission.language_models import LlamaCppLanguageModel
+from unlp_2026_submission.models.embeddings import EmbeddingsModelFactory
+from unlp_2026_submission.models.language_models import LlamaCppLanguageModel
 
 config = Config(
     embeddings_model_name="bflhc/Octen-Embedding-0.6B",
@@ -18,7 +18,7 @@ language_model = LlamaCppLanguageModel.create(config)
 
 """Index pipeline configuration:
 1) Load: DelimitedPageLoadNode
-2) Split: ContextualAugmentationNode via llm
+2) Split: ContextualSplitsAugmentationNode via llm
 3) Embed+Store: Qdrand(Octen-Embedding-0.6B)
 """
 
@@ -31,7 +31,7 @@ def on_success():
 nodes = [
     DelimitedPageLoadNode(),
     ProxySplitNode(),
-    ContextualAugmentationNode(
+    ContextualSplitsAugmentationNode(
         language_model=language_model,
         on_success=on_success,
     ),

@@ -2,20 +2,24 @@ from pathlib import Path
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from merlin.rag.index import IndexState, IndexRunner
-from merlin.rag.index.nodes import EmbedStoreNode, PyMuPDFLoadNode, SplitNode
-from merlin.models.embeddings import EmbeddingsFactory, EmbeddingsSpec
+from unlp_2026_submission.config import Config
+from unlp_2026_submission.models.embeddings import SentenceTransformerEmbeddingModel
+from unlp_2026_submission.rag.index import IndexState, IndexRunner
+from unlp_2026_submission.rag.index.nodes import EmbedStoreNode, PyMuPDFLoadNode, SimpleSplitNode
 
 def get_pdf_filepaths(documents_dir: str = "../documents") -> list[str]:
     p = Path(documents_dir)
     # recursive; use p.glob("*.pdf") if you only want top-level
     return sorted(str(fp) for fp in p.rglob("*.pdf") if fp.is_file())
 
-spec = EmbeddingsSpec(
-    provider="huggingface",
-    model_name="bflhc/Octen-Embedding-0.6B",
+config = Config(
+    embeddings_model_name="bflhc/Octen-Embedding-0.6B",
 )
-embeddings = EmbeddingsFactory.create_all_embeddings_factory().create(spec)
+
+embeddings = SentenceTransformerEmbeddingModel(
+    model_name_or_path=config.embeddings_model_name,
+    cache_folder=config.downloaded_models_cache_dir,
+)
 
 """Index pipeline configuration:
 1) Load: PyPDFLoader
@@ -24,7 +28,7 @@ embeddings = EmbeddingsFactory.create_all_embeddings_factory().create(spec)
 """
 nodes = [
     PyMuPDFLoadNode(),
-    SplitNode(
+    SimpleSplitNode(
         RecursiveCharacterTextSplitter(
             chunk_size=400,
             chunk_overlap=0,
