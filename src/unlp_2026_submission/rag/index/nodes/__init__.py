@@ -23,6 +23,8 @@ from .store_node import (
     HybridEmbedStoreNode
 )
 from .embed_questions_node import SimpleEmbedQuestionsNode
+from .prepare_context_node import SimplePrepareContextNode, PrepareContextWithRerankingNode
+from .cluster_similar_question_node import SimpleClusterSimilarQuestionNode
 
 __all__ = [
     "IndexNode",

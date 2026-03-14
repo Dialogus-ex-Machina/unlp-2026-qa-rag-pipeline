@@ -1,3 +1,4 @@
+import os
 import torch
 from typing import Any, Dict, List
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
@@ -10,7 +11,7 @@ from .reranker_model import RerankerModel
 class BGEV2RerankerModel(RerankerModel):
     def __init__(
             self,
-            cache_dir: str,
+            cache_dir: str | None = None,
             model_name: str = "BAAI/bge-reranker-v2-m3",
             device: str = "cuda",
             batch_size: int = 2,
@@ -32,6 +33,12 @@ class BGEV2RerankerModel(RerankerModel):
         )
         self._model.to(device)
         self._model.eval()
+
+    def save(self, save_directory: str) -> None:
+        os.makedirs(save_directory, exist_ok=True)
+
+        self._tokenizer.save_pretrained(save_directory)
+        self._model.save_pretrained(save_directory)
 
     def rerank(
             self,

@@ -1,5 +1,7 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, Any, Dict
+import gc
 
+import torch
 from langchain_core.documents import Document
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
@@ -24,8 +26,7 @@ class EmbeddingsModelWrapper(EmbeddingsModel):
 
 class SimpleEmbedQuestionsNode:
     vector_store_client: QdrantClient
-    questions: list[Question]
-    embeddings_model: EmbeddingsModel
+    embeddings_model_kwargs: Dict[str, Any]
     collection_name: str
     sparse_model_name: str
     on_success: Optional[Callable[[], None]] = None
@@ -34,16 +35,14 @@ class SimpleEmbedQuestionsNode:
     def __init__(
             self,
             vector_store_client: QdrantClient,
-            embeddings_model: SentenceTransformerEmbeddingModel,
-            questions: list[Question],
+            embeddings_model_kwargs: Dict[str, Any],
             collection_name: str = "default_questions",
             on_success: Optional[Callable[[], None]] = None,
             batch_size: int = 64,
     ):
         super().__init__()
 
-        self.questions = questions
-        self.embeddings_model = EmbeddingsModelWrapper(embeddings_model)
+        self.embeddings_model_kwargs = embeddings_model_kwargs
         self.collection_name = collection_name
         self.batch_size = batch_size
 
@@ -51,8 +50,16 @@ class SimpleEmbedQuestionsNode:
         self.on_success = on_success
 
     def __call__(self, state: IndexState) -> IndexState:
+        questions: list[Question] = state['questions']
+
+        embeddings_model = EmbeddingsModelWrapper(
+            SentenceTransformerEmbeddingModel(
+                **self.embeddings_model_kwargs
+            )
+        )
+
         if not self.vector_store_client.collection_exists(self.collection_name):
-            dim = self._embedding_dim()
+            dim = self._embedding_dim(embeddings_model=embeddings_model)
             self.vector_store_client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(size=dim, distance=Distance.COSINE),
@@ -61,12 +68,12 @@ class SimpleEmbedQuestionsNode:
         vector_store = QdrantVectorStore(
             client=self.vector_store_client,
             collection_name=self.collection_name,
-            embedding=self.embeddings_model
+            embedding=embeddings_model
         )
 
         documents = []
 
-        for question in self.questions:
+        for question in questions:
             page_content = question['question_text']
             metadata = { "id": question['question_id'] }
             document = Document(
@@ -83,13 +90,18 @@ class SimpleEmbedQuestionsNode:
         if self.on_success:
             self.on_success()
 
+        del embeddings_model
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        gc.collect()
+
         return {}
 
-    def _embedding_dim(self) -> int:
-        client = getattr(self.embeddings_model, "client", None)
+    def _embedding_dim(self, embeddings_model) -> int:
+        client = getattr(embeddings_model, "client", None)
 
         if client is not None and hasattr(client, "get_sentence_embedding_dimension"):
             return int(client.get_sentence_embedding_dimension())
         else:
-            return len(self.embeddings_model.embed_query("dimension_probe"))
+            return len(embeddings_model.embed_query("dimension_probe"))
 
