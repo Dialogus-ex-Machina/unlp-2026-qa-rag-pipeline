@@ -8,7 +8,7 @@ class SimpleSplitNode:
         self.splitter = splitter
 
     def __call__(self, state: IndexState) -> IndexState:
-        print("Splitting...")
+        # print("Splitting...")
         
         documents = state["documents"]
 

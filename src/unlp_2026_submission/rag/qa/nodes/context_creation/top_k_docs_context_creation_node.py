@@ -21,12 +21,12 @@ class TopKDocsContextCreationNode(BaseNode):
 
         is_relevant_context_exist = bool(state.get('relevant_context', None))
 
-        relevant_documents = state['relevant_documents']
 
         if is_relevant_context_exist:
             # print('Relevant context already exists. Skipping augmentation.')
             return {}
 
+        relevant_documents = state.get('relevant_documents', None)
 
         if not relevant_documents:
             # print('Most relevant document not found.')
