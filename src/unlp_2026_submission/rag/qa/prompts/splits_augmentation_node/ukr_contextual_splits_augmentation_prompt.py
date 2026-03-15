@@ -2,13 +2,32 @@ from langchain_core.documents import Document
 
 from .splits_augmentation_node import SplitsAugmentationPrompt
 
+# PROMPT = """
+# Твоє завдання: пояснити семантичний контекст вказаного фрагмента в межах наданого документа.
+# Контекст потрібен для покращення векторного пошуку фрагмента.
+#
+# Обмеження:
+# - Обсяг: 2-3 речення.
+# - Не дублюй текст фрагмента, лише пояснюй його суть.
+# - Формат: звертайся до тексту просто як до "фрагмента". У відповіді не повинно бути жодних цифр, ідентифікаторів чи згадок ID.
+#
+# <document>
+# {%- for fragment in fragments %}
+# <fragment id="{{ fragment.id }}">
+# {{ fragment.content | trim }}
+# </fragment>
+# {%- endfor %}
+# </document>
+#
+# Проаналізуй <document> та надай контекст для <fragment id="{{ target_fragment_id }}">.
+# """.strip()
+
 PROMPT = """
 Твоє завдання: пояснити семантичний контекст вказаного фрагмента в межах наданого документа. 
 Контекст потрібен для покращення векторного пошуку фрагмента.
 
 Обмеження:
 - Обсяг: 2-3 речення.
-- Не дублюй текст фрагмента, лише пояснюй його суть.
 - Формат: звертайся до тексту просто як до "фрагмента". У відповіді не повинно бути жодних цифр, ідентифікаторів чи згадок ID.
 
 <document>
@@ -21,7 +40,6 @@ PROMPT = """
 
 Проаналізуй <document> та надай контекст для <fragment id="{{ target_fragment_id }}">.
 """.strip()
-
 
 class UkrContextualSplitsAugmentationPrompt(SplitsAugmentationPrompt):
     def __init__(self):
