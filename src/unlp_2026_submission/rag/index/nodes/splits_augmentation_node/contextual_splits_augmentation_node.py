@@ -63,7 +63,7 @@ class ContextualSplitsAugmentationNode:
             context = split.metadata.get("context", None)
 
             if context is not None:
-                split.page_content = f"{split.page_content}\n\n{context}"
+                split.page_content = f"{context}\n\n{split.page_content}"
                 del split.metadata["context"]
 
         if self.on_success:

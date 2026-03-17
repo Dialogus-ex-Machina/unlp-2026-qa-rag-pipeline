@@ -16,7 +16,8 @@ from .load_node import (
     TxtLoadNode,
 )
 from .splits_augmentation_node import (
-    ContextualSplitsAugmentationNode
+    ContextualSplitsAugmentationNode,
+    SummarySplitsAugmentationNode,
 )
 from .store_node import (
     EmbedStoreNode,
