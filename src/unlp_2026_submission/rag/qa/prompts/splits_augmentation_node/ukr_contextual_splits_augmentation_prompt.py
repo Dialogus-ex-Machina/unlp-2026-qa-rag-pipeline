@@ -23,13 +23,6 @@ from .splits_augmentation_node import SplitsAugmentationPrompt
 # """.strip()
 
 PROMPT = """
-Твоє завдання: пояснити семантичний контекст вказаного фрагмента в межах наданого документа. 
-Контекст потрібен для покращення векторного пошуку фрагмента.
-
-Обмеження:
-- Обсяг: 2-3 речення.
-- Формат: звертайся до тексту просто як до "фрагмента". У відповіді не повинно бути жодних цифр, ідентифікаторів чи згадок ID.
-
 <document>
 {%- for fragment in fragments %}
 <fragment id="{{ fragment.id }}">
@@ -38,7 +31,10 @@ PROMPT = """
 {%- endfor %}
 </document>
 
-Проаналізуй <document> та надай контекст для <fragment id="{{ target_fragment_id }}">.
+Знайди у документі вище <fragment id="{{ target_fragment_id }}">.
+
+Надай короткий і стислий контекст, щоб розмістити цей фрагмент у межах усього документа з метою покращення його семантичного векторного пошуку. 
+Відповідай лише стислим контекстом.
 """.strip()
 
 class UkrContextualSplitsAugmentationPrompt(SplitsAugmentationPrompt):
