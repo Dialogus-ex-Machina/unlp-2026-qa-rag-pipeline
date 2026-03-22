@@ -18,7 +18,7 @@ class DoclingConverterLoadNode:
     def __init__(
         self,
         output_suffix: str = ".md",
-        zero_based_pages: bool = True,
+        zero_based_pages: bool = False,
         page_end_template: str = "\n\n<!-- page_end:{page} -->\n\n",
         join_sep: str = "\n\n",
         device: str = "auto",
@@ -592,6 +592,8 @@ class DoclingConverterLoadNode:
         order = self._extract_chunk_order(dl_meta)
 
         new_meta: Dict[str, Any] = {"source": source, "page": page, "_order": order}
+        if page != -1:
+            new_meta["page_label"] = str(page)
         return Document(page_content=doc.page_content, metadata=new_meta)
 
     def _to_page_index(self, page_no: Optional[int]) -> int:

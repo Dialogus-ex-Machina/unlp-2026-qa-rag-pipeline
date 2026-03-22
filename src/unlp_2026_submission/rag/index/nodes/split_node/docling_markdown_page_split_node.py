@@ -45,6 +45,7 @@ class DoclingMarkdownPageSplitNode:
                         metadata={
                             "source": pdf_source,
                             "page": page_no,
+                            "page_label": str(page_no),
                             "md_path": md_path,
                         },
                     )
@@ -100,7 +101,7 @@ class DoclingMarkdownPageSplitNode:
 
         tail = md_text[pos:].strip()
         if tail:
-            fallback_page = (last_page + 1) if last_page is not None else 0
+            fallback_page = (last_page + 1) if last_page is not None else 1
             out.append((fallback_page, tail))
 
         return out

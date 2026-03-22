@@ -21,7 +21,7 @@ class DoclingLoadSplitNode:
         embeddings: Embeddings,
         max_tokens: int = 450,
         merge_peers: bool = True,
-        zero_based_pages: bool = True,
+        zero_based_pages: bool = False,
         device: str = "auto",
         threaded: bool = True,
         do_ocr: bool = False,
@@ -142,6 +142,7 @@ class DoclingLoadSplitNode:
         new_meta: Dict[str, Any] = {"source": source}
         if page != -1:
             new_meta["page"] = page
+            new_meta["page_label"] = str(page)
 
         return Document(page_content=doc.page_content, metadata=new_meta)
 

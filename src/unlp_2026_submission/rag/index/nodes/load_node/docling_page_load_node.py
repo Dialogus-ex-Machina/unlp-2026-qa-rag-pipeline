@@ -24,7 +24,7 @@ class DoclingPageLoadNode:
         embeddings: Embeddings,
         max_tokens: int = 450,
         merge_peers: bool = True,
-        zero_based_pages: bool = True,
+        zero_based_pages: bool = False,
         join_sep: str = "\n\n",
         strip_repeated_headings: bool = True,
         device: str = "auto",
@@ -164,6 +164,8 @@ class DoclingPageLoadNode:
         page = self._to_page_index(page_no)
 
         new_meta: Dict[str, Any] = {"source": source, "page": page}
+        if page != -1:
+            new_meta["page_label"] = str(page)
 
         headings = dl_meta.get("headings")
         if isinstance(headings, list) and headings:
@@ -201,7 +203,7 @@ class DoclingPageLoadNode:
                     texts.append(t)
 
             page_text = self.join_sep.join(texts).strip()
-            meta = {"source": src, "page": page}
+            meta = {"source": src, "page": page, "page_label": str(page)}
             page_docs.append(Document(page_content=page_text, metadata=meta))
 
         page_docs.sort(key=lambda d: (d.metadata.get("source", ""), d.metadata.get("page", -1)))
