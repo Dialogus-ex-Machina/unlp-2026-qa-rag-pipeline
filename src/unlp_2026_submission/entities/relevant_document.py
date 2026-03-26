@@ -32,7 +32,7 @@ class RelevantDocument:
         document = doc_with_score[0]
         relevance_score = doc_with_score[1]
         metadata = document.metadata or {}
-        page_label = cls._resolve_page_label(metadata)
+        page_label = metadata.get("page_label", metadata.get("page", -1))
 
         return RelevantDocument(
             source=metadata.get("source", "UNKNOWN_SOURCE"),
@@ -40,19 +40,6 @@ class RelevantDocument:
             page_label=str(page_label),
             relevance_score=relevance_score,
         )
-
-    @staticmethod
-    def _resolve_page_label(metadata: dict) -> str:
-        page_label = metadata.get("page_label")
-        if page_label is not None:
-            return str(page_label)
-
-        page = metadata.get("page", -1)
-        if isinstance(page, int) and page >= 0:
-            # Backward compatibility for older vector stores that persisted bare 0-based page metadata.
-            return str(page + 1)
-
-        return str(page)
 
     @classmethod
     def from_nodes_with_score(cls, docs_with_score: list[tuple[Document, float]]):

@@ -14,15 +14,6 @@ class PyMuPDFLoadNode:
 
         for filepath in filepaths:
             loader = PyMuPDFLoader(filepath, mode="page")
-            document_pages = loader.load()
-            for document in document_pages:
-                metadata = document.metadata or {}
-                page = metadata.get("page")
-                if isinstance(page, int):
-                    page_number = page + 1
-                    metadata["page"] = page_number
-                    metadata["page_label"] = str(page_number)
-                    document.metadata = metadata
-            documents.extend(document_pages)
+            documents.extend(loader.load())
 
         return {"documents": documents}
