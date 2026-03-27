@@ -57,7 +57,7 @@ class ContextualSplitsAugmentationNode:
                     split
                 )
                 split.metadata["context"] = context
-                print('Added context:', context)
+                # print('Added context:', context)
 
         for split in splits:
             context = split.metadata.get("context", None)
