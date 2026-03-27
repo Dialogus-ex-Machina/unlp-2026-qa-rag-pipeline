@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import os
 from pathlib import Path
 import re
 from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Tuple
@@ -18,6 +19,7 @@ class DoclingConverterLoadNode:
     def __init__(
         self,
         output_suffix: str = ".md",
+        output_root_dir: str | None = None,
         zero_based_pages: bool = False,
         page_end_template: str = "\n\n<!-- page_end:{page} -->\n\n",
         join_sep: str = "\n\n",
@@ -45,6 +47,7 @@ class DoclingConverterLoadNode:
         json_suffix: str = ".docling.json",
     ):
         self.output_suffix = output_suffix
+        self.output_root_dir = Path(output_root_dir).expanduser() if output_root_dir else None
         self.zero_based_pages = zero_based_pages
         self.page_end_template = page_end_template
         self.join_sep = join_sep
@@ -125,11 +128,17 @@ class DoclingConverterLoadNode:
         if not filepaths:
             return {"documents": []}
 
+        common_input_root = self._infer_common_input_root(filepaths)
         out_docs: List[Document] = []
 
         for fp in filepaths:
             pdf_path = Path(fp)
-            md_path = pdf_path.with_suffix(self.output_suffix)
+            md_path = self._resolve_output_path(
+                source_path=pdf_path,
+                common_input_root=common_input_root,
+                suffix=self.output_suffix,
+            )
+            md_path.parent.mkdir(parents=True, exist_ok=True)
 
             if self.selective_ocr:
                 text_md = self._export_markdown_best_effort(fp, converter=self._converter_text)
@@ -163,11 +172,49 @@ class DoclingConverterLoadNode:
                 )
 
             if self.write_docling_json:
-                json_path = pdf_path.with_suffix(self.json_suffix)
+                json_path = self._resolve_output_path(
+                    source_path=pdf_path,
+                    common_input_root=common_input_root,
+                    suffix=self.json_suffix,
+                )
+                json_path.parent.mkdir(parents=True, exist_ok=True)
                 result = self._converter_ocr.convert(str(pdf_path))
                 json_path.write_text(self._safe_doc_to_json(result.document), encoding="utf-8")
 
         return {"documents": out_docs}
+
+    def _infer_common_input_root(self, filepaths: Sequence[str]) -> Optional[Path]:
+        if self.output_root_dir is None or not filepaths:
+            return None
+
+        expanded_paths = [str(Path(filepath).expanduser().resolve()) for filepath in filepaths]
+        if len(expanded_paths) == 1:
+            return Path(expanded_paths[0]).parent
+
+        common_path = Path(os.path.commonpath(expanded_paths))
+        if common_path.is_file():
+            return common_path.parent
+        return common_path
+
+    def _resolve_output_path(
+        self,
+        source_path: Path,
+        common_input_root: Optional[Path],
+        suffix: str,
+    ) -> Path:
+        if self.output_root_dir is None:
+            return source_path.with_suffix(suffix)
+
+        resolved_source = source_path.expanduser().resolve()
+        if common_input_root is not None:
+            try:
+                relative_path = resolved_source.relative_to(common_input_root)
+            except ValueError:
+                relative_path = Path(resolved_source.name)
+        else:
+            relative_path = Path(resolved_source.name)
+
+        return (self.output_root_dir / relative_path).with_suffix(suffix)
 
     def _export_markdown_best_effort(self, filepath: str, converter: DocumentConverter) -> str:
         placeholder = "<<<DOCLING_PAGE_BREAK>>>"
