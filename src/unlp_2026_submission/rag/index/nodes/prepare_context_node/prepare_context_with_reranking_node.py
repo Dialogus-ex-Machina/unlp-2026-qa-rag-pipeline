@@ -1,5 +1,6 @@
 from typing import Callable, Optional, Dict, Any
 import gc
+import random
 import torch
 
 from langchain_qdrant import QdrantVectorStore
@@ -17,7 +18,9 @@ class PrepareContextWithRerankingNode:
     documents_collection_name: str
     questions_collection_name: str
     top_k: int
-    context_window_size: int
+    context_size_1: int
+    context_size_2: int
+    context_size_1_probability: float
     batch_size: int
     reranker_kwargs: Dict[str, Any]
 
@@ -28,7 +31,9 @@ class PrepareContextWithRerankingNode:
             documents_collection_name: str = "default",
             questions_collection_name: str = "default_questions",
             top_k: int = 10,
-            context_window_size: int = 3,
+            context_size_1: int = 3,
+            context_size_2: int = 2,
+            context_size_1_probability: float = 0.70,
             on_success: Optional[Callable[[], None]] = None,
     ):
         super().__init__()
@@ -41,7 +46,11 @@ class PrepareContextWithRerankingNode:
             collection_name=questions_collection_name
         )
         self.top_k = top_k
-        self.context_window_size = context_window_size
+
+        self.context_size_1 = context_size_1
+        self.context_size_2 = context_size_2
+        self.context_size_1_probability = context_size_1_probability
+
         self.documents_collection_name = documents_collection_name
         self.reranker_kwargs = reranker_kwargs
 
@@ -93,12 +102,18 @@ class PrepareContextWithRerankingNode:
         }
 
     def _create_relevant_context(self, relevant_documents: list[RelevantDocument]) -> str:
-        k = min(self.context_window_size, len(relevant_documents))
+        bucket = random.random()
+
+        current_context_size = (
+            self.context_size_1
+            if bucket < self.context_size_1_probability
+            else self.context_size_2
+        )
+
+        k = min(current_context_size, len(relevant_documents))
         docs = relevant_documents[:k]
-        top_k_relevant = docs
 
         separator = "\n\n"
-        relevant_context = separator.join(doc.text for doc in top_k_relevant)
+        relevant_context = separator.join(doc.text for doc in docs)
 
         return relevant_context
-
