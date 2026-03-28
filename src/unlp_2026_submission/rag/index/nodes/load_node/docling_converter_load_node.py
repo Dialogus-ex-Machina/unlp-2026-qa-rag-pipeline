@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from contextlib import contextmanager
+import gc
 import os
 from pathlib import Path
 import re
@@ -20,6 +22,10 @@ class DoclingConverterLoadNode:
         self,
         output_suffix: str = ".md",
         output_root_dir: str | None = None,
+        artifacts_path: str | None = None,
+        offline_mode: bool = False,
+        allow_doc_chunks_fallback: bool = True,
+        cleanup_cuda_on_finish: bool = True,
         zero_based_pages: bool = False,
         page_end_template: str = "\n\n<!-- page_end:{page} -->\n\n",
         join_sep: str = "\n\n",
@@ -48,6 +54,10 @@ class DoclingConverterLoadNode:
     ):
         self.output_suffix = output_suffix
         self.output_root_dir = Path(output_root_dir).expanduser() if output_root_dir else None
+        self.artifacts_path = Path(artifacts_path).expanduser() if artifacts_path else None
+        self.offline_mode = offline_mode
+        self.allow_doc_chunks_fallback = allow_doc_chunks_fallback
+        self.cleanup_cuda_on_finish = cleanup_cuda_on_finish
         self.zero_based_pages = zero_based_pages
         self.page_end_template = page_end_template
         self.join_sep = join_sep
@@ -128,60 +138,67 @@ class DoclingConverterLoadNode:
         if not filepaths:
             return {"documents": []}
 
+        self._validate_offline_configuration()
+
         common_input_root = self._infer_common_input_root(filepaths)
         out_docs: List[Document] = []
 
-        for fp in filepaths:
-            pdf_path = Path(fp)
-            md_path = self._resolve_output_path(
-                source_path=pdf_path,
-                common_input_root=common_input_root,
-                suffix=self.output_suffix,
-            )
-            md_path.parent.mkdir(parents=True, exist_ok=True)
-
-            if self.selective_ocr:
-                text_md = self._export_markdown_best_effort(fp, converter=self._converter_text)
-                text_pages = self._split_markdown_pages(text_md)
-                bad_pages = self._detect_bad_pages_from_page_map(text_pages)
-
-                if bad_pages:
-                    ocr_md = self._export_markdown_best_effort(fp, converter=self._converter_ocr)
-                    ocr_pages = self._split_markdown_pages(ocr_md)
-                    merged_pages = self._merge_page_maps(text_pages, ocr_pages, bad_pages)
-                else:
-                    merged_pages = text_pages
-
-                md = self._build_markdown_from_pages(merged_pages)
-                md_path.write_text(md, encoding="utf-8")
-
-                out_docs.append(
-                    Document(
-                        page_content=md,
-                        metadata={"source": str(pdf_path), "md_path": str(md_path)},
+        try:
+            with self._docling_runtime_env():
+                for fp in filepaths:
+                    pdf_path = Path(fp)
+                    md_path = self._resolve_output_path(
+                        source_path=pdf_path,
+                        common_input_root=common_input_root,
+                        suffix=self.output_suffix,
                     )
-                )
-            else:
-                md = self._export_markdown_best_effort(fp, converter=self._converter_ocr)
-                md_path.write_text(md, encoding="utf-8")
-                out_docs.append(
-                    Document(
-                        page_content=md,
-                        metadata={"source": str(pdf_path), "md_path": str(md_path)},
-                    )
-                )
+                    md_path.parent.mkdir(parents=True, exist_ok=True)
 
-            if self.write_docling_json:
-                json_path = self._resolve_output_path(
-                    source_path=pdf_path,
-                    common_input_root=common_input_root,
-                    suffix=self.json_suffix,
-                )
-                json_path.parent.mkdir(parents=True, exist_ok=True)
-                result = self._converter_ocr.convert(str(pdf_path))
-                json_path.write_text(self._safe_doc_to_json(result.document), encoding="utf-8")
+                    if self.selective_ocr:
+                        text_md = self._export_markdown_best_effort(fp, converter=self._converter_text)
+                        text_pages = self._split_markdown_pages(text_md)
+                        bad_pages = self._detect_bad_pages_from_page_map(text_pages)
 
-        return {"documents": out_docs}
+                        if bad_pages:
+                            ocr_md = self._export_markdown_best_effort(fp, converter=self._converter_ocr)
+                            ocr_pages = self._split_markdown_pages(ocr_md)
+                            merged_pages = self._merge_page_maps(text_pages, ocr_pages, bad_pages)
+                        else:
+                            merged_pages = text_pages
+
+                        md = self._build_markdown_from_pages(merged_pages)
+                        md_path.write_text(md, encoding="utf-8")
+
+                        out_docs.append(
+                            Document(
+                                page_content=md,
+                                metadata={"source": str(pdf_path), "md_path": str(md_path)},
+                            )
+                        )
+                    else:
+                        md = self._export_markdown_best_effort(fp, converter=self._converter_ocr)
+                        md_path.write_text(md, encoding="utf-8")
+                        out_docs.append(
+                            Document(
+                                page_content=md,
+                                metadata={"source": str(pdf_path), "md_path": str(md_path)},
+                            )
+                        )
+
+                    if self.write_docling_json:
+                        json_path = self._resolve_output_path(
+                            source_path=pdf_path,
+                            common_input_root=common_input_root,
+                            suffix=self.json_suffix,
+                        )
+                        json_path.parent.mkdir(parents=True, exist_ok=True)
+                        result = self._converter_ocr.convert(str(pdf_path))
+                        json_path.write_text(self._safe_doc_to_json(result.document), encoding="utf-8")
+
+            return {"documents": out_docs}
+        finally:
+            if self.cleanup_cuda_on_finish:
+                self._release_docling_resources()
 
     def _infer_common_input_root(self, filepaths: Sequence[str]) -> Optional[Path]:
         if self.output_root_dir is None or not filepaths:
@@ -228,7 +245,13 @@ class DoclingConverterLoadNode:
             docs = loader.load()
             raw = docs[0].page_content if docs else ""
             return self._inject_page_end_from_placeholder(raw, placeholder)
-        except Exception:
+        except Exception as exc:
+            if self.offline_mode or not self.allow_doc_chunks_fallback:
+                raise RuntimeError(
+                    "Docling markdown export failed. "
+                    "DOC_CHUNKS fallback is disabled, so no secondary tokenizer/model download "
+                    "will be attempted. Ensure all Docling artifacts are available locally."
+                ) from exc
             chunks = self._load_doc_chunks(filepath, converter=converter)
             norm = [self._normalize_chunk(d) for d in chunks]
             norm.sort(key=self._sort_key)
@@ -465,6 +488,70 @@ class DoclingConverterLoadNode:
         )
         return loader.load()
 
+    def _validate_offline_configuration(self) -> None:
+        if not self.offline_mode:
+            return
+
+        if self.artifacts_path is None:
+            raise ValueError(
+                "Docling offline_mode=True requires artifacts_path to point to prefetched Docling models."
+            )
+        if not self.artifacts_path.exists():
+            raise FileNotFoundError(
+                f"Docling artifacts_path does not exist: {self.artifacts_path}"
+            )
+
+    @contextmanager
+    def _docling_runtime_env(self):
+        env_updates: Dict[str, str] = {}
+        if self.artifacts_path is not None:
+            env_updates["DOCLING_ARTIFACTS_PATH"] = str(self.artifacts_path)
+        if self.offline_mode:
+            env_updates["HF_HUB_OFFLINE"] = "1"
+            env_updates["TRANSFORMERS_OFFLINE"] = "1"
+
+        old_values = {key: os.environ.get(key) for key in env_updates}
+        try:
+            for key, value in env_updates.items():
+                os.environ[key] = value
+            yield
+        finally:
+            for key, old_value in old_values.items():
+                if old_value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = old_value
+
+    def _release_docling_resources(self) -> None:
+        self._release_converter(self._converter_text)
+        self._release_converter(self._converter_ocr)
+
+        try:
+            import torch
+
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except Exception:
+            pass
+
+        gc.collect()
+
+    @staticmethod
+    def _release_converter(converter: DocumentConverter) -> None:
+        pipelines = getattr(converter, "initialized_pipelines", None)
+        if not isinstance(pipelines, dict):
+            return
+
+        for cache_key, pipeline in list(pipelines.items()):
+            try:
+                close = getattr(pipeline, "close", None)
+                if callable(close):
+                    close()
+            except Exception:
+                pass
+            pipelines.pop(cache_key, None)
+            del pipeline
+
     def _merge_pages(self, text_chunks: List[Document], ocr_chunks: List[Document], bad_pages: set[int]) -> List[Document]:
         out: List[Document] = []
         by_page_text: DefaultDict[int, List[Document]] = defaultdict(list)
@@ -509,8 +596,8 @@ class DoclingConverterLoadNode:
 
         return bad
 
-    @staticmethod
     def _build_converter(
+        self,
         device: str,
         threaded: bool,
         num_threads: int,
@@ -568,6 +655,8 @@ class DoclingConverterLoadNode:
 
         _setattr_if(pipeline_options, "allow_external_plugins", allow_external_plugins)
         _setattr_if(pipeline_options, "enable_remote_services", enable_remote_services)
+        if self.artifacts_path is not None:
+            _setattr_if(pipeline_options, "artifacts_path", str(self.artifacts_path))
 
         _setattr_if(pipeline_options, "force_backend_text", True)
         _setattr_if(pipeline_options, "images_scale", images_scale)
