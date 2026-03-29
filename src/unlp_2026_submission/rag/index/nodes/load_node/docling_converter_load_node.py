@@ -6,6 +6,7 @@ import gc
 import os
 from pathlib import Path
 import re
+import shutil
 from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Tuple
 
 from docling.datamodel.accelerator_options import AcceleratorOptions
@@ -139,6 +140,7 @@ class DoclingConverterLoadNode:
             return {"documents": []}
 
         self._validate_offline_configuration()
+        self._prepare_easyocr_runtime_artifacts()
 
         common_input_root = self._infer_common_input_root(filepaths)
         out_docs: List[Document] = []
@@ -501,11 +503,42 @@ class DoclingConverterLoadNode:
                 f"Docling artifacts_path does not exist: {self.artifacts_path}"
             )
 
+    def _prepare_easyocr_runtime_artifacts(self) -> None:
+        if not self.offline_mode or str(self.ocr_engine).lower() != "easyocr":
+            return
+
+        source_dir = self._easyocr_artifacts_dir()
+        if source_dir is None or not source_dir.exists():
+            return
+
+        target_dir = Path.home() / ".EasyOCR" / "model"
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for source_path in source_dir.iterdir():
+            if not source_path.is_file():
+                continue
+
+            target_path = target_dir / source_path.name
+            if target_path.exists():
+                continue
+
+            try:
+                target_path.symlink_to(source_path)
+            except Exception:
+                shutil.copy2(source_path, target_path)
+
+    def _easyocr_artifacts_dir(self) -> Optional[Path]:
+        if self.artifacts_path is None:
+            return None
+        return self.artifacts_path / "EasyOcr"
+
     @contextmanager
     def _docling_runtime_env(self):
         env_updates: Dict[str, str] = {}
         if self.artifacts_path is not None:
             env_updates["DOCLING_ARTIFACTS_PATH"] = str(self.artifacts_path)
+        if str(self.ocr_engine).lower() == "easyocr":
+            env_updates["EASYOCR_MODULE_PATH"] = str(Path.home() / ".EasyOCR")
         if self.offline_mode:
             env_updates["HF_HUB_OFFLINE"] = "1"
             env_updates["TRANSFORMERS_OFFLINE"] = "1"
@@ -676,7 +709,13 @@ class DoclingConverterLoadNode:
             if ocr_engine_l == "easyocr":
                 from docling.datamodel.pipeline_options import EasyOcrOptions
 
-                pipeline_options.ocr_options = EasyOcrOptions(lang=list(ocr_lang), force_full_page_ocr=ocr_force_full_page)
+                ocr_options = EasyOcrOptions(lang=list(ocr_lang), force_full_page_ocr=ocr_force_full_page)
+                easyocr_dir = self._easyocr_artifacts_dir()
+                if easyocr_dir is not None:
+                    _setattr_if(ocr_options, "model_storage_directory", str(easyocr_dir))
+                if self.offline_mode:
+                    _setattr_if(ocr_options, "download_enabled", False)
+                pipeline_options.ocr_options = ocr_options
             elif ocr_engine_l in ("rapidocr", "rapid"):
                 from docling.datamodel.pipeline_options import RapidOcrOptions
 
