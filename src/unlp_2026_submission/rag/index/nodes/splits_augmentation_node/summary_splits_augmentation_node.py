@@ -65,13 +65,25 @@ class SummarySplitsAugmentationNode:
             language_model: LanguageModel,
             document_splits: list[Document]
     ) -> str:
-        prompt = self.prompt.format(
-            document_splits=document_splits,
-            char_length=self.char_length,
-            window_size=self.window_size,
-        )
+        current_window_size = self.window_size
 
-        result = language_model.invoke(prompt)
-        context = getattr(result, "content", str(result))
+        while True:
+            prompt = self.prompt.format(
+                document_splits=document_splits,
+                char_length=self.char_length,
+                window_size=current_window_size,
+            )
 
-        return context
+            try:
+                # Attempt to invoke the model
+                result = language_model.invoke(prompt)
+                context = getattr(result, "content", str(result))
+                return context
+
+            except Exception as e:
+                # If we've reduced the window size to the absolute minimum and it still throws an error, raise it
+                if current_window_size <= 1:
+                    raise RuntimeError(f"Prompt exceeds context length even at window_size=1. Original error: {e}")
+
+                # Catch context length errors and reduce window size by 2 pages
+                current_window_size = max(1, current_window_size - 2)
