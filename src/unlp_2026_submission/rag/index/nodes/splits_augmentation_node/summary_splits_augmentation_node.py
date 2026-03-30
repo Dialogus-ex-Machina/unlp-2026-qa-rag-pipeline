@@ -71,12 +71,7 @@ class SummarySplitsAugmentationNode:
             window_size=self.window_size,
         )
 
-        try:
-            result = language_model.invoke(prompt)
-            context = getattr(result, "content", str(result))
+        result = language_model.invoke(prompt)
+        context = getattr(result, "content", str(result))
 
-            return context
-        except Exception as e:
-            print(f"Error in SummarySplitsAugmentationNode: {e}")
-            return ""
-
+        return context
