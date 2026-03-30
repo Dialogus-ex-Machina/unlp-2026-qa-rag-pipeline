@@ -7,6 +7,7 @@ from unlp_2026_submission.rag.qa.prompts.qa import BaseQAPrompt
 from unlp_2026_submission.rag.qa.state import QAState
 from unlp_2026_submission.models.language_models import LanguageModel
 
+
 class SimpleQuestionAnswerNode(BaseNode):
     def __init__(
             self,
@@ -19,38 +20,38 @@ class SimpleQuestionAnswerNode(BaseNode):
 
     def __call__(self, state: QAState):
         question = state['question']
-        relevant_context = state['relevant_context']
+        current_context = state['relevant_context']
 
-        prompt = self.prompt.format_messages(
-            question=question,
-            relevant_context=relevant_context
-        )
+        while True:
+            prompt = self.prompt.format_messages(
+                question=question,
+                relevant_context=current_context
+            )
 
-        try:
-            response = self.language_model.invoke(prompt)
+            try:
+                response = self.language_model.invoke(prompt)
 
-            formatted_response = self.format_single_answer_response(response)
+                formatted_response = self.format_single_answer_response(response)
 
-            # print('raw_answer:', formatted_response['raw_answer'])
-            # print('answer:', formatted_response['answer'])
+                return {
+                    **formatted_response,
+                }
+            except Exception:
+                # If we've reduced the context to nothing and it still fails,
+                # return the fallback to prevent an infinite loop.
+                if not current_context:
+                    return {
+                        'raw_answer': 'A',
+                        'answer': 'A',
+                    }
 
-            # correct_answer = question.get('correct_answer')
-            # if correct_answer is not None:
-            #     print('correct_answer:', correct_answer)
+                # Keep top 85%, chopping off the bottom 15%.
+                # min() ensures we always drop at least 1 char/item to prevent infinite loops.
+                target_length = min(len(current_context) - 1, int(len(current_context) * 0.85))
+                # Ensure target_length doesn't drop below 0
+                target_length = max(0, target_length)
 
-            return {
-                **formatted_response,
-            }
-        # except Exception as e:
-        except Exception:
-            # TODO try to cut some part of relevant context for processing
-            # print('Error in SimpleQuestionAnswerNode:', e)
-            # print('Random value assigned to answer')
-
-            return {
-                'raw_answer': 'A',
-                'answer': 'A',
-            }
+                current_context = current_context[:target_length]
 
     def format_single_answer_response(self, response: AIMessage):
         raw_answer = getattr(response, "content", str(response))
