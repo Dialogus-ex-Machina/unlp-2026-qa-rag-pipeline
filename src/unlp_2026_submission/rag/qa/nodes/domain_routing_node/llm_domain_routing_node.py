@@ -48,19 +48,19 @@ class LLMDomainRoutingNode(BaseNode):
 
     def _normalize_domain(self, text: str) -> QuestionDomain:
         if not text:
-            return "other"
+            return "sport"
 
         t = text.strip().lower()
 
-        pattern_token = re.compile(r"\b(medicine|sport|other)\b", re.IGNORECASE)
+        pattern_token = re.compile(r"\b(medicine|sport)\b", re.IGNORECASE)
         matches = list(pattern_token.finditer(t))
         if matches:
             return matches[-1].group(1).lower()
 
-        pattern_punct = re.compile(r"(medicine|sport|other)(?=\s*[\)\]\}\.,:;\-—!?\"']|\s*$)", re.IGNORECASE)
+        pattern_punct = re.compile(r"(medicine|sport)(?=\s*[\)\]\}\.,:;\-—!?\"']|\s*$)", re.IGNORECASE)
         matches = list(pattern_punct.finditer(t))
         if matches:
             return matches[-1].group(1).lower()
 
         last_token = re.split(r"\s+", t)[-1].strip("()[]{}.,:;—-!?\"'")
-        return last_token if last_token in {"medicine", "sport", "other"} else "other"
+        return last_token if last_token in {"medicine", "sport"} else "medicine"

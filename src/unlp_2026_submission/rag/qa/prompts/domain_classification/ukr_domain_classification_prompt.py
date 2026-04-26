@@ -1,7 +1,7 @@
 from .domain_classification_prompt import DomainClassificationPrompt
 
 SYSTEM_PROMPT = """
-Класифікуй наведене запитання з варіантами відповідей в одну з категорій: medicine, sport або other.
+Класифікуй наведене запитання з варіантами відповідей в одну з категорій: medicine або sport.
 """.strip()
 
 USER_PROMPT = """

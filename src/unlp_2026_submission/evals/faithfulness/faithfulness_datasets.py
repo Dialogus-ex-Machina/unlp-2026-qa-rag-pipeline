@@ -111,21 +111,3 @@ def get_faithfulness_medicine_dataset(
     )
 
     return dataset
-
-def get_faithfulness_other_dataset(
-        data_root_dir: str
-):
-    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions_with_context.csv"))
-
-    sports_domain_df = df[df["Domain"].str.strip() == "other"]
-
-    formatted_df = _format_dataframe(sports_domain_df)
-
-    dataset = Dataset.from_pandas(
-        dataframe=formatted_df,
-        name="other_qa_with_context",
-        backend="local/csv",
-        root_dir=''
-    )
-
-    return dataset

@@ -29,8 +29,6 @@ class FaithfulnessDatasetFactory:
                     return get_faithfulness_sports_dataset(data_root_dir)
                 case FaithfulnessDatasetName.MEDICINE:
                     return get_faithfulness_medicine_dataset(data_root_dir)
-                case FaithfulnessDatasetName.OTHER:
-                    return get_faithfulness_other_dataset(data_root_dir)
                 case _:
                     raise ValueError("Metric not found.")
 

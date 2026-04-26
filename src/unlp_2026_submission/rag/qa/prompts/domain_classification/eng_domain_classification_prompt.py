@@ -1,7 +1,7 @@
 from .domain_classification_prompt import DomainClassificationPrompt
 
 SYSTEM_PROMPT = """
-Classify the following question with answers into one of the predefined categories: medicine, sport or other.
+Classify the following question with answers into one of the predefined categories: medicine or sport.
 """.strip()
 
 USER_PROMPT = """

@@ -7,7 +7,7 @@ class MockDomainRoutingNode(BaseNode):
 
     def __init__(
             self,
-            domain: QuestionDomain = 'other',
+            domain: QuestionDomain = 'sport',
     ):
         super().__init__()
         self.domain = domain
