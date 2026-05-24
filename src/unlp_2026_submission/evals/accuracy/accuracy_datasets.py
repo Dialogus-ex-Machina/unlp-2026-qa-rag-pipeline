@@ -84,3 +84,21 @@ def get_accuracy_sports_dataset(
     )
 
     return dataset
+
+def get_accuracy_medicine_dataset(
+        data_root_dir: str
+):
+    df = pd.read_csv(os.path.join(data_root_dir, "dev_questions.csv"))
+
+    sports_domain_df = df[df["Domain"].str.strip() == "medicine"]
+
+    formatted_df = _format_dataframe(sports_domain_df)
+
+    dataset = Dataset.from_pandas(
+        dataframe=formatted_df,
+        name="accuracy_medicine_dataset",
+        backend="local/csv",
+        root_dir=''
+    )
+
+    return dataset

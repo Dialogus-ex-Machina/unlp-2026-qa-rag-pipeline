@@ -4,7 +4,6 @@ from .faithfulness_datasets import (
     get_faithfulness_full_dataset,
     get_faithfulness_sports_dataset,
     get_faithfulness_medicine_dataset,
-    get_faithfulness_other_dataset
 )
 from .faithfulness_dataset_name import FaithfulnessDatasetName
 
